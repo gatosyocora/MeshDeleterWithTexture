@@ -1,0 +1,15 @@
+﻿#pragma kernel CSMain
+
+int Width;
+int Height;
+
+RWStructuredBuffer<int> Data;
+AppendStructured<uint2> DeletePos;
+
+[numthreads(32,32,1)]
+void CSMain (uint2 id : SV_DispatchThreadID)
+{
+	if(Data[id.y * Width + id.x] == 1) {
+		DeletePos.Append(id);
+	}
+}

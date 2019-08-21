@@ -1,0 +1,68 @@
+﻿#pragma kernel CSMain
+
+RWTexture2D<float4> FillTex;
+Texture2D<float4> Tex;
+RWStructuredBuffer<int> Result;
+
+int Width;
+int Height;
+float TargetCol[3];
+int Pos[2];
+float Pos1[2];
+float Pos2[2];
+
+float HsvThreshold[3];
+
+int PenSize;
+
+int DrawType;
+
+#include "color.cginc"
+
+[numthreads(32,32,1)]
+void CSMain (uint2 id : SV_DispatchThreadID)
+{
+	bool result;
+	
+	int index = id.y * Width + id.x;
+
+	// pen
+	if (DrawType == 2) {
+		int2 currentPos = int2(Pos[0], Pos[1]);
+		result = (distance(currentPos, id) <= PenSize);
+		
+		if (!result) return;
+
+		FillTex[id.xy] = float4(1, 1, 1, 1);
+		Result[index] = true;
+	}
+	// eraser
+	else if (DrawType == 3) {
+		int2 currentPos = int2(Pos[0], Pos[1]);
+		result = (distance(currentPos, id) <= PenSize);
+		
+		if (!result) return;
+
+		FillTex[id.xy] = float4(0, 0, 0, 1);
+		Result[index] = false;
+	}
+	// fill
+	else {
+		// scope outside ?
+		if(	min(Pos1[0], Pos2[0]) > id.x || max(Pos1[0], Pos2[0]) < id.x ||
+			min(Pos1[1], Pos2[1]) > id.y || max(Pos1[1], Pos2[1]) < id.y ) return;
+
+		// same color ?
+		float4 col = Tex[id.xy];
+		float3 hsv = rgb2hsv(col.rgb);
+		float3 targetHsv = rgb2hsv(float3(TargetCol[0], TargetCol[1], TargetCol[2]));
+		result = (	abs(hsv.x - targetHsv.x) < HsvThreshold[0] &&
+					abs(hsv.y - targetHsv.y) < HsvThreshold[1] &&
+					abs(hsv.z - targetHsv.z) < HsvThreshold[2]);
+		
+		FillTex[id.xy] = (result)? float4(1, 1, 1, 1): float4(0, 0, 0, 1);
+		Result[index] = result;
+	}
+
+}
+        

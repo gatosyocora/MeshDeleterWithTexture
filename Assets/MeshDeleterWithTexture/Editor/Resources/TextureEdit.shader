@@ -8,6 +8,13 @@
 		_Threshold ("Threshold", Float) = 1
 		_TextureScale ("TextureScale", Float) = 1
 		_Offset ("Offset", Vector) = (0, 0, 0, 0)
+
+		_SecondTex ("Second Texture", 2D) = "black" {}
+		_CurrentPos ("Mouse Current Pos", Vector) = (0, 0, 0, 0)
+		_StartPos ("Drag Start Pos", Vector) = (0, 0, 0, 0)
+		_EndPos ("Drag End Pos", Vector) = (0, 0, 0, 0)
+		_LineWidth ("Line Width", Float) = 0.002
+		_PenSize("Pen Size", Float) = 0.01
 	}
 	SubShader
 	{
@@ -45,6 +52,16 @@
 			float _Threshold;
 			float _TextureScale;
 			float4 _Offset;
+
+			sampler2D _SecondTex;
+
+			float4 _StartPos;
+			float4 _EndPos;
+			float4 _CurrentPos;
+
+			float _LineWidth;
+
+			float _PenSize;
 			
 			v2f vert (appdata v)
 			{
@@ -60,11 +77,17 @@
 				float2 uv = (float2(0.5, 0.5) * (1-_TextureScale) + _Offset.xy * 0.5) + i.uv * _TextureScale;
 				fixed4 col = tex2D(_MainTex, uv);
 
-				if (_EditType == 3) {
-					if (abs(dot(col.rgb, _Color.rgb)) < _Threshold) {
-						col.rgb = fixed3(0, 0, 0);
-					}
-				}
+				col.rgb *= (1-tex2D(_SecondTex, i.uv).rgb);
+
+				
+				if ((abs(i.uv.x - _StartPos.x) <= _LineWidth || abs(i.uv.x - _EndPos.x) <= _LineWidth) && i.uv.y >= min(_StartPos.y, _EndPos.y)-_LineWidth && i.uv.y <= max(_StartPos.y, _EndPos.y)+_LineWidth ||
+					(abs(i.uv.y - _StartPos.y) <= _LineWidth || abs(i.uv.y - _EndPos.y) <= _LineWidth) && i.uv.x >= min(_StartPos.x, _EndPos.x)-_LineWidth && i.uv.x <= max(_StartPos.x, _EndPos.x)+_LineWidth
+				)
+					col = fixed4(1, 0.7, 0, 1);
+
+				float raito = _MainTex_TexelSize.x / _MainTex_TexelSize.y;
+				if (distance (i.uv * float2(1, raito), _CurrentPos.xy * float2(1, raito)) <= _PenSize)
+					col = fixed4(1, 1, 0, 1);
 
 				return pow(col, 1/2.2);
 			}
