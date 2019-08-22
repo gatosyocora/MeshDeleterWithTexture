@@ -7,11 +7,9 @@ using UnityEditor;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Diagnostics;
 //using System.Drawing;
 //using System.Runtime.InteropServices;
 using System;
-using System.Runtime.InteropServices;
 
 /*
  * Copyright (c) 2019 gatosyocora
@@ -41,13 +39,16 @@ namespace Gatosyocora.MeshDeleterWithTexture
         private float zoomScale = 1;
         private Vector4 textureOffset = Vector4.zero;
 
+        private bool isAreaSizeChanging = false;
+        private int changingLine = 0;
+
         private static Material editMat;
 
         #region compute shader variable
 
         private ComputeShader computeShader;
         private ComputeBuffer buffer;
-        private int kernelId;
+        private int penKernelId, eraserKernelId, fillKernelId;
         private RenderTexture rwTexture;
 
         #endregion
@@ -66,8 +67,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
         private HSV hsvThreshold = new HSV(0.1f, 0.1f, 0.1f);
 
         private Color targetColor = Color.white;
-        private Vector2 dragStartPos = Vector2.zero;
-        private Vector2 dragCurrentPos = Vector2.zero;
+        private Vector2 dragPos1 = Vector2.zero;
+        private Vector2 dragPos2 = Vector2.zero;
 
         private enum DRAW_TYPES
         {
@@ -141,11 +142,13 @@ namespace Gatosyocora.MeshDeleterWithTexture
                             {
                                 textureIndex = 0;
                                 originTexture = textures[textureIndex];
-                                InitComputeBuffer(originTexture);
                                 if (originTexture != null)
                                 {
                                     texture = LoadSettingToTexture(originTexture);
                                     renderer.sharedMaterials[textureIndex].mainTexture = texture;
+
+                                    ResetDrawArea(ref texture, ref rwTexture, ref editMat);
+                                    SetupComputeShader(ref originTexture, ref rwTexture);
                                 }
 
                                 textureOffset = Vector4.zero;
@@ -155,8 +158,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
                             }
                         }
 
-                        ResetDrawArea(ref texture, ref rwTexture, ref editMat);
-                        SetupComputeShader(ref texture, ref rwTexture);
                     }
                     else
                     {
@@ -406,27 +407,86 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 }
                 else if (drawType == DRAW_TYPES.SELECT_AREA)
                 {
-                    if (isMouseDowning)
-                    {
-                        dragCurrentPos = ConvertWindowPosToTexturePos(texture, Event.current.mousePosition, rect);
-                        var uvPos = ConvertTexturePosToUVPos(texture, dragCurrentPos);
-                        editMat.SetVector("_EndPos", new Vector4(uvPos.x, uvPos.y, 0, 0));
-
-                        FillOnTexture(ref texture, targetColor, dragStartPos, dragCurrentPos, hsvThreshold);
-                    }
 
                     if (Event.current.type == EventType.MouseDown)
                     {
-                        dragStartPos = ConvertWindowPosToTexturePos(texture, Event.current.mousePosition, rect);
-                        var uvPos = ConvertTexturePosToUVPos(texture, dragStartPos);
-                        var uvPosVector4 = new Vector4(uvPos.x, uvPos.y, 0, 0);
                         isMouseDowning = true;
-                        editMat.SetVector("_StartPos", uvPosVector4);
-                        editMat.SetVector("_EndPos", uvPosVector4);
+
+                        if (Mathf.Abs(pos.x - dragPos1.x) < 10 && Mathf.Max(dragPos1.y, dragPos2.y) >= pos.y && Mathf.Min(dragPos1.y, dragPos2.y) <= pos.y)
+                        {
+                            changingLine = 1;
+                            isAreaSizeChanging = true;
+                        }
+                        else if (Mathf.Abs(pos.x - dragPos2.x) < 10 && Mathf.Max(dragPos1.y, dragPos2.y) >= pos.y && Mathf.Min(dragPos1.y, dragPos2.y) <= pos.y)
+                        {
+                            changingLine = 2;
+                            isAreaSizeChanging = true;
+                        }
+                        else if (Mathf.Abs(pos.y - dragPos1.y) < 10 && Mathf.Max(dragPos1.x, dragPos2.x) >= pos.x && Mathf.Min(dragPos1.x, dragPos2.x) <= pos.x)
+                        {
+                            changingLine = 3;
+                            isAreaSizeChanging = true;
+                        }
+                        else if (Mathf.Abs(pos.y - dragPos2.y) < 10 && Mathf.Max(dragPos1.x, dragPos2.x) >= pos.x && Mathf.Min(dragPos1.x, dragPos2.x) <= pos.x)
+                        {
+                            changingLine = 4;
+                            isAreaSizeChanging = true;
+                        }
+                        else
+                        {
+                            dragPos1 = pos;
+                            var uvPos = ConvertTexturePosToUVPos(texture, dragPos1);
+                            var uvPosVector4 = new Vector4(uvPos.x, uvPos.y, 0, 0);
+
+                            editMat.SetVector("_StartPos", uvPosVector4);
+                            editMat.SetVector("_EndPos", uvPosVector4);
+                        }
+
                     }
                     else if (Event.current.type == EventType.MouseUp)
                     {
                         isMouseDowning = false;
+                        isAreaSizeChanging = false;
+                        changingLine = 0;
+                    }
+
+
+                    if (isMouseDowning)
+                    {
+                        if (isAreaSizeChanging)
+                        {
+                            if (changingLine == 1)
+                            {
+                                dragPos1.x =pos.x;
+                                var uvPos = ConvertTexturePosToUVPos(texture, dragPos1);
+                                editMat.SetVector("_StartPos", new Vector4(uvPos.x, uvPos.y, 0, 0));
+                            }
+                            else if (changingLine == 2)
+                            {
+                                dragPos2.x = pos.x;
+                                var uvPos = ConvertTexturePosToUVPos(texture, dragPos2);
+                                editMat.SetVector("_EndPos", new Vector4(uvPos.x, uvPos.y, 0, 0));
+                            }
+                            else if (changingLine == 3)
+                            {
+                                dragPos1.y = pos.y;
+                                var uvPos = ConvertTexturePosToUVPos(texture, dragPos1);
+                                editMat.SetVector("_StartPos", new Vector4(uvPos.x, uvPos.y, 0, 0));
+                            }
+                            else if (changingLine == 4)
+                            {
+                                dragPos2.y = pos.y;
+                                var uvPos = ConvertTexturePosToUVPos(texture, dragPos2);
+                                editMat.SetVector("_EndPos", new Vector4(uvPos.x, uvPos.y, 0, 0));
+                            }
+                        }
+                        else
+                        {
+                            dragPos2 = pos;
+                            var uvPos = ConvertTexturePosToUVPos(texture, dragPos2);
+                            editMat.SetVector("_EndPos", new Vector4(uvPos.x, uvPos.y, 0, 0));
+                        }
+                        Repaint();
                     }
                 }
 
@@ -447,7 +507,10 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                     if (isDrawing)
                     {
-                        DrawOnTexture(pos);
+                        if (drawType == DRAW_TYPES.PEN)
+                            DrawOnTexture(pos);
+                        else
+                            ClearOnTexture(pos);
                     }
                 }
             }
@@ -499,13 +562,13 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                 if (check.changed)
                 {
-                    FillOnTexture(ref texture, targetColor, dragStartPos, dragCurrentPos, hsvThreshold);
+                    FillOnTexture(ref texture, targetColor, dragPos1, dragPos2, hsvThreshold);
                 }
             }
 
             if (GUILayout.Button("Fill"))
             {
-                FillOnTexture(ref texture, targetColor, dragStartPos, dragCurrentPos, hsvThreshold);
+                FillOnTexture(ref texture, targetColor, dragPos1, dragPos2, hsvThreshold);
             }
         }
 
@@ -753,7 +816,22 @@ namespace Gatosyocora.MeshDeleterWithTexture
             posArray[1 * sizeof(int)] = (int)pos.y;
             computeShader.SetInts("Pos", posArray);
 
-            computeShader.Dispatch(kernelId, texture.width / 32, texture.height / 32, 1);
+            computeShader.Dispatch(penKernelId, texture.width / 32, texture.height / 32, 1);
+            Repaint();
+        }
+
+        /// <summary>
+        /// 消しゴム
+        /// </summary>
+        /// <param name="pos"></param>
+        private void ClearOnTexture(Vector2 pos)
+        {
+            var posArray = new int[2 * sizeof(int)];
+            posArray[0 * sizeof(int)] = (int)pos.x;
+            posArray[1 * sizeof(int)] = (int)pos.y;
+            computeShader.SetInts("Pos", posArray);
+
+            computeShader.Dispatch(eraserKernelId, texture.width / 32, texture.height / 32, 1);
             Repaint();
         }
 
@@ -795,7 +873,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             computeShader.SetFloats("Pos1", pos1Array);
             computeShader.SetFloats("Pos2", pos2Array);
 
-            computeShader.Dispatch(kernelId, texture.width / 32, texture.height / 32, 1);
+            computeShader.Dispatch(fillKernelId, texture.width / 32, texture.height / 32, 1);
 
             Repaint();
         }
@@ -991,34 +1069,41 @@ namespace Gatosyocora.MeshDeleterWithTexture
         private void InitComputeShader()
         {
             computeShader = Instantiate(Resources.Load<ComputeShader>("colorchecker2")) as ComputeShader;
-            kernelId = computeShader.FindKernel("CSMain");
+            penKernelId = computeShader.FindKernel("CSPen");
+            eraserKernelId = computeShader.FindKernel("CSEraser");
+            fillKernelId = computeShader.FindKernel("CSFill");
         }
 
         private void InitComputeBuffer(Texture2D texture)
         {
             if (buffer != null) buffer.Release();
             buffer = new ComputeBuffer(texture.width * texture.height, sizeof(int));
-            computeShader.SetBuffer(kernelId, "Result", buffer);
+            computeShader.SetBuffer(penKernelId, "Result", buffer);
+            computeShader.SetBuffer(eraserKernelId, "Result", buffer);
+            computeShader.SetBuffer(fillKernelId, "Result", buffer);
         }
 
         private void SetupComputeShader(ref Texture2D texture, ref RenderTexture rwTexture)
         {
             InitComputeBuffer(texture);
 
-            computeShader.SetTexture(kernelId, "Tex", texture);
+            computeShader.SetTexture(penKernelId, "Tex", texture);
+            computeShader.SetTexture(eraserKernelId, "Tex", texture);
+            computeShader.SetTexture(fillKernelId, "Tex", texture);
             computeShader.SetInt("Width", texture.width);
             computeShader.SetInt("Height", texture.height);
 
-            computeShader.SetTexture(kernelId, "FillTex", rwTexture);
+            computeShader.SetTexture(penKernelId, "FillTex", rwTexture);
+            computeShader.SetTexture(eraserKernelId, "FillTex", rwTexture);
+            computeShader.SetTexture(fillKernelId, "FillTex", rwTexture);
         }
-
         private void ResetDrawArea(ref Texture2D texture, ref RenderTexture rwTexture, ref Material mat)
         {
             if (rwTexture != null) rwTexture.Release();
             rwTexture = new RenderTexture(texture.width, texture.height, 0, RenderTextureFormat.ARGBFloat);
             rwTexture.enableRandomWrite = true;
             rwTexture.Create();
-
+            
             mat.SetTexture("_SecondTex", rwTexture);
 
             mat.SetVector("_StartPos", new Vector4(0, 0, 0, 0));
