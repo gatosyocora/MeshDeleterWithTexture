@@ -86,6 +86,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
         private string saveFolder = "Assets/";
         private string meshName;
 
+        struct UVItem {
+            public Vector2 uv;
+            public int index;
+        };
+
         [MenuItem("GatoTool/MeshDeleter with Texture")]
         private static void Open()
         {
@@ -626,7 +631,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             var deletePos = new int[texture.width * texture.height];
             computeBuffer.GetData(deletePos);
-
+/*
 #region 削除するUV座標の配列を取得
 
             // GPU
@@ -676,9 +681,16 @@ namespace Gatosyocora.MeshDeleterWithTexture
             UnityEngine.Debug.LogFormat("cpu time (ms) = {0}, gpu time = {1}, size = {2}:{3}",cpuSpeed, gpuSpeed, deletePosCPU.Count() ,size);
 
 #endregion
+*/
 
             var count = 0;
 
+
+            Stopwatch sw = new Stopwatch();
+            sw.Reset();
+            sw.Start();
+
+            /*
             foreach (var uv in alluvs)
             {
                 x = (int)(Mathf.Abs(uv.x % 1.0f) * texture.width);
@@ -705,6 +717,74 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     "Searching deleteVertices: " + count++ + "/" + alluvs.Count(),
                     count/(float)alluvs.Count());
             }
+        */
+
+            for (int i = 0; i < uvs.Count(); i++)
+            {
+                x = (int)(Mathf.Abs(uvs[i].x % 1.0f) * texture.width);
+                y = (int)(Mathf.Abs(uvs[i].y % 1.0f) * texture.height);
+
+                if (x == texture.width || y == texture.height) continue;
+
+                int index = y * texture.width + x;
+
+                if (deletePos[index] == 1)
+                {
+                    deleteIndexList.Add(i);
+                }
+
+                /*EditorUtility.DisplayProgressBar("Delete Mesh",
+                    "Searching deleteVertices: " + count++ + "/" + alluvs.Count(),
+                    count/(float)alluvs.Count());
+                    */
+            }
+
+
+            sw.Stop();
+            var cpuSpeed = sw.ElapsedMilliseconds;
+
+            sw.Reset();
+            sw.Start();
+
+            var uvItems = uvs.Select((v, i) => new UVItem {uv = v, index = i}).ToArray();
+
+            var cs = Instantiate(Resources.Load("getDeleteUVIndexs")) as ComputeShader;
+            var kernel = cs.FindKernel("CSMain");
+
+            var uvBuffer = new ComputeBuffer(uvs.Count(), Marshal.SizeOf(typeof(UVItem)));
+            uvBuffer.SetData(uvItems);
+
+            var deleteVertexIndexBuffer = new ComputeBuffer(uvs.Count(), Marshal.SizeOf(typeof(Vector2)), ComputeBufferType.Append);
+            deleteVertexIndexBuffer.SetCounterValue(0);
+
+            var countBuffer = new ComputeBuffer(4, Marshal.SizeOf(typeof(int)), ComputeBufferType.IndirectArguments);
+            var itemCount = new int[] { 0, 1, 0, 0 };
+            countBuffer.SetData(itemCount);
+
+            cs.SetBuffer(kernel, "isDelete", computeBuffer);
+            cs.SetBuffer(kernel, "UV", uvBuffer);
+            cs.SetInt("Width", texture.width);
+            cs.SetInt("Height", texture.height);
+            cs.SetBuffer(kernel, "DeleteVertexIndex", deleteVertexIndexBuffer);
+            cs.Dispatch(kernel, uvs.Count() / 32, 1, 1);
+
+            ComputeBuffer.CopyCount(deleteVertexIndexBuffer, countBuffer, 0);
+            countBuffer.GetData(itemCount);
+            var size = itemCount[0];
+            var deleteVertexIndexs = new int[size];
+            deleteVertexIndexBuffer.GetData(deleteVertexIndexs);
+
+            uvBuffer.Release();
+            deleteVertexIndexBuffer.Release();
+            countBuffer.Release();
+
+            sw.Stop();
+            var gpuSpeed = sw.ElapsedMilliseconds;
+
+            deleteIndexList = deleteVertexIndexs.ToList();
+
+
+            UnityEngine.Debug.LogFormat("cpu:{0}, gpu:{1}", cpuSpeed, gpuSpeed);
 
             // TODO: 共有されている頂点は存在しない？
             // 他のサブメッシュで共有されている頂点は削除してはいけない
