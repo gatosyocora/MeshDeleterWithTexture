@@ -10,6 +10,8 @@ using System.Text.RegularExpressions;
 //using System.Drawing;
 //using System.Runtime.InteropServices;
 using System;
+using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 /*
  * Copyright (c) 2019 gatosyocora
@@ -625,6 +627,56 @@ namespace Gatosyocora.MeshDeleterWithTexture
             var deletePos = new int[texture.width * texture.height];
             computeBuffer.GetData(deletePos);
 
+#region 削除するUV座標の配列を取得
+
+            // GPU
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+            var cs = Instantiate(Resources.Load("deleteUVPickup")) as ComputeShader;
+            var kernel = cs.FindKernel("CSMain");
+
+            var cb = new ComputeBuffer(texture.width * texture.height, Marshal.SizeOf(typeof(Vector2)), ComputeBufferType.Append);
+            cb.SetCounterValue(0);
+
+            var countBuffer = new ComputeBuffer(4, Marshal.SizeOf(typeof(int)), ComputeBufferType.IndirectArguments);
+            var itemCount = new int[] { 0, 1, 0, 0 };
+            countBuffer.SetData(itemCount);
+
+            cs.SetBuffer(kernel, "Data", computeBuffer);
+            cs.SetInt("Width", texture.width);
+            cs.SetBuffer(kernel, "DeletePos", cb);
+            cs.Dispatch(kernel, texture.width/32, texture.height/32, 1);
+
+            ComputeBuffer.CopyCount(cb, countBuffer, 0);
+            countBuffer.GetData(itemCount);
+            var size = itemCount[0];
+            var deletePositions = new Vector2[size];
+            cb.GetData(deletePositions);
+
+            cb.Release();
+            countBuffer.Release();
+
+            sw.Stop();
+            var gpuSpeed = sw.ElapsedMilliseconds;
+
+            // CPU
+            sw.Reset();
+            sw.Start();
+
+            var deletePosCPU = deletePos
+                                .Select((value, index) => new { Value = value, Index = index })
+                                .Where(v => v.Value == 1)
+                                .Select(v => new Vector2(v.Index / texture.width, v.Index % texture.width))
+                                .ToArray();
+
+            sw.Stop();
+            var cpuSpeed = sw.ElapsedMilliseconds;
+
+            UnityEngine.Debug.LogFormat("cpu time (ms) = {0}, gpu time = {1}, size = {2}:{3}",cpuSpeed, gpuSpeed, deletePosCPU.Count() ,size);
+
+#endregion
+
             var count = 0;
 
             foreach (var uv in alluvs)
@@ -671,41 +723,37 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     .OrderByDescending(value => value)
                     .ToArray();
 
+            // 削除する頂点のインデックスのリスト (重複なし, 昇順)
+            var deleteIndexsOrdered
+                = deleteIndexList
+                    .Distinct()
+                    .Where(i => !nonDeleteSubMeshIndexs.Contains(i))
+                    .OrderBy(value => value)
+                    .ToList();
+
             // 頂点を削除
             var vertices = mesh.vertices.ToList();
             var boneWeights = mesh.boneWeights.ToList();
             var normals = mesh.normals.ToList();
             var tangents = mesh.tangents.ToList();
 
-            count = 0;
-            foreach (var deleteVertexIndex in deleteIndexListUniqueDescending)
-            {
-                vertices.RemoveAt(deleteVertexIndex);
-                boneWeights.RemoveAt(deleteVertexIndex);
-                normals.RemoveAt(deleteVertexIndex);
-                tangents.RemoveAt(deleteVertexIndex);
-                if (deleteVertexIndex < uvs.Count())
-                    uvs.RemoveAt(deleteVertexIndex);
-                if (deleteVertexIndex < uv2s.Count())
-                    uv2s.RemoveAt(deleteVertexIndex);
-                if (deleteVertexIndex < uv3s.Count())
-                    uv3s.RemoveAt(deleteVertexIndex);
-                if (deleteVertexIndex < uv4s.Count())
-                    uv4s.RemoveAt(deleteVertexIndex);
+            var nonDeleteVertices = vertices.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
+            var nonDeleteWeights = boneWeights.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
+            var nonDeleteNormals = normals.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
+            var nonDeleteTangents = tangents.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
+            var nonDeleteUVs = uvs.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
+            var nonDeleteUV2s = uv2s.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
+            var nonDeleteUV3s = uv3s.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
+            var nonDeleteUV4s = uv4s.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
 
-                EditorUtility.DisplayProgressBar("Delete Mesh",
-                    "Deleting Vertices: " + count++ + "/" + deleteIndexListUniqueDescending.Count(),
-                    count / (float)deleteIndexListUniqueDescending.Count());
-            }
-            mesh_custom.SetVertices(vertices);
-            mesh_custom.boneWeights = boneWeights.ToArray();
-            mesh_custom.normals = normals.ToArray();
-            mesh_custom.tangents = tangents.ToArray();
-            mesh_custom.SetUVs(0, uvs);
-            mesh_custom.SetUVs(1, uv2s);
-            mesh_custom.SetUVs(2, uv3s);
-            mesh_custom.SetUVs(3, uv4s);
-
+            mesh_custom.SetVertices(nonDeleteVertices);
+            mesh_custom.boneWeights = nonDeleteWeights;
+            mesh_custom.normals = nonDeleteNormals;
+            mesh_custom.tangents = nonDeleteTangents;
+            mesh_custom.SetUVs(0, nonDeleteUVs);
+            mesh_custom.SetUVs(1, nonDeleteUV2s);
+            mesh_custom.SetUVs(2, nonDeleteUV3s);
+            mesh_custom.SetUVs(3, nonDeleteUV4s);
 
             count = 0;
 
@@ -766,31 +814,26 @@ namespace Gatosyocora.MeshDeleterWithTexture
             var deltaVertices = new Vector3[mesh.vertexCount];
             var deltaNormals = new Vector3[mesh.vertexCount];
             var deltaTangents = new Vector3[mesh.vertexCount];
-            List<Vector3> deltaVerticesList, deltaNormalsList, deltaTangentsList;
             for (int blendshapeIndex = 0; blendshapeIndex < mesh.blendShapeCount; blendshapeIndex++)
             {
                 blendShapeName = mesh.GetBlendShapeName(blendshapeIndex);
                 frameWeight = mesh.GetBlendShapeFrameWeight(blendshapeIndex, 0);
                 
                 mesh.GetBlendShapeFrameVertices(blendshapeIndex, 0, deltaVertices, deltaNormals, deltaTangents);
-                deltaVerticesList = deltaVertices.ToList();
-                deltaNormalsList = deltaNormals.ToList();
-                deltaTangentsList = deltaTangents.ToList();
-                foreach (var deleteVertexIndex in deleteIndexListUniqueDescending)
-                {
-                    deltaVerticesList.RemoveAt(deleteVertexIndex);
-                    deltaNormalsList.RemoveAt(deleteVertexIndex);
-                    deltaTangentsList.RemoveAt(deleteVertexIndex);
 
-                    EditorUtility.DisplayProgressBar("Delete Mesh",
-                        "Setting BlendShapes : " + count++ + "/" + mesh.blendShapeCount * deleteIndexListUniqueDescending.Count(),
-                        count / (float)(mesh.blendShapeCount * deleteIndexListUniqueDescending.Count())
-                    );
-                }
+                var deltaNonDeleteVerteicesList = deltaVertices.Where((value, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
+                var deltaNonDeleteNormalsList = deltaNormals.Where((value, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
+                var deltaNonDeleteTangentsList = deltaTangents.Where((value, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
+
+                EditorUtility.DisplayProgressBar("Delete Mesh",
+                        "Setting BlendShapes : " + count++ + "/" + mesh.blendShapeCount,
+                        count / (float)mesh.blendShapeCount
+                );
+
                 mesh_custom.AddBlendShapeFrame(blendShapeName, frameWeight,
-                    deltaVerticesList.ToArray(),
-                    deltaNormalsList.ToArray(),
-                    deltaTangentsList.ToArray());
+                    deltaNonDeleteVerteicesList,
+                    deltaNonDeleteNormalsList,
+                    deltaNonDeleteTangentsList);
             }
 
             if (meshName == "") meshName = mesh.name+"_deleteMesh";
