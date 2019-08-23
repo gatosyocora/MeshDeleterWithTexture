@@ -109,9 +109,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
             saveFolder = "Assets/";
 
             InitComputeShader();
-
-            editMat.SetFloat("_EditType", (int)drawType);
-            computeShader.SetInt("DrawType", (int)drawType);
         }
 
         private void OnDisable()
@@ -152,10 +149,13 @@ namespace Gatosyocora.MeshDeleterWithTexture
                                 if (originTexture != null)
                                 {
                                     texture = LoadSettingToTexture(originTexture);
-                                    renderer.sharedMaterials[textureIndex].mainTexture = texture;
 
+                                    DrawTypeSetting();
                                     ResetDrawArea(ref texture, ref rwTexture, ref editMat);
-                                    SetupComputeShader(ref originTexture, ref rwTexture);
+                                    SetupComputeShader(ref texture, ref rwTexture);
+                                    InitComputeBuffer(texture);
+
+                                    renderer.sharedMaterials[textureIndex].mainTexture = texture;
                                 }
 
                                 textureOffset = Vector4.zero;
@@ -213,106 +213,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         }
                     }
                 }
-                    
 
-                using (new EditorGUILayout.VerticalScope())
-                {
-                    using (new EditorGUI.DisabledGroupScope(texture == null))
-                    using (new EditorGUILayout.HorizontalScope())
-                    {
-                        if (GUILayout.Button("Import DeleteMask"))
-                        {
-                            ImportDeleteMaskTexture(ref texture, ref buffer);
-                        }
-                        if (GUILayout.Button("Export DeleteMask"))
-                        {
-                            ExportDeleteMaskTexture(buffer, originTexture);
-                            renderer.sharedMaterials[textureIndex].mainTexture = texture;
-                        }
-                    }
-
-                    GUILayout.Space(10);
-
-                    using (var check = new EditorGUI.ChangeCheckScope())
-                    {
-                        if (textures != null)
-                            textureIndex = EditorGUILayout.Popup("Texture", textureIndex, textures.Select(x => x.name).ToArray());
-
-                        if (check.changed)
-                        {
-                            if (textures != null)
-                            {
-                                ResetMaterialTextures(ref renderer, ref textures);
-
-                                originTexture = textures[textureIndex];
-                                if (originTexture != null)
-                                {
-                                    InitComputeBuffer(originTexture);
-                                    texture = LoadSettingToTexture(originTexture);
-                                    renderer.sharedMaterials[textureIndex].mainTexture = texture;
-                                }
-                            }
-                        }
-                    }
-
-                    GUILayout.Space(20);
-
-                    EditorGUILayout.LabelField("DrawType");
-                    using (new EditorGUI.DisabledGroupScope(texture == null))
-                    using (new EditorGUILayout.HorizontalScope())
-                    {
-                        using (var check = new EditorGUI.ChangeCheckScope())
-                        {
-                            drawType = (DRAW_TYPES)GUILayout.Toolbar((int)drawType, Enum.GetNames(typeof(DRAW_TYPES)));
-
-                            if (check.changed)
-                            {
-                                editMat.SetFloat("_EditType", (int)drawType);
-                                computeShader.SetInt("DrawType", (int)drawType);
-
-                                if (drawType == DRAW_TYPES.PEN)
-                                {
-                                    SetupDrawing(penSize);
-                                }
-                            }
-                        }
-                    }
-
-                    if (texture != null)
-                    {
-                        if (drawType == DRAW_TYPES.PEN || drawType == DRAW_TYPES.ERASER)
-                        {
-                            PenEraserGUI();
-                        }
-
-                        if (drawType == DRAW_TYPES.CHOOSE_COLOR || drawType == DRAW_TYPES.SELECT_AREA)
-                        {
-                            FillGUI();
-                        }
-                    }
-
-                    EditorGUILayout.LabelField("Triangle Count", triangleCount + "");
-
-                    GUILayout.Space(10);
-
-                    OutputMeshGUI();
-
-                    GUILayout.Space(50);
-
-                    using (new EditorGUI.DisabledGroupScope(texture == null))
-                    using (new EditorGUILayout.HorizontalScope())
-                    {
-                        GUILayout.FlexibleSpace();
-
-                        if (GUILayout.Button("Reset All"))
-                        {
-                            ResetDrawArea(ref texture, ref rwTexture, ref editMat);
-                            InitComputeBuffer(originTexture);
-                            texture.SetPixels(originTexture.GetPixels());
-                            texture.Apply();
-                        }
-                    }
-                }
+                ToolGUI();
                 
             }
 
@@ -523,6 +425,109 @@ namespace Gatosyocora.MeshDeleterWithTexture
             }
         }
 
+        private void ToolGUI()
+        {
+
+            using (new EditorGUILayout.VerticalScope())
+            {
+                using (new EditorGUI.DisabledGroupScope(texture == null))
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    if (GUILayout.Button("Import DeleteMask"))
+                    {
+                        ImportDeleteMaskTexture(ref texture, ref buffer);
+                    }
+                    if (GUILayout.Button("Export DeleteMask"))
+                    {
+                        ExportDeleteMaskTexture(buffer, originTexture);
+                        renderer.sharedMaterials[textureIndex].mainTexture = texture;
+                    }
+                }
+
+                GUILayout.Space(10);
+
+                using (var check = new EditorGUI.ChangeCheckScope())
+                {
+                    if (textures != null)
+                        textureIndex = EditorGUILayout.Popup("Texture", textureIndex, textures.Select(x => x.name).ToArray());
+
+                    if (check.changed)
+                    {
+                        if (textures != null)
+                        {
+                            ResetMaterialTextures(ref renderer, ref textures);
+
+                            originTexture = textures[textureIndex];
+                            if (originTexture != null)
+                            {
+                                texture = LoadSettingToTexture(originTexture);
+
+                                DrawTypeSetting();
+                                ResetDrawArea(ref texture, ref rwTexture, ref editMat);
+                                SetupComputeShader(ref texture, ref rwTexture);
+                                InitComputeBuffer(texture);
+
+                                renderer.sharedMaterials[textureIndex].mainTexture = texture;
+                            }
+                        }
+                    }
+                }
+
+                GUILayout.Space(20);
+
+                EditorGUILayout.LabelField("DrawType");
+                using (new EditorGUI.DisabledGroupScope(texture == null))
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    using (var check = new EditorGUI.ChangeCheckScope())
+                    {
+                        drawType = (DRAW_TYPES)GUILayout.Toolbar((int)drawType, Enum.GetNames(typeof(DRAW_TYPES)));
+
+                        if (check.changed)
+                        {
+                            DrawTypeSetting();
+                        }
+                    }
+                }
+
+                // DrawTypeによるGUIの表示
+                if (texture != null)
+                {
+                    if (drawType == DRAW_TYPES.PEN || drawType == DRAW_TYPES.ERASER)
+                    {
+                        PenEraserGUI();
+                    }
+
+                    if (drawType == DRAW_TYPES.CHOOSE_COLOR || drawType == DRAW_TYPES.SELECT_AREA)
+                    {
+                        FillGUI();
+                    }
+                }
+
+                EditorGUILayout.LabelField("Triangle Count", triangleCount + "");
+
+                GUILayout.Space(10);
+
+                OutputMeshGUI();
+
+                GUILayout.Space(50);
+
+                using (new EditorGUI.DisabledGroupScope(texture == null))
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    GUILayout.FlexibleSpace();
+
+                    if (GUILayout.Button("Reset All"))
+                    {
+                        DrawTypeSetting();
+                        ResetDrawArea(ref texture, ref rwTexture, ref editMat);
+                        SetupComputeShader(ref texture, ref rwTexture);
+                        InitComputeBuffer(texture);
+                    }
+                }
+            }
+        }
+
         private void PenEraserGUI()
         {
             EditorGUILayout.LabelField("PenColor");
@@ -553,7 +558,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 penSize = EditorGUILayout.IntSlider("Pen/Eraser size", penSize, 1, texture.width / 20);
 
                 if (check.changed)
-                    SetupDrawing(penSize);
+                    SetupDrawing(penSize, texture);
             }
         }
 
@@ -958,7 +963,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             Repaint();
         }
 
-        private void SetupDrawing(int penSize)
+        private void SetupDrawing(int penSize, Texture2D texture)
         {
             computeShader.SetInt("PenSize", penSize);
             editMat.SetFloat("_PenSize", penSize / (float)texture.width);
@@ -1231,6 +1236,17 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             mat.SetVector("_StartPos", new Vector4(0, 0, 0, 0));
             mat.SetVector("_EndPos", new Vector4(texture.width - 1, texture.height - 1, 0, 0));
+        }
+
+        private void DrawTypeSetting()
+        {
+            editMat.SetFloat("_EditType", (int)drawType);
+            computeShader.SetInt("DrawType", (int)drawType);
+
+            if (drawType == DRAW_TYPES.PEN)
+            {
+                SetupDrawing(penSize, texture);
+            }
         }
 
         #endregion
