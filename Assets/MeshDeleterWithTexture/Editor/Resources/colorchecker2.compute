@@ -36,7 +36,7 @@ void CSPen (uint2 id : SV_DispatchThreadID)
 	if (!result) return;
 
 	FillTex[id.xy] = float4(1, 1, 1, 1);
-	//PreviewTex[id.xy] = PenColor;
+	PreviewTex[id.xy] = PenColor;
 	Result[index] = true;
 }
 
@@ -53,7 +53,7 @@ void CSEraser (uint2 id : SV_DispatchThreadID)
 	if (!result) return;
 
 	FillTex[id.xy] = float4(0, 0, 0, 1);
-	//PreviewTex[id.xy] = Tex[id.xy];
+	PreviewTex[id.xy] = Tex[id.xy];
 	Result[index] = false;
 }
 
@@ -77,7 +77,7 @@ void CSFill (uint2 id : SV_DispatchThreadID)
 				abs(hsv.z - targetHsv.z) < HsvThreshold[2]);
 		
 	FillTex[id.xy] = (result)? float4(1, 1, 1, 1): float4(0, 0, 0, 1);
-	//PreviewTex[id.xy] = (result)? PenColor : Tex[id.xy];
+	PreviewTex[id.xy] = (result)? PenColor : Tex[id.xy];
 	Result[index] = result;
 }
         
