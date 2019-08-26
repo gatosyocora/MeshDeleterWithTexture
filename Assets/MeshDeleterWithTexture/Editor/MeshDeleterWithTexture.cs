@@ -155,6 +155,9 @@ namespace Gatosyocora.MeshDeleterWithTexture
                                     SetupComputeShader(ref texture, ref rwTexture);
                                     InitComputeBuffer(texture);
 
+                                    var uvMapTex = GetUVMap(mesh, textureIndex, texture);
+                                    editMat.SetTexture("_UVMap", uvMapTex);
+
                                     renderer.sharedMaterials[textureIndex].mainTexture = texture;
                                 }
 
@@ -230,6 +233,13 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     if (mesh != null)
                     {
                         triangleCount = GetMeshTriangleCount(mesh);
+
+                        ResetDrawArea(ref texture, ref rwTexture, ref editMat);
+                        SetupComputeShader(ref texture, ref rwTexture);
+                        InitComputeBuffer(texture);
+
+                        var uvMapTex = GetUVMap(mesh, textureIndex, texture);
+                        editMat.SetTexture("_UVMap", uvMapTex);
                     }
                 }
             }
@@ -467,6 +477,13 @@ namespace Gatosyocora.MeshDeleterWithTexture
                                 SetupComputeShader(ref texture, ref rwTexture);
                                 InitComputeBuffer(texture);
 
+                                var mesh = renderer.sharedMesh;
+                                if (mesh != null)
+                                {
+                                    var uvMapTex = GetUVMap(mesh, textureIndex, texture);
+                                    editMat.SetTexture("_UVMap", uvMapTex);
+                                }
+
                                 renderer.sharedMaterials[textureIndex].mainTexture = texture;
                             }
                         }
@@ -558,7 +575,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 penSize = EditorGUILayout.IntSlider("Pen/Eraser size", penSize, 1, texture.width / 20);
 
                 if (check.changed)
-                    SetupDrawing(penSize, texture);
+                    SetupDrawing(penSize, penColor, texture);
             }
         }
 
@@ -636,57 +653,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             var deletePos = new int[texture.width * texture.height];
             computeBuffer.GetData(deletePos);
-/*
-#region 削除するUV座標の配列を取得
-
-            // GPU
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-
-            var cs = Instantiate(Resources.Load("deleteUVPickup")) as ComputeShader;
-            var kernel = cs.FindKernel("CSMain");
-
-            var cb = new ComputeBuffer(texture.width * texture.height, Marshal.SizeOf(typeof(Vector2)), ComputeBufferType.Append);
-            cb.SetCounterValue(0);
-
-            var countBuffer = new ComputeBuffer(4, Marshal.SizeOf(typeof(int)), ComputeBufferType.IndirectArguments);
-            var itemCount = new int[] { 0, 1, 0, 0 };
-            countBuffer.SetData(itemCount);
-
-            cs.SetBuffer(kernel, "Data", computeBuffer);
-            cs.SetInt("Width", texture.width);
-            cs.SetBuffer(kernel, "DeletePos", cb);
-            cs.Dispatch(kernel, texture.width/32, texture.height/32, 1);
-
-            ComputeBuffer.CopyCount(cb, countBuffer, 0);
-            countBuffer.GetData(itemCount);
-            var size = itemCount[0];
-            var deletePositions = new Vector2[size];
-            cb.GetData(deletePositions);
-
-            cb.Release();
-            countBuffer.Release();
-
-            sw.Stop();
-            var gpuSpeed = sw.ElapsedMilliseconds;
-
-            // CPU
-            sw.Reset();
-            sw.Start();
-
-            var deletePosCPU = deletePos
-                                .Select((value, index) => new { Value = value, Index = index })
-                                .Where(v => v.Value == 1)
-                                .Select(v => new Vector2(v.Index / texture.width, v.Index % texture.width))
-                                .ToArray();
-
-            sw.Stop();
-            var cpuSpeed = sw.ElapsedMilliseconds;
-
-            UnityEngine.Debug.LogFormat("cpu time (ms) = {0}, gpu time = {1}, size = {2}:{3}",cpuSpeed, gpuSpeed, deletePosCPU.Count() ,size);
-
-#endregion
-*/
 
             var count = 0;
 
@@ -963,9 +929,16 @@ namespace Gatosyocora.MeshDeleterWithTexture
             Repaint();
         }
 
-        private void SetupDrawing(int penSize, Texture2D texture)
+        private void SetupDrawing(int penSize, Color penColor, Texture2D texture)
         {
+            float[] penColorArray = new float[4 * sizeof(float)];
+            penColorArray[0 * sizeof(float)] = penColor.r;
+            penColorArray[1 * sizeof(float)] = penColor.g;
+            penColorArray[2 * sizeof(float)] = penColor.b;
+            penColorArray[3 * sizeof(float)] = penColor.a;
+
             computeShader.SetInt("PenSize", penSize);
+            computeShader.SetFloats("PenColor", penColorArray);
             editMat.SetFloat("_PenSize", penSize / (float)texture.width);
         }
 
@@ -1058,7 +1031,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             AssetDatabase.ImportAsset(assetPath);
             AssetDatabase.Refresh();
             
-            Texture2D editTexture = new Texture2D(originTexture.width, originTexture.height);
+            Texture2D editTexture = new Texture2D(originTexture.width, originTexture.height, TextureFormat.ARGB32, false);
             editTexture.SetPixels(originTexture.GetPixels());
             editTexture.name = originTexture.name;
 
@@ -1245,8 +1218,52 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             if (drawType == DRAW_TYPES.PEN)
             {
-                SetupDrawing(penSize, texture);
+                SetupDrawing(penSize, penColor, texture);
             }
+        }
+
+        /// <summary>
+        /// UVマップを取得する
+        /// </summary>
+        /// <param name="mesh"></param>
+        /// <param name="subMeshIndex"></param>
+        /// <param name="texture"></param>
+        /// <returns></returns>
+        private Texture2D GetUVMap(Mesh mesh, int subMeshIndex, Texture2D texture)
+        {
+            var triangles = mesh.GetTriangles(subMeshIndex);
+            var uvs = mesh.uv;
+
+            if (uvs.Count() <= 0) return null;
+
+            ComputeShader cs = Instantiate(Resources.Load<ComputeShader>("getUVMap")) as ComputeShader;
+            int kernel = cs.FindKernel("CSMain");
+
+            RenderTexture uvMapRT = new RenderTexture(texture.width, texture.height, 0);
+            uvMapRT.enableRandomWrite = true;
+            uvMapRT.Create();
+
+            var triangleBuffer = new ComputeBuffer(triangles.Count(), sizeof(int));
+            var uvBuffer = new ComputeBuffer(uvs.Count(), Marshal.SizeOf(typeof(Vector2)));
+            triangleBuffer.SetData(triangles);
+            uvBuffer.SetData(uvs);
+
+            cs.SetTexture(kernel, "UVMap", uvMapRT);
+            cs.SetInt("Width", texture.width);
+            cs.SetInt("Height", texture.height);
+            cs.SetBuffer(kernel, "Triangles", triangleBuffer);
+            cs.SetBuffer(kernel, "UVs", uvBuffer);
+
+            cs.Dispatch(kernel, triangles.Length / 3, 1, 1);
+
+            triangleBuffer.Release();
+            uvBuffer.Release();
+
+            Texture2D uvMapTex = new Texture2D(texture.width, texture.height, TextureFormat.ARGB32, false);
+            Graphics.CopyTexture(uvMapRT, uvMapTex);
+            uvMapRT.Release();
+
+            return uvMapTex;
         }
 
         #endregion

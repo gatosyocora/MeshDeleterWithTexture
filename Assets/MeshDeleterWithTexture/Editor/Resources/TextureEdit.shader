@@ -15,6 +15,10 @@
 		_EndPos ("Drag End Pos", Vector) = (0, 0, 0, 0)
 		_LineWidth ("Line Width", Float) = 0.002
 		_PenSize("Pen Size", Float) = 0.01
+
+		_UVMap ("UVMap Texture", 2D) = "black"{}
+
+		_ApplyGammaCorrection ("Apply Gamma Correction", Float) = 1
 	}
 	SubShader
 	{
@@ -62,6 +66,10 @@
 			float _LineWidth;
 
 			float _PenSize;
+
+			sampler2D _UVMap;
+
+			float _ApplyGammaCorrection;
 			
 			v2f vert (appdata v)
 			{
@@ -77,20 +85,30 @@
 				float2 uv = (float2(0.5, 0.5) * (1-_TextureScale) + _Offset.xy * 0.5) + i.uv * _TextureScale;
 				fixed4 col = tex2D(_MainTex, uv);
 
-				col.rgb *= (1-tex2D(_SecondTex, i.uv).rgb);
+				// ガンマ補正を適用
+				if (_ApplyGammaCorrection)
+					col = pow(col, 1/2.2);
 				
+				// UVMapを表示
+				col.rgb *= 1-tex2D(_UVMap, uv).rgb;
+
+				// 塗りつぶし状態を表示
+				col.rgb *= (1-tex2D(_SecondTex, i.uv).rgb);
+
+				
+				// 範囲選択用の枠を表示				
 				if ((abs(i.uv.x - _StartPos.x) <= _LineWidth || abs(i.uv.x - _EndPos.x) <= _LineWidth) && i.uv.y >= min(_StartPos.y, _EndPos.y)-_LineWidth && i.uv.y <= max(_StartPos.y, _EndPos.y)+_LineWidth ||
 					(abs(i.uv.y - _StartPos.y) <= _LineWidth || abs(i.uv.y - _EndPos.y) <= _LineWidth) && i.uv.x >= min(_StartPos.x, _EndPos.x)-_LineWidth && i.uv.x <= max(_StartPos.x, _EndPos.x)+_LineWidth
 				)
 					col = fixed4(1, 0.7, 0, 1);
 
+				// ペンカーソルを表示
 				float2 currentPos = (float2(0.5, 0.5) * (1-_TextureScale) + _Offset.xy * 0.5) + _CurrentPos.xy * _TextureScale;
-
 				float raito = _MainTex_TexelSize.x / _MainTex_TexelSize.y;
 				if (distance (i.uv * float2(1, raito), currentPos * float2(1, raito)) <= _PenSize)
 					col = fixed4(1, 1, 0, 1);
 
-				return pow(col, 1/2.2);
+				return col;
 			}
 			ENDCG
 		}

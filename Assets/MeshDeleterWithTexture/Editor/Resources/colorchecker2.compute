@@ -5,6 +5,7 @@
 RWTexture2D<float4> FillTex;
 Texture2D<float4> Tex;
 RWStructuredBuffer<int> Result;
+RWTexture2D<float4> PreviewTex;
 
 int Width;
 int Height;
@@ -12,6 +13,7 @@ float TargetCol[3];
 int Pos[2];
 float Pos1[2];
 float Pos2[2];
+float4 PenColor;
 
 float HsvThreshold[3];
 
@@ -34,6 +36,7 @@ void CSPen (uint2 id : SV_DispatchThreadID)
 	if (!result) return;
 
 	FillTex[id.xy] = float4(1, 1, 1, 1);
+	//PreviewTex[id.xy] = PenColor;
 	Result[index] = true;
 }
 
@@ -50,6 +53,7 @@ void CSEraser (uint2 id : SV_DispatchThreadID)
 	if (!result) return;
 
 	FillTex[id.xy] = float4(0, 0, 0, 1);
+	//PreviewTex[id.xy] = Tex[id.xy];
 	Result[index] = false;
 }
 
@@ -73,6 +77,7 @@ void CSFill (uint2 id : SV_DispatchThreadID)
 				abs(hsv.z - targetHsv.z) < HsvThreshold[2]);
 		
 	FillTex[id.xy] = (result)? float4(1, 1, 1, 1): float4(0, 0, 0, 1);
+	//PreviewTex[id.xy] = (result)? PenColor : Tex[id.xy];
 	Result[index] = result;
 }
         
