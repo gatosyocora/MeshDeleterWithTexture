@@ -654,13 +654,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
             var deletePos = new int[texture.width * texture.height];
             computeBuffer.GetData(deletePos);
 
-            var count = 0;
-
-
-            Stopwatch sw = new Stopwatch();
-            sw.Reset();
-            sw.Start();
-
             /*
             foreach (var uv in alluvs)
             {
@@ -688,7 +681,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     "Searching deleteVertices: " + count++ + "/" + alluvs.Count(),
                     count/(float)alluvs.Count());
             }
-        */
+            */
 
             for (int i = 0; i < uvs.Count(); i++)
             {
@@ -703,17 +696,9 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 {
                     deleteIndexList.Add(i);
                 }
-
-                /*EditorUtility.DisplayProgressBar("Delete Mesh",
-                    "Searching deleteVertices: " + count++ + "/" + alluvs.Count(),
-                    count/(float)alluvs.Count());
-                    */
             }
 
-
-            sw.Stop();
-            var cpuSpeed = sw.ElapsedMilliseconds;
-
+            /*
             sw.Reset();
             sw.Start();
 
@@ -737,7 +722,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             cs.SetInt("Width", texture.width);
             cs.SetInt("Height", texture.height);
             cs.SetBuffer(kernel, "DeleteVertexIndex", deleteVertexIndexBuffer);
-            cs.Dispatch(kernel, uvs.Count() / 32, 1, 1);
+            cs.Dispatch(kernel, uvs.Count(), 1, 1);
 
             ComputeBuffer.CopyCount(deleteVertexIndexBuffer, countBuffer, 0);
             countBuffer.GetData(itemCount);
@@ -749,28 +734,20 @@ namespace Gatosyocora.MeshDeleterWithTexture
             deleteVertexIndexBuffer.Release();
             countBuffer.Release();
 
-            sw.Stop();
-            var gpuSpeed = sw.ElapsedMilliseconds;
-
             deleteIndexList = deleteVertexIndexs.ToList();
 
-
+            sw.Stop();
+            var gpuSpeed = sw.ElapsedMilliseconds;
+            
             UnityEngine.Debug.LogFormat("cpu:{0}, gpu:{1}", cpuSpeed, gpuSpeed);
 
-            // TODO: 共有されている頂点は存在しない？
-            // 他のサブメッシュで共有されている頂点は削除してはいけない
-            List<int> nonDeleteSubMeshIndexs = new List<int>();
-            for (var subMeshIndex = 0; subMeshIndex < mesh.subMeshCount; subMeshIndex++)
-            {
-                if (subMeshIndex != subMeshIndexInDeletedVertex)
-                    nonDeleteSubMeshIndexs.AddRange(mesh.GetIndices(subMeshIndex));
-            }
+            */
 
             // 削除する頂点のインデックスのリスト（重複なし, 降順）
+
             var deleteIndexListUniqueDescending
                 = deleteIndexList
                     .Distinct()
-                    .Where(i => !nonDeleteSubMeshIndexs.Contains(i))
                     .OrderByDescending(value => value)
                     .ToArray();
 
@@ -778,7 +755,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
             var deleteIndexsOrdered
                 = deleteIndexList
                     .Distinct()
-                    .Where(i => !nonDeleteSubMeshIndexs.Contains(i))
                     .OrderBy(value => value)
                     .ToList();
 
@@ -806,9 +782,10 @@ namespace Gatosyocora.MeshDeleterWithTexture
             mesh_custom.SetUVs(2, nonDeleteUV3s);
             mesh_custom.SetUVs(3, nonDeleteUV4s);
 
-            count = 0;
-
             // サブメッシュごとにポリゴンを処理
+
+            var count = 0;
+
             mesh_custom.subMeshCount = mesh.subMeshCount;
             for (int subMeshIndex = 0; subMeshIndex < mesh.subMeshCount; subMeshIndex++)
             {
@@ -839,25 +816,16 @@ namespace Gatosyocora.MeshDeleterWithTexture
                                 subMeshTriangles[i + 2]--;
                         }
                     }
+
+                    EditorUtility.DisplayProgressBar("delete triangles", 
+                                                        count + " / " + mesh.subMeshCount * deleteIndexListUniqueDescending.Count(), 
+                                                        (count++) / (float)(mesh.subMeshCount * deleteIndexListUniqueDescending.Count()));
                 }
-                
+
                 // 不要なポリゴンを削除する
-                var triangleList = subMeshTriangles.ToList();
-                for (int i = triangleList.Count() - 1; i >= 0; i--)
-                {
-                    if (triangleList[i] == -1)
-                        triangleList.RemoveAt(i);
-                }
-
-                EditorUtility.DisplayProgressBar("Delete Mesh",
-                    "Deleting Triangles in subMeshs : " + count++ + "/ " + mesh.subMeshCount,
-                    count / (float)mesh.subMeshCount
-                );
-
-                mesh_custom.SetTriangles(triangleList.ToArray(), subMeshIndex);
+                var triangleList = subMeshTriangles.Where(v => v != -1).ToArray();
+                mesh_custom.SetTriangles(triangleList, subMeshIndex);
             }
-
-            count = 0;
 
             // BlendShapeを設定する
             string blendShapeName;
@@ -875,11 +843,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 var deltaNonDeleteVerteicesList = deltaVertices.Where((value, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
                 var deltaNonDeleteNormalsList = deltaNormals.Where((value, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
                 var deltaNonDeleteTangentsList = deltaTangents.Where((value, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
-
-                EditorUtility.DisplayProgressBar("Delete Mesh",
-                        "Setting BlendShapes : " + count++ + "/" + mesh.blendShapeCount,
-                        count / (float)mesh.blendShapeCount
-                );
 
                 mesh_custom.AddBlendShapeFrame(blendShapeName, frameWeight,
                     deltaNonDeleteVerteicesList,
