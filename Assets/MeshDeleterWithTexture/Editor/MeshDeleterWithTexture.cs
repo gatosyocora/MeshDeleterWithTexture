@@ -51,7 +51,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
         private ComputeShader computeShader;
         private ComputeBuffer buffer;
         private int penKernelId, eraserKernelId, fillKernelId;
-        private RenderTexture rwTexture;
         private RenderTexture previewTexture;
 
         #endregion
@@ -152,8 +151,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
                                     texture = LoadSettingToTexture(originTexture);
 
                                     DrawTypeSetting();
-                                    ResetDrawArea(ref texture, ref rwTexture, ref editMat, ref previewTexture);
-                                    SetupComputeShader(ref texture, ref rwTexture, ref previewTexture);
+                                    ResetDrawArea(ref texture, ref editMat, ref previewTexture);
+                                    SetupComputeShader(ref texture, ref previewTexture);
                                     InitComputeBuffer(texture);
 
                                     var uvMapTex = GetUVMap(mesh, textureIndex, texture);
@@ -235,8 +234,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     {
                         triangleCount = GetMeshTriangleCount(mesh);
 
-                        ResetDrawArea(ref texture, ref rwTexture, ref editMat, ref previewTexture);
-                        SetupComputeShader(ref texture, ref rwTexture, ref previewTexture);
+                        ResetDrawArea(ref texture, ref editMat, ref previewTexture);
+                        SetupComputeShader(ref texture, ref previewTexture);
                         InitComputeBuffer(texture);
 
                         var uvMapTex = GetUVMap(mesh, textureIndex, texture);
@@ -252,7 +251,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             var height = width * texture.height / texture.width;
             EventType mouseEventType = 0;
             Rect rect = new Rect(0, 0, 0, 0);
-            var delta = GatoGUILayout.MiniMonitor(texture, width, height, ref rect, ref mouseEventType, true);
+            var delta = GatoGUILayout.MiniMonitor(previewTexture, width, height, ref rect, ref mouseEventType, true);
 
             if (mouseEventType == EventType.ScrollWheel)
             {
@@ -446,7 +445,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 {
                     if (GUILayout.Button("Import DeleteMask"))
                     {
-                        ImportDeleteMaskTexture(ref texture, ref buffer, ref rwTexture);
+                        ImportDeleteMaskTexture(ref texture, ref buffer, ref previewTexture);
                     }
                     if (GUILayout.Button("Export DeleteMask"))
                     {
@@ -474,8 +473,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
                                 texture = LoadSettingToTexture(originTexture);
 
                                 DrawTypeSetting();
-                                ResetDrawArea(ref texture, ref rwTexture, ref editMat, ref previewTexture);
-                                SetupComputeShader(ref texture, ref rwTexture, ref previewTexture);
+                                ResetDrawArea(ref texture, ref editMat, ref previewTexture);
+                                SetupComputeShader(ref texture, ref previewTexture);
                                 InitComputeBuffer(texture);
 
                                 var mesh = renderer.sharedMesh;
@@ -538,8 +537,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     if (GUILayout.Button("Reset All"))
                     {
                         DrawTypeSetting();
-                        ResetDrawArea(ref texture, ref rwTexture, ref editMat,ref previewTexture);
-                        SetupComputeShader(ref texture, ref rwTexture, ref previewTexture);
+                        ResetDrawArea(ref texture, ref editMat,ref previewTexture);
+                        SetupComputeShader(ref texture, ref previewTexture);
                         InitComputeBuffer(texture);
                     }
                 }
@@ -555,18 +554,22 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 if (GUILayout.Button("Black"))
                 {
                     penColor = UnityEngine.Color.black;
+                    SetupDrawing(penSize, penColor, texture);
                 }
                 if (GUILayout.Button("R"))
                 {
                     penColor = UnityEngine.Color.red;
+                    SetupDrawing(penSize, penColor, texture);
                 }
                 if (GUILayout.Button("G"))
                 {
                     penColor = UnityEngine.Color.green;
+                    SetupDrawing(penSize, penColor, texture);
                 }
                 if (GUILayout.Button("B"))
                 {
                     penColor = UnityEngine.Color.blue;
+                    SetupDrawing(penSize, penColor, texture);
                 }
                 penColor = EditorGUILayout.ColorField(penColor);
             }
@@ -913,14 +916,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
         private void SetupDrawing(int penSize, Color penColor, Texture2D texture)
         {
-            float[] penColorArray = new float[4 * sizeof(float)];
-            penColorArray[0 * sizeof(float)] = penColor.r;
-            penColorArray[1 * sizeof(float)] = penColor.g;
-            penColorArray[2 * sizeof(float)] = penColor.b;
-            penColorArray[3 * sizeof(float)] = penColor.a;
-
             computeShader.SetInt("PenSize", penSize);
-            computeShader.SetFloats("PenColor", penColorArray);
+            computeShader.SetVector("PenColor", penColor);
             editMat.SetFloat("_PenSize", penSize / (float)texture.width);
         }
 
@@ -1061,7 +1058,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
             computeBuffer.SetData(deletePos);
 
             Material negaposiMat = new Material(Shader.Find("Gato/NegaPosi"));
-            Graphics.Blit(maskTexture, renderTexture, negaposiMat);
+            negaposiMat.SetTexture("_MaskTex", maskTexture);
+            Graphics.Blit(texture, renderTexture, negaposiMat);
             Repaint();
 
             return true;
@@ -1171,7 +1169,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             computeShader.SetBuffer(fillKernelId, "Result", buffer);
         }
 
-        private void SetupComputeShader(ref Texture2D texture, ref RenderTexture rwTexture, ref RenderTexture previewTexture)
+        private void SetupComputeShader(ref Texture2D texture, ref RenderTexture previewTexture)
         {
             InitComputeBuffer(texture);
 
@@ -1181,28 +1179,17 @@ namespace Gatosyocora.MeshDeleterWithTexture
             computeShader.SetInt("Width", texture.width);
             computeShader.SetInt("Height", texture.height);
 
-            computeShader.SetTexture(penKernelId, "FillTex", rwTexture);
-            computeShader.SetTexture(eraserKernelId, "FillTex", rwTexture);
-            computeShader.SetTexture(fillKernelId, "FillTex", rwTexture);
-
             computeShader.SetTexture(penKernelId, "PreviewTex", previewTexture);
             computeShader.SetTexture(eraserKernelId, "PreviewTex", previewTexture);
             computeShader.SetTexture(fillKernelId, "PreviewTex", previewTexture);
         }
-        private void ResetDrawArea(ref Texture2D texture, ref RenderTexture rwTexture, ref Material mat, ref RenderTexture previewTexture)
+        private void ResetDrawArea(ref Texture2D texture, ref Material mat, ref RenderTexture previewTexture)
         {
-            if (rwTexture != null) rwTexture.Release();
-            rwTexture = new RenderTexture(texture.width, texture.height, 0, RenderTextureFormat.ARGBFloat);
-            rwTexture.enableRandomWrite = true;
-            rwTexture.Create();
-
             if (previewTexture != null) previewTexture.Release();
-            previewTexture = new RenderTexture(texture.width, texture.height, 0, RenderTextureFormat.ARGBFloat);
+            previewTexture = new RenderTexture(texture.width, texture.height, 0, RenderTextureFormat.ARGB32);
             previewTexture.enableRandomWrite = true;
             previewTexture.Create();
             Graphics.Blit(texture, previewTexture);
-
-            mat.SetTexture("_SecondTex", rwTexture);
 
             mat.SetVector("_StartPos", new Vector4(0, 0, 0, 0));
             mat.SetVector("_EndPos", new Vector4(texture.width - 1, texture.height - 1, 0, 0));

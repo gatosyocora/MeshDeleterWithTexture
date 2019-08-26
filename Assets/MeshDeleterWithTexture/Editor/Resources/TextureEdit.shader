@@ -9,7 +9,6 @@
 		_TextureScale ("TextureScale", Float) = 1
 		_Offset ("Offset", Vector) = (0, 0, 0, 0)
 
-		_SecondTex ("Second Texture", 2D) = "black" {}
 		_CurrentPos ("Mouse Current Pos", Vector) = (0, 0, 0, 0)
 		_StartPos ("Drag Start Pos", Vector) = (0, 0, 0, 0)
 		_EndPos ("Drag End Pos", Vector) = (0, 0, 0, 0)
@@ -57,8 +56,6 @@
 			float _TextureScale;
 			float4 _Offset;
 
-			sampler2D _SecondTex;
-
 			float4 _StartPos;
 			float4 _EndPos;
 			float4 _CurrentPos;
@@ -91,10 +88,6 @@
 				
 				// UVMapを表示
 				col.rgb *= 1-tex2D(_UVMap, uv).rgb;
-
-				// 塗りつぶし状態を表示
-				col.rgb *= (1-tex2D(_SecondTex, i.uv).rgb);
-
 				
 				// 範囲選択用の枠を表示				
 				if ((abs(i.uv.x - _StartPos.x) <= _LineWidth || abs(i.uv.x - _EndPos.x) <= _LineWidth) && i.uv.y >= min(_StartPos.y, _EndPos.y)-_LineWidth && i.uv.y <= max(_StartPos.y, _EndPos.y)+_LineWidth ||
