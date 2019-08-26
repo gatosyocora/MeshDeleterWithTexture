@@ -445,7 +445,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 {
                     if (GUILayout.Button("Import DeleteMask"))
                     {
-                        ImportDeleteMaskTexture(ref texture, ref buffer);
+                        ImportDeleteMaskTexture(ref texture, ref buffer, ref rwTexture);
                     }
                     if (GUILayout.Button("Export DeleteMask"))
                     {
@@ -655,6 +655,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
             computeBuffer.GetData(deletePos);
 
             /*
+            var count = 0;
+
             foreach (var uv in alluvs)
             {
                 x = (int)(Mathf.Abs(uv.x % 1.0f) * texture.width);
@@ -744,7 +746,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
             */
 
             // 削除する頂点のインデックスのリスト（重複なし, 降順）
-
             var deleteIndexListUniqueDescending
                 = deleteIndexList
                     .Distinct()
@@ -1009,7 +1010,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
         /// <param name="texture"></param>
         /// <param name="deletePos"></param>
         /// <returns></returns>
-        private bool ImportDeleteMaskTexture(ref Texture2D texture, ref ComputeBuffer buffer)
+        private bool ImportDeleteMaskTexture(ref Texture2D texture, ref ComputeBuffer computeBuffer, ref RenderTexture renderTexture)
         {
             // 画像ファイルを取得(png, jpg)
             var path = EditorUtility.OpenFilePanelWithFilters("Select delete mask texture", "Assets", new string[]{"Image files", "png,jpg,jpeg"});
@@ -1027,18 +1028,23 @@ namespace Gatosyocora.MeshDeleterWithTexture
             if (maskTexture == null || texture.width != maskTexture.width || texture.height != maskTexture.height) return false;
 
             var deletePos = new int[maskTexture.width * maskTexture.height];
-            buffer.GetData(deletePos);
+            computeBuffer.GetData(deletePos);
 
             for (int j = 0; j < maskTexture.height; j++)
             {
                 for (int i = 0; i < maskTexture.width; i++)
                 {
-                    var isDelete = (maskTexture.GetPixel(i, j) == UnityEngine.Color.black)? 1:0;
+                    var col = maskTexture.GetPixel(i, j);
+                    var isDelete = (col == UnityEngine.Color.black)? 1:0;
                     deletePos[j * maskTexture.width + i] = isDelete;
                 }
             }
 
-            buffer.SetData(deletePos);
+            computeBuffer.SetData(deletePos);
+
+            Material negaposiMat = new Material(Shader.Find("Gato/NegaPosi"));
+            Graphics.Blit(maskTexture, renderTexture, negaposiMat);
+            Repaint();
 
             return true;
         }
