@@ -745,17 +745,26 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             */
 
-            // 削除する頂点のインデックスのリスト（重複なし, 降順）
-            var deleteIndexListUniqueDescending
+            // TODO: 共有されている頂点は存在しない？
+            // これがないと他のサブメッシュのポリゴンも削除された
+            // 他のサブメッシュで共有されている頂点は削除してはいけない
+            List<int> nonDeleteVertexIndexs = new List<int>();
+            for (var subMeshIndex = 0; subMeshIndex < mesh.subMeshCount; subMeshIndex++)
+            {
+                if (subMeshIndex != subMeshIndexInDeletedVertex)
+                    nonDeleteVertexIndexs.AddRange(mesh.GetIndices(subMeshIndex));
+            }
+            nonDeleteVertexIndexs = nonDeleteVertexIndexs.Distinct().OrderBy(v => v).ToList();
+
+            // 削除する頂点のインデックスのリスト(重複なし)
+            var deleteIndexListUnique
                 = deleteIndexList
                     .Distinct()
-                    .OrderByDescending(value => value)
-                    .ToArray();
+                    .Where(i => nonDeleteVertexIndexs.BinarySearch(i) < 0);
 
             // 削除する頂点のインデックスのリスト (重複なし, 昇順)
             var deleteIndexsOrdered
-                = deleteIndexList
-                    .Distinct()
+                = deleteIndexListUnique
                     .OrderBy(value => value)
                     .ToList();
 
@@ -786,6 +795,12 @@ namespace Gatosyocora.MeshDeleterWithTexture
             // サブメッシュごとにポリゴンを処理
 
             var count = 0;
+
+            // 削除する頂点のインデックスのリスト（重複なし, 降順）
+            var deleteIndexListUniqueDescending
+                = deleteIndexListUnique
+                    .OrderByDescending(value => value)
+                    .ToArray();
 
             mesh_custom.subMeshCount = mesh.subMeshCount;
             for (int subMeshIndex = 0; subMeshIndex < mesh.subMeshCount; subMeshIndex++)
