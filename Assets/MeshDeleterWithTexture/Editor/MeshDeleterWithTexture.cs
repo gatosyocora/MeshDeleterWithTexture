@@ -50,7 +50,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
         private ComputeShader computeShader;
         private ComputeBuffer buffer;
-        private int penKernelId, eraserKernelId, fillKernelId;
+        private int penKernelId, eraserKernelId, fillKernelId, fill2KernelId;
         private RenderTexture previewTexture;
 
         #endregion
@@ -77,7 +77,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
             CHOOSE_COLOR = 0,
             SELECT_AREA = 1,
             PEN = 2,
-            ERASER = 3
+            ERASER = 3,
+            SELECT_A = 4
         };
 
         private DRAW_TYPES drawType;
@@ -85,6 +86,19 @@ namespace Gatosyocora.MeshDeleterWithTexture
         private int triangleCount = 0;
         private string saveFolder = "Assets/";
         private string meshName;
+
+        private const int POINT_MAX_NUM = 100;
+        private Vector4[] flexibleSelectAreaPoints = new Vector4[POINT_MAX_NUM];
+        private int pointCount = 0;
+        private int movingPointIndex = -1;
+        private enum SelectAreaMode
+        {
+            SELECT_AREA,
+            IDLE,
+            CUT_LINE,
+            DELETE_POINT
+        };
+        private SelectAreaMode mode = SelectAreaMode.IDLE;
 
         struct UVItem {
             public Vector2 uv;
@@ -107,6 +121,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
             drawType = DRAW_TYPES.PEN;
             triangleCount = 0;
             saveFolder = "Assets/";
+
+            editMat.SetInt("_PointNum", 0);
 
             InitComputeShader();
         }
@@ -432,6 +448,174 @@ namespace Gatosyocora.MeshDeleterWithTexture
                             ClearOnTexture(pos);
                     }
                 }
+                else if (drawType == DRAW_TYPES.SELECT_A)
+                {
+                    var uvPos = ConvertTexturePosToUVPos(texture, pos);
+
+                    if (Event.current.type == EventType.MouseDown)
+                    {
+                        if (mode != SelectAreaMode.SELECT_AREA && pointCount == 0)
+                        {
+                            mode = SelectAreaMode.SELECT_AREA;
+                            flexibleSelectAreaPoints = new Vector4[100];
+                            pointCount = 0;
+                            editMat.SetFloat("_IsSelectingArea", 1);
+                            editMat.SetVectorArray("_Points", flexibleSelectAreaPoints);
+                            editMat.SetInt("_PointNum", pointCount);
+                        }
+
+
+                        if (mode == SelectAreaMode.SELECT_AREA)
+                        {
+                            // 最初の点と十分に近かったら閉路にして終わる
+                            if (pointCount > 0 && Vector4.Distance(flexibleSelectAreaPoints[0], uvPos) < 0.01)
+                            {
+                                mode = SelectAreaMode.IDLE;
+                                editMat.SetFloat("_IsSelectingArea", 0);
+                            }
+                            else
+                            {
+                                flexibleSelectAreaPoints[pointCount++] = new Vector4(uvPos.x, uvPos.y, 0, 0);
+
+                                editMat.SetVectorArray("_Points", flexibleSelectAreaPoints);
+                                editMat.SetInt("_PointNum", pointCount);
+                            }
+
+                            Repaint();
+                        }
+                        // 範囲を選択し終えた後
+                        else if (pointCount > 0)
+                        {
+                            if (mode == SelectAreaMode.CUT_LINE)
+                            {
+                                for (int i = 0; i < pointCount; i++)
+                                {
+                                    Vector4 p1, p2;
+                                    if (i != pointCount - 1)
+                                    {
+                                        p1 = flexibleSelectAreaPoints[i];
+                                        p2 = flexibleSelectAreaPoints[i + 1];
+                                    }
+                                    else
+                                    {
+                                        p1 = flexibleSelectAreaPoints[pointCount - 1];
+                                        p2 = flexibleSelectAreaPoints[0];
+
+                                    }
+                                    var uvPosVec4 = new Vector4(uvPos.x, uvPos.y, 0, 0);
+                                    float inner = Vector4.Dot(Vector4.Normalize(p2-p1), Vector4.Normalize(uvPosVec4 - p1));
+
+                                    if (inner > 0.999 && inner <= 1)
+                                    {
+                                        var flexibleSelectAreaPointList = flexibleSelectAreaPoints.ToList();
+                                        flexibleSelectAreaPointList.Insert(i+1, uvPosVec4);
+                                        pointCount++;
+                                        flexibleSelectAreaPoints = flexibleSelectAreaPointList.ToArray();
+                                        Array.Resize(ref flexibleSelectAreaPoints, POINT_MAX_NUM);
+
+                                        editMat.SetVectorArray("_Points", flexibleSelectAreaPoints);
+                                        editMat.SetInt("_PointNum", pointCount);
+
+                                        break;
+                                    }
+                                }
+
+                                mode = SelectAreaMode.IDLE;
+                            }
+                            else if (mode == SelectAreaMode.DELETE_POINT)
+                            {
+                                for (int i = 0; i < pointCount; i++)
+                                {
+                                    if (Vector4.Distance(flexibleSelectAreaPoints[i], uvPos) < 0.005)
+                                    {
+                                        var flexibleSelectAreaPointList = flexibleSelectAreaPoints.ToList();
+                                        flexibleSelectAreaPointList.RemoveAt(i);
+                                        pointCount--;
+                                        flexibleSelectAreaPoints = flexibleSelectAreaPointList.ToArray();
+                                        Array.Resize(ref flexibleSelectAreaPoints, POINT_MAX_NUM);
+
+                                        editMat.SetVectorArray("_Points", flexibleSelectAreaPoints);
+                                        editMat.SetInt("_PointNum", pointCount);
+
+                                        break;
+                                    }
+                                }
+
+                                mode = SelectAreaMode.IDLE;
+                            }
+                            else
+                            {
+                                isMouseDowning = true;
+
+                                for (int i = 0; i < pointCount; i++)
+                                {
+                                    if (Vector4.Distance(flexibleSelectAreaPoints[i], uvPos) < 0.005)
+                                    {
+                                        movingPointIndex = i;
+                                        break;
+                                    }
+                                }
+                                UnityEngine.Debug.Log(movingPointIndex);
+
+                                isAreaSizeChanging = (movingPointIndex != -1);
+                            }
+                        }
+                    }
+                    else if (Event.current.type == EventType.MouseUp)
+                    {
+                        isAreaSizeChanging = false;
+                        isMouseDowning = false;
+                        movingPointIndex = -1;
+                    }
+
+                    if (isMouseDowning && isAreaSizeChanging)
+                    {
+                        flexibleSelectAreaPoints[movingPointIndex] = new Vector4(uvPos.x, uvPos.y, 0, 0);
+                        editMat.SetVectorArray("_Points", flexibleSelectAreaPoints);
+                        Repaint();
+                    }
+                }
+                /*
+                else if (drawType == DRAW_TYPES.SELECT_AREA_AUTO)
+                {
+                    if (Event.current.type == EventType.MouseDown)
+                    {
+                        ComputeShader cs = Instantiate(Resources.Load<ComputeShader>("selectAreaNshape")) as ComputeShader;
+                        int kernel = cs.FindKernel("CSMain");
+
+                        RenderTexture selectAreaTex = new RenderTexture(texture.width, texture.height, 0);
+                        selectAreaTex.enableRandomWrite = true;
+                        selectAreaTex.Create();
+
+                        cs.SetInt("Width", texture.width);
+                        cs.SetInt("Height", texture.height);
+                        cs.SetTexture(kernel, "Tex", texture);
+
+                        int[] posArray = new int[2 * sizeof(int)];
+                        posArray[0 * sizeof(int)] = (int)pos.x;
+                        posArray[1 * sizeof(int)] = (int)pos.y;
+                        cs.SetInts("Pos", posArray);
+
+                        int N = 4;
+                        var cb = new ComputeBuffer(N, sizeof(int) * 2);
+                        cs.SetBuffer(kernel, "Points", cb);
+                        cs.SetTexture(kernel, "Result", selectAreaTex);
+
+                        cs.Dispatch(kernel, 1, 1, 1);
+
+                        Material negaposiMat = new Material(Shader.Find("Gato/NegaPosi"));
+                        negaposiMat.SetTexture("_MaskTex", selectAreaTex);
+                        negaposiMat.SetFloat("_Inverse", 1);
+
+                        Graphics.Blit(texture, previewTexture, negaposiMat);
+
+                        selectAreaTex.Release();
+                        cb.Release();
+
+                        Repaint();
+                    }
+                }
+                */
             }
         }
 
@@ -519,6 +703,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     {
                         FillGUI();
                     }
+
+                    if (drawType == DRAW_TYPES.SELECT_A)
+                    {
+                        SelectAGUI();
+                    }
                 }
 
                 EditorGUILayout.LabelField("Triangle Count", triangleCount + "");
@@ -603,6 +792,51 @@ namespace Gatosyocora.MeshDeleterWithTexture
             {
                 FillOnTexture(ref texture, targetColor, dragPos1, dragPos2, hsvThreshold);
             }
+        }
+
+        private void SelectAGUI()
+        {
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                if (GUILayout.Button("Cut line"))
+                {
+                    mode = SelectAreaMode.CUT_LINE;
+                }
+                if (GUILayout.Button("Delete point"))
+                {
+                    mode = SelectAreaMode.DELETE_POINT;
+                }
+
+                if (GUILayout.Button("Reset Selecting"))
+                {
+                    flexibleSelectAreaPoints = new Vector4[POINT_MAX_NUM];
+                    pointCount = 0;
+
+                    editMat.SetVectorArray("_Points", flexibleSelectAreaPoints);
+                    editMat.SetInt("_PointNum", pointCount);
+
+                }
+            }
+
+            targetColor = EditorGUILayout.ColorField("Target Color", targetColor);
+
+            using (var check = new EditorGUI.ChangeCheckScope())
+            {
+                hsvThreshold.h = EditorGUILayout.Slider("H Threshold", hsvThreshold.h, 0, 1);
+                hsvThreshold.s = EditorGUILayout.Slider("S Threshold", hsvThreshold.s, 0, 1);
+                hsvThreshold.v = EditorGUILayout.Slider("V Threshold", hsvThreshold.v, 0, 1);
+
+                if (check.changed)
+                {
+                    FillOnTexture2(ref texture, targetColor, flexibleSelectAreaPoints, pointCount, hsvThreshold);
+                }
+            }
+
+            if (GUILayout.Button("Fill"))
+            {
+                FillOnTexture2(ref texture, targetColor, flexibleSelectAreaPoints, pointCount, hsvThreshold);
+            }
+
         }
 
         private void OutputMeshGUI()
@@ -958,6 +1192,31 @@ namespace Gatosyocora.MeshDeleterWithTexture
             Repaint();
         }
 
+        private void FillOnTexture2(ref Texture2D texture, Color targetColor, Vector4[] points, int pointNum, HSV hsvThreshold)
+        {
+            var colArray = new float[3 * sizeof(float)];
+            colArray[0 * sizeof(float)] = targetColor.r;
+            colArray[1 * sizeof(float)] = targetColor.g;
+            colArray[2 * sizeof(float)] = targetColor.b;
+            computeShader.SetFloats("TargetCol", colArray);
+
+            var hsvThresholdArray = new float[3 * sizeof(float)];
+            hsvThresholdArray[0 * sizeof(float)] = hsvThreshold.h;
+            hsvThresholdArray[1 * sizeof(float)] = hsvThreshold.s;
+            hsvThresholdArray[2 * sizeof(float)] = hsvThreshold.v;
+            computeShader.SetFloats("HsvThreshold", hsvThresholdArray);
+
+            var pointBuffer = new ComputeBuffer(pointNum, Marshal.SizeOf(typeof(Vector4)));
+            pointBuffer.SetData(points);
+            computeShader.SetBuffer(fill2KernelId, "Points", pointBuffer);
+
+            computeShader.SetInt("PointNum", pointNum);
+
+            computeShader.Dispatch(fill2KernelId, texture.width / 32, texture.height / 32, 1);
+
+            Repaint();
+        }
+
 
         /// <summary>
         /// ウィンドウの座標をテクスチャの座標に変換
@@ -1059,6 +1318,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             Material negaposiMat = new Material(Shader.Find("Gato/NegaPosi"));
             negaposiMat.SetTexture("_MaskTex", maskTexture);
+            negaposiMat.SetFloat("_Inverse", 0);
             Graphics.Blit(texture, renderTexture, negaposiMat);
             Repaint();
 
@@ -1158,6 +1418,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             penKernelId = computeShader.FindKernel("CSPen");
             eraserKernelId = computeShader.FindKernel("CSEraser");
             fillKernelId = computeShader.FindKernel("CSFill");
+            fill2KernelId = computeShader.FindKernel("CSFill2");
         }
 
         private void InitComputeBuffer(Texture2D texture)

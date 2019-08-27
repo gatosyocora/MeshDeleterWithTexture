@@ -4,6 +4,7 @@
 	{
 		_MainTex ("Texture", 2D) = "white" {}
 		_MaskTex("Mask Texture", 2D) = "black"{}
+		_Inverse ("Inverse", Float) = 0
 	}
 	SubShader
 	{
@@ -34,6 +35,8 @@
 			float4 _MainTex_ST;
 
 			sampler2D _MaskTex;
+
+			float _Inverse;
 			
 			v2f vert (appdata v)
 			{
@@ -46,7 +49,7 @@
 			fixed4 frag (v2f i) : SV_Target
 			{
 				fixed4 col = tex2D(_MainTex, i.uv);
-				col.rgb *= tex2D(_MaskTex, i.uv).rgb;
+				col.rgb *= abs(_Inverse - tex2D(_MaskTex, i.uv).rgb);
 				return col;
 			}
 			ENDCG

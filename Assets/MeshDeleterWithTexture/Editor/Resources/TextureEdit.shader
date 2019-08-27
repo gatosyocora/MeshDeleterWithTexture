@@ -67,6 +67,10 @@
 			sampler2D _UVMap;
 
 			float _ApplyGammaCorrection;
+
+			float4 _Points[100];
+			int _PointNum;
+			float _IsSelectingArea;
 			
 			v2f vert (appdata v)
 			{
@@ -94,6 +98,55 @@
 					(abs(i.uv.y - _StartPos.y) <= _LineWidth || abs(i.uv.y - _EndPos.y) <= _LineWidth) && i.uv.x >= min(_StartPos.x, _EndPos.x)-_LineWidth && i.uv.x <= max(_StartPos.x, _EndPos.x)+_LineWidth
 				)
 					col = fixed4(1, 0.7, 0, 1);
+
+				int p1Index, p2Index;
+				float pointRadius;
+				for (int k = 0; k < _PointNum; k++) {
+					
+					if (k == 0)
+						pointRadius = 0.01;
+					else
+						pointRadius = 0.005;
+
+					if (_PointNum > 1) {
+						if (k != _PointNum-1) {
+							p1Index = k;
+							p2Index = k+1;
+
+							float4 p1 = _Points[p1Index];
+							float4 p2 = _Points[p2Index];
+
+							float innerP1 = dot(normalize(p2.xy-p1.xy), normalize(i.uv-p1.xy));
+							float innerP2 = dot(normalize(p1.xy-p2.xy), normalize(i.uv-p2.xy));
+
+							if (innerP1 > 0.99999 && innerP1 <= 1 && innerP2 > 0.9999 && innerP2)
+								col = fixed4(1, 0.7, 0, 1);
+						}
+						else if (!_IsSelectingArea)
+						{
+							p1Index = _PointNum-1;
+							p2Index = 0;
+
+							float4 p1 = _Points[p1Index];
+							float4 p2 = _Points[p2Index];
+
+							float innerP1 = dot(normalize(p2.xy-p1.xy), normalize(i.uv-p1.xy));
+							float innerP2 = dot(normalize(p1.xy-p2.xy), normalize(i.uv-p2.xy));
+
+							if (innerP1 > 0.99999 && innerP1 <= 1 && innerP2 > 0.9999 && innerP2)
+								col = fixed4(1, 0.7, 0, 1);
+						}
+
+					}
+
+					float2 p1 = _Points[k].xy;
+
+					float2 currentPos = (float2(0.5, 0.5) * (1-_TextureScale) + _Offset.xy * 0.5) + p1 * _TextureScale;
+					float raito = _MainTex_TexelSize.x / _MainTex_TexelSize.y;
+					if (distance (i.uv * float2(1, raito), currentPos * float2(1, raito)) <= pointRadius)
+						col = fixed4(1, 0.7, 0, 1);
+
+				}
 
 				// ペンカーソルを表示
 				float2 currentPos = (float2(0.5, 0.5) * (1-_TextureScale) + _Offset.xy * 0.5) + _CurrentPos.xy * _TextureScale;

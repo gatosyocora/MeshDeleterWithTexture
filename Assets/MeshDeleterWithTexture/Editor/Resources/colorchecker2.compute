@@ -1,6 +1,7 @@
 ﻿#pragma kernel CSPen
 #pragma kernel CSEraser
 #pragma kernel CSFill
+#pragma kernel CSFill2
 
 Texture2D<float4> Tex;
 RWStructuredBuffer<int> Result;
@@ -19,6 +20,9 @@ float4 PenColor;
 int PenSize;
 
 int DrawType;
+
+StructuredBuffer<float4> Points;
+int PointNum;
 
 #include "color.cginc"
 
@@ -76,4 +80,26 @@ void CSFill (uint2 id : SV_DispatchThreadID)
 	PreviewTex[id.xy] = (result)? PenColor : Tex[id.xy];
 	Result[index] = result;
 }
+
+[numthreads(32,32,1)]
+void CSFill2 (uint2 id : SV_DispatchThreadID)
+{
+	bool result;
+	
+	int index = id.y * Width + id.x;
+
+	// scope outside ?
+
+	// same color ?
+	float4 col = Tex[id.xy];
+	float3 hsv = rgb2hsv(col.rgb);
+	float3 targetHsv = rgb2hsv(float3(TargetCol[0], TargetCol[1], TargetCol[2]));
+	result = (	abs(hsv.x - targetHsv.x) < HsvThreshold[0] &&
+				abs(hsv.y - targetHsv.y) < HsvThreshold[1] &&
+				abs(hsv.z - targetHsv.z) < HsvThreshold[2]);
+		
+	PreviewTex[id.xy] = (result)? PenColor : Tex[id.xy];
+	Result[index] = result;
+}
+
         
