@@ -6,10 +6,16 @@ int Height;
 
 int Pos[2];
 
+int N;
+
 RWStructuredBuffer<int2> Points;
 RWTexture2D<float4> Result;
 
-[numthreads(4,1,1)]
+CGPROGRAM
+#define PI 3.1415926535
+ENDCG
+
+[numthreads(1,1,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
 	uint2 pos = uint2(Pos[0], Pos[1]);
@@ -23,6 +29,10 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 
 	float4 color = float4(1, 1, 1, 1);
 
+	dx = sin(2 * PI * id.x/(float)N);
+	dy = cos(2 * PI * id.x/(float)N);
+	
+	/*
 	if (id.x == 0) {
 		dx = 0;
 		dy = 1;
@@ -43,6 +53,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 		dy = 0;
 		endPos = float2(Pos[0], 0);
 	}
+	*/
 
 	for(int i = 0; i < max(Width, Height); i++)
 	{
@@ -52,8 +63,6 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 			currentPos.y < 0 || currentPos.y >= Height) break;
 
 		float4 col = Tex[currentPos];
-
-		//Result[currentPos] = float4(1, 0, 0, 1);
 
 		if (col.r == targetColor.r &&
 			col.g == targetColor.g &&

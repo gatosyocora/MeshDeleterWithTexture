@@ -79,7 +79,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
             SELECT_AREA = 1,
             PEN = 2,
             ERASER = 3,
-            SELECT_A = 4
+            SELECT_A = 4,
+            //SELECT_B = 5
         };
 
         private DRAW_TYPES drawType;
@@ -579,7 +580,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     }
                 }
                 /*
-                else if (drawType == DRAW_TYPES.SELECT_AREA_AUTO)
+                else if (drawType == DRAW_TYPES.SELECT_B)
                 {
                     if (Event.current.type == EventType.MouseDown)
                     {
@@ -599,17 +600,17 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         posArray[1 * sizeof(int)] = (int)pos.y;
                         cs.SetInts("Pos", posArray);
 
-                        int N = 4;
+                        int N = 8;
                         var cb = new ComputeBuffer(N, sizeof(int) * 2);
                         cs.SetBuffer(kernel, "Points", cb);
                         cs.SetTexture(kernel, "Result", selectAreaTex);
+                        cs.SetInt("N", N);
 
-                        cs.Dispatch(kernel, 1, 1, 1);
+                        cs.Dispatch(kernel, N, 1, 1);
 
                         Material negaposiMat = new Material(Shader.Find("Gato/NegaPosi"));
                         negaposiMat.SetTexture("_MaskTex", selectAreaTex);
                         negaposiMat.SetFloat("_Inverse", 1);
-
                         Graphics.Blit(texture, previewTexture, negaposiMat);
 
                         selectAreaTex.Release();
