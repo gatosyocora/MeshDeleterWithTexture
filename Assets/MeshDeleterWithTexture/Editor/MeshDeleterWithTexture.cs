@@ -52,6 +52,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
         private ComputeBuffer buffer;
         private int penKernelId, eraserKernelId, fillKernelId, fill2KernelId;
         private RenderTexture previewTexture;
+        private Texture2D uvMapTex;
 
         #endregion
 
@@ -171,7 +172,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                                     SetupComputeShader(ref texture, ref previewTexture);
                                     InitComputeBuffer(texture);
 
-                                    var uvMapTex = GetUVMap(mesh, textureIndex, texture);
+                                    uvMapTex = GetUVMap(mesh, textureIndex, texture);
                                     editMat.SetTexture("_UVMap", uvMapTex);
 
                                     renderer.sharedMaterials[textureIndex].mainTexture = previewTexture;
@@ -254,7 +255,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         SetupComputeShader(ref texture, ref previewTexture);
                         InitComputeBuffer(texture);
 
-                        var uvMapTex = GetUVMap(mesh, textureIndex, texture);
+                        uvMapTex = GetUVMap(mesh, textureIndex, texture);
                         editMat.SetTexture("_UVMap", uvMapTex);
                     }
                 }
@@ -666,7 +667,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                                 var mesh = renderer.sharedMesh;
                                 if (mesh != null)
                                 {
-                                    var uvMapTex = GetUVMap(mesh, textureIndex, texture);
+                                    uvMapTex = GetUVMap(mesh, textureIndex, texture);
                                     editMat.SetTexture("_UVMap", uvMapTex);
                                 }
 
@@ -732,6 +733,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         SetupComputeShader(ref texture, ref previewTexture);
                         InitComputeBuffer(texture);
                     }
+                }
+
+                if  (GUILayout.Button("Export UVMap"))
+                {
+                    ExportUVMapTexture(uvMapTex);
                 }
             }
         }
@@ -1512,13 +1518,26 @@ namespace Gatosyocora.MeshDeleterWithTexture
             triangleBuffer.Release();
             uvBuffer.Release();
 
-            Texture2D uvMapTex = new Texture2D(texture.width, texture.height, TextureFormat.ARGB32, false);
-            Graphics.CopyTexture(uvMapRT, uvMapTex);
+            Texture2D uvMapTex = new Texture2D(texture.width, texture.height, TextureFormat.RGB24, false);
+            uvMapTex.name = texture.name;
+
+            var original = RenderTexture.active;
+            RenderTexture.active = uvMapRT;
+            uvMapTex.ReadPixels(new Rect(0, 0, uvMapRT.width, uvMapRT.height), 0, 0);
+            uvMapTex.Apply();
+            RenderTexture.active = original;
+
             uvMapRT.Release();
 
             return uvMapTex;
         }
 
+        /// <summary>
+        /// 点を反時計回り順にソート
+        /// </summary>
+        /// <param name="points"></param>
+        /// <param name="pointNum"></param>
+        /// <returns></returns>
         // Surveyor’s Area Formula
         // https://web.archive.org/web/20121107190918/http://www.maa.org/pubs/Calc_articles/ma063.pdf
         private bool SortCounterclockwise(ref Vector4[] points, int pointNum)
@@ -1542,6 +1561,39 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             return false;
 
+        }
+
+        /// <summary>
+        ///　UVマップを書き出す
+        /// </summary>
+        /// <param name="deletePos"></param>
+        private void ExportUVMapTexture(Texture2D uvMapTexture)
+        {
+            RenderTexture uvMapRT = new RenderTexture(uvMapTexture.width, uvMapTexture.height, 0, RenderTextureFormat.ARGB32);
+            Material negaposiMat = new Material(Shader.Find("Gato/NegaPosi"));
+            negaposiMat.SetTexture("_MaskTex", uvMapTexture);
+            negaposiMat.SetFloat("_Inverse", 1);
+            Graphics.Blit(null, uvMapRT, negaposiMat);
+
+            var original = RenderTexture.active;
+            RenderTexture.active = uvMapRT;
+            uvMapTexture.ReadPixels(new Rect(0, 0, uvMapRT.width, uvMapRT.height), 0, 0);
+            uvMapTexture.Apply();
+            RenderTexture.active = original;
+
+            var png = uvMapTexture.EncodeToPNG();
+
+            var path = EditorUtility.SaveFilePanel(
+                        "Save delete mask texture as PNG",
+                        "Assets",
+                        uvMapTexture.name + "_uv.png",
+                        "png");
+
+            if (path.Length > 0)
+                File.WriteAllBytes(path, png);
+
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
         }
 
         #endregion
