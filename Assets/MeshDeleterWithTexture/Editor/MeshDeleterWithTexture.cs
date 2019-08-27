@@ -472,6 +472,9 @@ namespace Gatosyocora.MeshDeleterWithTexture
                             {
                                 mode = SelectAreaMode.IDLE;
                                 editMat.SetFloat("_IsSelectingArea", 0);
+
+                                SortCounterclockwise(ref flexibleSelectAreaPoints, pointCount);
+                                editMat.SetVectorArray("_Points", flexibleSelectAreaPoints);
                             }
                             else
                             {
@@ -555,7 +558,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
                                         break;
                                     }
                                 }
-                                UnityEngine.Debug.Log(movingPointIndex);
 
                                 isAreaSizeChanging = (movingPointIndex != -1);
                             }
@@ -1206,13 +1208,15 @@ namespace Gatosyocora.MeshDeleterWithTexture
             hsvThresholdArray[2 * sizeof(float)] = hsvThreshold.v;
             computeShader.SetFloats("HsvThreshold", hsvThresholdArray);
 
-            var pointBuffer = new ComputeBuffer(pointNum, Marshal.SizeOf(typeof(Vector4)));
+            var pointBuffer = new ComputeBuffer(POINT_MAX_NUM, Marshal.SizeOf(typeof(Vector4)));
             pointBuffer.SetData(points);
             computeShader.SetBuffer(fill2KernelId, "Points", pointBuffer);
 
             computeShader.SetInt("PointNum", pointNum);
 
             computeShader.Dispatch(fill2KernelId, texture.width / 32, texture.height / 32, 1);
+
+            pointBuffer.Release();
 
             Repaint();
         }
@@ -1428,6 +1432,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             computeShader.SetBuffer(penKernelId, "Result", buffer);
             computeShader.SetBuffer(eraserKernelId, "Result", buffer);
             computeShader.SetBuffer(fillKernelId, "Result", buffer);
+            computeShader.SetBuffer(fill2KernelId, "Result", buffer);
         }
 
         private void SetupComputeShader(ref Texture2D texture, ref RenderTexture previewTexture)
@@ -1437,13 +1442,16 @@ namespace Gatosyocora.MeshDeleterWithTexture
             computeShader.SetTexture(penKernelId, "Tex", texture);
             computeShader.SetTexture(eraserKernelId, "Tex", texture);
             computeShader.SetTexture(fillKernelId, "Tex", texture);
+            computeShader.SetTexture(fill2KernelId, "Tex", texture);
             computeShader.SetInt("Width", texture.width);
             computeShader.SetInt("Height", texture.height);
 
             computeShader.SetTexture(penKernelId, "PreviewTex", previewTexture);
             computeShader.SetTexture(eraserKernelId, "PreviewTex", previewTexture);
             computeShader.SetTexture(fillKernelId, "PreviewTex", previewTexture);
+            computeShader.SetTexture(fill2KernelId, "PreviewTex", previewTexture);
         }
+
         private void ResetDrawArea(ref Texture2D texture, ref Material mat, ref RenderTexture previewTexture)
         {
             if (previewTexture != null) previewTexture.Release();
@@ -1509,6 +1517,31 @@ namespace Gatosyocora.MeshDeleterWithTexture
             uvMapRT.Release();
 
             return uvMapTex;
+        }
+
+        // Surveyor’s Area Formula
+        // https://web.archive.org/web/20121107190918/http://www.maa.org/pubs/Calc_articles/ma063.pdf
+        private bool SortCounterclockwise(ref Vector4[] points, int pointNum)
+        {
+            Vector4 p0, p1, p2;
+            p0 = points[0];
+            p1 = points[pointNum / 3];
+            p2 = points[pointNum / 3 * 2];
+
+            bool isCounterclockwise = ((p1.x - p0.x) * (p2.y - p0.y) - (p2.x - p0.x) * (p1.y - p0.y) >= 0);
+
+            if (!isCounterclockwise)
+            {
+                var existPoints = new Vector4[pointNum];
+                Array.Copy(points, existPoints, pointNum);
+                existPoints = existPoints.Reverse().ToArray();
+                Array.Copy(existPoints, points, pointNum);
+
+                return true;
+            }
+
+            return false;
+
         }
 
         #endregion
