@@ -97,7 +97,7 @@ void CSFill2 (uint2 id : SV_DispatchThreadID)
 	float otherSign = 0;
 
 	// scope outside ?
-	float3 outP = float3(Width, Height, 0);
+	float3 outP = Points[0].xyz;
 	int count = 0;
 	
 	for (int i = 0; i < PointNum; i++) {
