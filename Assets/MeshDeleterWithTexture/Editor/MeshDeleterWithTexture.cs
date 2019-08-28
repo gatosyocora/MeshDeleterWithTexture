@@ -7,11 +7,8 @@ using UnityEditor;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-//using System.Drawing;
-//using System.Runtime.InteropServices;
 using System;
 using System.Runtime.InteropServices;
-using System.Diagnostics;
 
 /*
  * Copyright (c) 2019 gatosyocora
@@ -620,6 +617,9 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                         var points = EstimateAreaWithDrawResult(isDrawBuffer);
                         pointCount = points.Length;
+
+                        UnityEngine.Debug.Log(pointCount);
+
                         flexibleSelectAreaPoints = new Vector4[POINT_MAX_NUM];
                         Array.Copy(points, flexibleSelectAreaPoints, pointCount);
                         editMat.SetTexture("_SelectTex", null);
@@ -1716,7 +1716,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             // xが最大でyが最小な点を基点にする
             var maxX = drawPos.Max(v => v.x);
             var minY = drawPos.Where(v => v.x == maxX).Min(v => v.y);
-            var originPointIndex = drawPos.Select((value, index) => new {Value = value, Index = index }).Where(v => v.Value.x == maxX && v.Value.y == minY).First().Index;
+            var originPointIndex = drawPos.Select((value, index) => new { Value = value, Index = index }).Where(v => v.Value.x == maxX && v.Value.y == minY).First().Index;
 
             // 基点を原点と見たときの偏角順に並べる
             var pointIndexSortedByDeclination
@@ -1749,14 +1749,14 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                 var p2 = drawPos[nextPointIndex];
 
-                while(pointIndexs.Count >= 2)
+                while (pointIndexs.Count >= 2)
                 {
                     var p1 = drawPos[pointIndexs[pointIndexs.Count - 1]];
                     var p0 = drawPos[pointIndexs[pointIndexs.Count - 2]];
 
                     // p0, p1, p2が左回りならp2を追加
                     // 右回りならp1を除外する
-                    var outer = Vector3.Normalize(Vector3.Cross(p0-p1, p2-p1)).z;
+                    var outer = Vector3.Normalize(Vector3.Cross(p0 - p1, p2 - p1)).z;
 
                     if (outer < 0)
                     {
@@ -1776,6 +1776,87 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         .Select(i => new Vector4(drawPos[i].x, drawPos[i].y, 0, 0)).ToArray();
 
         }
+        private Vector4[] EstimateAreaWithDrawResult2(ComputeBuffer isDrawBuffer)
+        {
+            int width = selectAreaRT.width;
+
+            int[] isDraw = new int[selectAreaRT.width * selectAreaRT.height];
+            isDrawBuffer.GetData(isDraw);
+
+            var drawPos
+                = isDraw
+                    .Select((value, index) => new { Value = value, Pos = new Vector2(index % width, index / width) })
+                    .Where(v => v.Value == 1 && (v.Pos.x >= 0 && v.Pos.x < selectAreaRT.width) && (v.Pos.y >= 0 && v.Pos.y < selectAreaRT.height))
+                    .Select(v => ConvertTexturePosToUVPos(texture, v.Pos))
+                    .ToList();
+
+            // yが最小な点を基点にする
+            var originPointIndex = drawPos.Select((value, index) => new { Value = value, Index = index }).OrderBy(v => v.Value.y).First().Index;
+
+            var pointIndexs = new List<int>();
+            pointIndexs.Add(originPointIndex);
+
+            var k = 4;
+
+            for (int i = 0; i < drawPos.Count; i++)
+            {
+                if (i == originPointIndex) continue;
+
+                var p1 = drawPos[pointIndexs.Count - 1];
+
+                // p1に近いk点を取得
+                var kNearPoints
+                            = drawPos
+                                .Select((value, index) => new { Value = value, Index = index })
+                                .Where(v => v.Index != originPointIndex)
+                                .OrderBy(v => Vector2.Distance(v.Value, p1))
+                                .Where(v => Vector2.Distance(v.Value, p1) >= 0.05f)
+                                .Where((v, index) => index < k)
+                                .ToList();
+
+                if (kNearPoints.Count() <= 0) continue;
+
+                int nextPointIndex;
+                if (pointIndexs.Count > 2)
+                {
+                    var p0 = drawPos[pointIndexs.Count - 2];
+
+                    // k点のうち最も右にある点を選ぶ
+                    nextPointIndex
+                                = kNearPoints
+                                    .OrderByDescending(v => Vector3.Dot(Vector3.Normalize(p1 - p0), Vector3.Normalize(v.Value - p1)))
+                                    .Select(v => v.Index)
+                                    .First();
+                }
+                else
+                {
+                    // 最も右にある点を選ぶ
+                    nextPointIndex
+                                = kNearPoints
+                                    .OrderBy(v => Mathf.Atan((v.Value - p1).y / (v.Value - p1).x))
+                                    .Select(v => v.Index)
+                                    .First();
+                }
+
+
+                pointIndexs.Add(nextPointIndex);
+
+            }
+
+            var resultPoints = pointIndexs
+                        .Select(i => new Vector4(drawPos[i].x, drawPos[i].y, 0, 0)).ToArray();
+
+            return resultPoints;
+
+            //var originPointVec4 = new Vector4(drawPos[originPointIndex].x, drawPos[originPointIndex].y, 0, 0);
+
+            // 基点を原点と見たときの偏角順に並べる
+            //var orderedPoints = resultPoints
+                                    //.OrderBy(v => Mathf.Atan((v - originPointVec4).y / (v - originPointVec4).x))
+                                    //.ToArray();
+
+        }
+
 
 
         #endregion
