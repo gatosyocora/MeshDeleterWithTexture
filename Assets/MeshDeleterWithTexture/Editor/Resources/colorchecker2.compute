@@ -19,8 +19,6 @@ float HsvThreshold[3];
 float4 PenColor;
 int PenSize;
 
-int DrawType;
-
 StructuredBuffer<float4> Points;
 int PointNum;
 

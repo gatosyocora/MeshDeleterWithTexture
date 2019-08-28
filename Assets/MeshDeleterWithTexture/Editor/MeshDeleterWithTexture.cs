@@ -79,11 +79,18 @@ namespace Gatosyocora.MeshDeleterWithTexture
             SELECT_AREA = 1,
             PEN = 2,
             ERASER = 3,
-            SELECT_A = 4,
-            //SELECT_B = 5
         };
 
         private DRAW_TYPES drawType;
+
+        private enum SELECT_AREA_TYPES
+        {
+            RECT,
+            FLEXIBLE,
+            DRAW
+        };
+
+        private SELECT_AREA_TYPES selectAreaType;
 
         private int triangleCount = 0;
         private string saveFolder = "Assets/";
@@ -100,7 +107,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             CUT_LINE,
             DELETE_POINT
         };
-        private SelectAreaMode mode = SelectAreaMode.IDLE;
+        private SelectAreaMode mode;
 
         struct UVItem {
             public Vector2 uv;
@@ -121,6 +128,9 @@ namespace Gatosyocora.MeshDeleterWithTexture
             textures = null;
             
             drawType = DRAW_TYPES.PEN;
+            selectAreaType = SELECT_AREA_TYPES.RECT;
+            mode = SelectAreaMode.IDLE;
+
             triangleCount = 0;
             saveFolder = "Assets/";
 
@@ -342,7 +352,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         targetColor = originTexture.GetPixel((int)pos.x, (int)pos.y);
                     }
                 }
-                else if (drawType == DRAW_TYPES.SELECT_AREA)
+                else if (drawType == DRAW_TYPES.SELECT_AREA && selectAreaType == SELECT_AREA_TYPES.RECT)
                 {
 
                     if (Event.current.type == EventType.MouseDown)
@@ -450,7 +460,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                             ClearOnTexture(pos);
                     }
                 }
-                else if (drawType == DRAW_TYPES.SELECT_A)
+                else if (drawType == DRAW_TYPES.SELECT_AREA && selectAreaType == SELECT_AREA_TYPES.FLEXIBLE)
                 {
                     var uvPos = ConvertTexturePosToUVPos(texture, pos);
 
@@ -698,6 +708,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 // DrawTypeによるGUIの表示
                 if (texture != null)
                 {
+                    GUILayout.Space(20);
+
                     if (drawType == DRAW_TYPES.PEN || drawType == DRAW_TYPES.ERASER)
                     {
                         PenEraserGUI();
@@ -705,12 +717,21 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                     if (drawType == DRAW_TYPES.CHOOSE_COLOR || drawType == DRAW_TYPES.SELECT_AREA)
                     {
-                        FillGUI();
-                    }
+                        using (var check = new EditorGUI.ChangeCheckScope())
+                        {
+                            selectAreaType = (SELECT_AREA_TYPES)GUILayout.Toolbar((int)selectAreaType, Enum.GetNames(typeof(SELECT_AREA_TYPES)));
 
-                    if (drawType == DRAW_TYPES.SELECT_A)
-                    {
-                        SelectAGUI();
+                            if (check.changed)
+                            {
+                            }
+                        }
+
+                        if (selectAreaType == SELECT_AREA_TYPES.FLEXIBLE)
+                        {
+                            SelectAGUI();
+                        }
+
+                        FillGUI();
                     }
                 }
 
@@ -793,13 +814,20 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                 if (check.changed)
                 {
-                    FillOnTexture(ref texture, targetColor, dragPos1, dragPos2, hsvThreshold);
+                    if (selectAreaType == SELECT_AREA_TYPES.RECT)
+                        FillOnTexture(ref texture, targetColor, dragPos1, dragPos2, hsvThreshold);
+                    else if (selectAreaType == SELECT_AREA_TYPES.FLEXIBLE)
+                        FillOnTexture2(ref texture, targetColor, flexibleSelectAreaPoints, pointCount, hsvThreshold);
+
                 }
             }
 
             if (GUILayout.Button("Fill"))
             {
-                FillOnTexture(ref texture, targetColor, dragPos1, dragPos2, hsvThreshold);
+                if (selectAreaType == SELECT_AREA_TYPES.RECT)
+                    FillOnTexture(ref texture, targetColor, dragPos1, dragPos2, hsvThreshold);
+                else if (selectAreaType == SELECT_AREA_TYPES.FLEXIBLE)
+                    FillOnTexture2(ref texture, targetColor, flexibleSelectAreaPoints, pointCount, hsvThreshold);
             }
         }
 
@@ -815,7 +843,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 {
                     mode = SelectAreaMode.DELETE_POINT;
                 }
-
                 if (GUILayout.Button("Reset Selecting"))
                 {
                     flexibleSelectAreaPoints = new Vector4[POINT_MAX_NUM];
@@ -823,27 +850,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                     editMat.SetVectorArray("_Points", flexibleSelectAreaPoints);
                     editMat.SetInt("_PointNum", pointCount);
-
                 }
-            }
-
-            targetColor = EditorGUILayout.ColorField("Target Color", targetColor);
-
-            using (var check = new EditorGUI.ChangeCheckScope())
-            {
-                hsvThreshold.h = EditorGUILayout.Slider("H Threshold", hsvThreshold.h, 0, 1);
-                hsvThreshold.s = EditorGUILayout.Slider("S Threshold", hsvThreshold.s, 0, 1);
-                hsvThreshold.v = EditorGUILayout.Slider("V Threshold", hsvThreshold.v, 0, 1);
-
-                if (check.changed)
-                {
-                    FillOnTexture2(ref texture, targetColor, flexibleSelectAreaPoints, pointCount, hsvThreshold);
-                }
-            }
-
-            if (GUILayout.Button("Fill"))
-            {
-                FillOnTexture2(ref texture, targetColor, flexibleSelectAreaPoints, pointCount, hsvThreshold);
             }
 
         }
@@ -1473,9 +1480,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
         private void DrawTypeSetting()
         {
-            editMat.SetFloat("_EditType", (int)drawType);
-            computeShader.SetInt("DrawType", (int)drawType);
-
             if (drawType == DRAW_TYPES.PEN)
             {
                 SetupDrawing(penSize, penColor, texture);

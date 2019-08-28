@@ -51,7 +51,6 @@
 			float4 _MainTex_ST;
 			float4 _MainTex_TexelSize;
 			fixed4 _Color;
-			float _EditType;
 			float _Threshold;
 			float _TextureScale;
 			float4 _Offset;
@@ -125,6 +124,7 @@
 							if (innerP1 > 0.99999 && innerP1 <= 1 && innerP2 > 0.9999 && innerP2)
 								col = fixed4(1, 0.7, 0, 1);
 						}
+						// 閉路完成状態のときだけ始点と終点をつなぐ線を描画
 						else if (!_IsSelectingArea)
 						{
 							p1Index = _PointNum-1;
