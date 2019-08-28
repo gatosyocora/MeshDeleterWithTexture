@@ -92,10 +92,13 @@
 				
 				// UVMapを表示
 				col.rgb *= 1-tex2D(_UVMap, uv).rgb;
+
+				float2 startPos = (float2(0.5, 0.5) * (1-_TextureScale) + _Offset.xy * 0.5) + _StartPos.xy * _TextureScale;
+				float2 endPos = (float2(0.5, 0.5) * (1-_TextureScale) + _Offset.xy * 0.5) + _EndPos.xy * _TextureScale;
 				
 				// 範囲選択用の枠を表示				
-				if ((abs(i.uv.x - _StartPos.x) <= _LineWidth || abs(i.uv.x - _EndPos.x) <= _LineWidth) && i.uv.y >= min(_StartPos.y, _EndPos.y)-_LineWidth && i.uv.y <= max(_StartPos.y, _EndPos.y)+_LineWidth ||
-					(abs(i.uv.y - _StartPos.y) <= _LineWidth || abs(i.uv.y - _EndPos.y) <= _LineWidth) && i.uv.x >= min(_StartPos.x, _EndPos.x)-_LineWidth && i.uv.x <= max(_StartPos.x, _EndPos.x)+_LineWidth
+				if ((abs(uv.x - _StartPos.x) <= _LineWidth || abs(uv.x - _EndPos.x) <= _LineWidth) && uv.y >= min(_StartPos.y, _EndPos.y)-_LineWidth && uv.y <= max(_StartPos.y, _EndPos.y)+_LineWidth ||
+					(abs(uv.y - _StartPos.y) <= _LineWidth || abs(uv.y - _EndPos.y) <= _LineWidth) && uv.x >= min(_StartPos.x, _EndPos.x)-_LineWidth && uv.x <= max(_StartPos.x, _EndPos.x)+_LineWidth
 				)
 					col = fixed4(1, 0.7, 0, 1);
 
@@ -116,8 +119,8 @@
 							float4 p1 = _Points[p1Index];
 							float4 p2 = _Points[p2Index];
 
-							float innerP1 = dot(normalize(p2.xy-p1.xy), normalize(i.uv-p1.xy));
-							float innerP2 = dot(normalize(p1.xy-p2.xy), normalize(i.uv-p2.xy));
+							float innerP1 = dot(normalize(p2.xy-p1.xy), normalize(uv-p1.xy));
+							float innerP2 = dot(normalize(p1.xy-p2.xy), normalize(uv-p2.xy));
 
 							if (innerP1 > 0.99999 && innerP1 <= 1 && innerP2 > 0.9999 && innerP2)
 								col = fixed4(1, 0.7, 0, 1);
@@ -130,8 +133,8 @@
 							float4 p1 = _Points[p1Index];
 							float4 p2 = _Points[p2Index];
 
-							float innerP1 = dot(normalize(p2.xy-p1.xy), normalize(i.uv-p1.xy));
-							float innerP2 = dot(normalize(p1.xy-p2.xy), normalize(i.uv-p2.xy));
+							float innerP1 = dot(normalize(p2.xy-p1.xy), normalize(uv-p1.xy));
+							float innerP2 = dot(normalize(p1.xy-p2.xy), normalize(uv-p2.xy));
 
 							if (innerP1 > 0.99999 && innerP1 <= 1 && innerP2 > 0.9999 && innerP2)
 								col = fixed4(1, 0.7, 0, 1);
@@ -141,17 +144,15 @@
 
 					float2 p1 = _Points[k].xy;
 
-					float2 currentPos = (float2(0.5, 0.5) * (1-_TextureScale) + _Offset.xy * 0.5) + p1 * _TextureScale;
 					float raito = _MainTex_TexelSize.x / _MainTex_TexelSize.y;
-					if (distance (i.uv * float2(1, raito), currentPos * float2(1, raito)) <= pointRadius)
+					if (distance (uv * float2(1, raito), p1 * float2(1, raito)) <= pointRadius)
 						col = fixed4(1, 0.7, 0, 1);
 
 				}
 
 				// ペンカーソルを表示
-				float2 currentPos = (float2(0.5, 0.5) * (1-_TextureScale) + _Offset.xy * 0.5) + _CurrentPos.xy * _TextureScale;
 				float raito = _MainTex_TexelSize.x / _MainTex_TexelSize.y;
-				if (distance (i.uv * float2(1, raito), currentPos * float2(1, raito)) <= _PenSize)
+				if (distance (uv * float2(1, raito), _CurrentPos.xy * float2(1, raito)) <= _PenSize)
 					col = fixed4(1, 1, 0, 1);
 
 				return col;
