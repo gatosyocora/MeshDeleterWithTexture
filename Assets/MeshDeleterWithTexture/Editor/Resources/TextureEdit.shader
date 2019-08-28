@@ -17,6 +17,8 @@
 
 		_UVMap ("UVMap Texture", 2D) = "black"{}
 
+		_SelectTex ("Select Area Texture", 2D) = "black"{}
+
 		_ApplyGammaCorrection ("Apply Gamma Correction", Float) = 1
 	}
 	SubShader
@@ -70,6 +72,8 @@
 			float4 _Points[100];
 			int _PointNum;
 			float _IsSelectingArea;
+
+			sampler2D _SelectTex;
 			
 			v2f vert (appdata v)
 			{
@@ -149,6 +153,8 @@
 						col = fixed4(1, 0.7, 0, 1);
 
 				}
+
+				col.rgb = lerp(col.rgb, fixed3(1, 0.7, 0), tex2D(_SelectTex, uv));
 
 				// ペンカーソルを表示
 				float raito = _MainTex_TexelSize.x / _MainTex_TexelSize.y;

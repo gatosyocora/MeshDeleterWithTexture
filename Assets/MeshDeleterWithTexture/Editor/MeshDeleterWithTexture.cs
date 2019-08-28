@@ -54,6 +54,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
         private RenderTexture previewTexture;
         private Texture2D uvMapTex;
 
+        private ComputeShader selectAreaComputeShader;
+        private int selectAreaDrawsKernelId;
+        private RenderTexture selectAreaRT;
+        private ComputeBuffer isDrawBuffer;
+
         #endregion
 
         private bool isDrawing = false;
@@ -179,7 +184,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                                     texture = LoadSettingToTexture(originTexture);
 
                                     DrawTypeSetting();
-                                    ResetDrawArea(ref texture, ref editMat, ref previewTexture);
+                                    ResetDrawArea(texture, ref editMat, ref previewTexture);
                                     SetupComputeShader(ref texture, ref previewTexture);
                                     InitComputeBuffer(texture);
 
@@ -262,7 +267,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     {
                         triangleCount = GetMeshTriangleCount(mesh);
 
-                        ResetDrawArea(ref texture, ref editMat, ref previewTexture);
+                        ResetDrawArea(texture, ref editMat, ref previewTexture);
                         SetupComputeShader(ref texture, ref previewTexture);
                         InitComputeBuffer(texture);
 
@@ -325,6 +330,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 }
 
                 editMat.SetVector("_Offset", textureOffset);
+
+                
                 Repaint();
             }
 
@@ -404,7 +411,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         {
                             if (changingLine == 1)
                             {
-                                dragPos1.x =pos.x;
+                                dragPos1.x = pos.x;
                                 var uvPos = ConvertTexturePosToUVPos(texture, dragPos1);
                                 editMat.SetVector("_StartPos", new Vector4(uvPos.x, uvPos.y, 0, 0));
                             }
@@ -433,6 +440,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
                             var uvPos = ConvertTexturePosToUVPos(texture, dragPos2);
                             editMat.SetVector("_EndPos", new Vector4(uvPos.x, uvPos.y, 0, 0));
                         }
+
+                        
                         Repaint();
                     }
                 }
@@ -441,7 +450,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 {
                     var uvPos = ConvertTexturePosToUVPos(texture, pos);
                     editMat.SetVector("_CurrentPos", new Vector4(uvPos.x, uvPos.y, 0, 0));
-                    Repaint();
 
                     if (Event.current.type == EventType.MouseDown)
                     {
@@ -458,6 +466,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
                             DrawOnTexture(pos);
                         else
                             ClearOnTexture(pos);
+                    }
+                    else
+                    {
+                        
+                        Repaint();
                     }
                 }
                 else if (drawType == DRAW_TYPES.SELECT_AREA && selectAreaType == SELECT_AREA_TYPES.FLEXIBLE)
@@ -496,6 +509,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                                 editMat.SetInt("_PointNum", pointCount);
                             }
 
+                            
                             Repaint();
                         }
                         // 範囲を選択し終えた後
@@ -518,12 +532,12 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                                     }
                                     var uvPosVec4 = new Vector4(uvPos.x, uvPos.y, 0, 0);
-                                    float inner = Vector4.Dot(Vector4.Normalize(p2-p1), Vector4.Normalize(uvPosVec4 - p1));
+                                    float inner = Vector4.Dot(Vector4.Normalize(p2 - p1), Vector4.Normalize(uvPosVec4 - p1));
 
                                     if (inner > 0.999 && inner <= 1)
                                     {
                                         var flexibleSelectAreaPointList = flexibleSelectAreaPoints.ToList();
-                                        flexibleSelectAreaPointList.Insert(i+1, uvPosVec4);
+                                        flexibleSelectAreaPointList.Insert(i + 1, uvPosVec4);
                                         pointCount++;
                                         flexibleSelectAreaPoints = flexibleSelectAreaPointList.ToArray();
                                         Array.Resize(ref flexibleSelectAreaPoints, POINT_MAX_NUM);
@@ -586,8 +600,39 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     {
                         flexibleSelectAreaPoints[movingPointIndex] = new Vector4(uvPos.x, uvPos.y, 0, 0);
                         editMat.SetVectorArray("_Points", flexibleSelectAreaPoints);
+
+                        
                         Repaint();
                     }
+                }
+                else if (drawType == DRAW_TYPES.SELECT_AREA && selectAreaType == SELECT_AREA_TYPES.DRAW)
+                {
+                    var uvPos = ConvertTexturePosToUVPos(texture, pos);
+                    editMat.SetVector("_CurrentPos", new Vector4(uvPos.x, uvPos.y, 0, 0));
+
+                    if (Event.current.type == EventType.MouseDown)
+                    {
+                        isDrawing = true;
+                    }
+                    else if (Event.current.type == EventType.MouseUp)
+                    {
+                        isDrawing = false;
+
+                        var points = EstimateAreaWithDrawResult(isDrawBuffer);
+                        pointCount = points.Length;
+                        flexibleSelectAreaPoints = new Vector4[POINT_MAX_NUM];
+                        Array.Copy(points, flexibleSelectAreaPoints, pointCount);
+                        editMat.SetTexture("_SelectTex", null);
+                        editMat.SetVectorArray("_Points", flexibleSelectAreaPoints);
+                        editMat.SetInt("_PointNum", pointCount);
+
+                        isDrawBuffer.Release();
+
+                        selectAreaType = SELECT_AREA_TYPES.FLEXIBLE;
+                    }
+
+                    if (isDrawing)
+                        SelectAreaWithDrawing(pos);
                 }
                 /*
                 else if (drawType == DRAW_TYPES.SELECT_B)
@@ -626,6 +671,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         selectAreaTex.Release();
                         cb.Release();
 
+                        
                         Repaint();
                     }
                 }
@@ -671,7 +717,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                                 texture = LoadSettingToTexture(originTexture);
 
                                 DrawTypeSetting();
-                                ResetDrawArea(ref texture, ref editMat, ref previewTexture);
+                                ResetDrawArea(texture, ref editMat, ref previewTexture);
                                 SetupComputeShader(ref texture, ref previewTexture);
                                 InitComputeBuffer(texture);
 
@@ -723,12 +769,31 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                             if (check.changed)
                             {
+                                SelectAreaSetting(selectAreaType);
                             }
                         }
 
                         if (selectAreaType == SELECT_AREA_TYPES.FLEXIBLE)
                         {
-                            SelectAGUI();
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
+                                if (GUILayout.Button("Cut line"))
+                                {
+                                    mode = SelectAreaMode.CUT_LINE;
+                                }
+                                if (GUILayout.Button("Delete point"))
+                                {
+                                    mode = SelectAreaMode.DELETE_POINT;
+                                }
+                                if (GUILayout.Button("Reset Selecting"))
+                                {
+                                    flexibleSelectAreaPoints = new Vector4[POINT_MAX_NUM];
+                                    pointCount = 0;
+
+                                    editMat.SetVectorArray("_Points", flexibleSelectAreaPoints);
+                                    editMat.SetInt("_PointNum", pointCount);
+                                }
+                            }
                         }
 
                         FillGUI();
@@ -751,7 +816,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     if (GUILayout.Button("Reset All"))
                     {
                         DrawTypeSetting();
-                        ResetDrawArea(ref texture, ref editMat,ref previewTexture);
+                        ResetDrawArea(texture, ref editMat,ref previewTexture);
                         SetupComputeShader(ref texture, ref previewTexture);
                         InitComputeBuffer(texture);
                     }
@@ -829,30 +894,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 else if (selectAreaType == SELECT_AREA_TYPES.FLEXIBLE)
                     FillOnTexture2(ref texture, targetColor, flexibleSelectAreaPoints, pointCount, hsvThreshold);
             }
-        }
-
-        private void SelectAGUI()
-        {
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                if (GUILayout.Button("Cut line"))
-                {
-                    mode = SelectAreaMode.CUT_LINE;
-                }
-                if (GUILayout.Button("Delete point"))
-                {
-                    mode = SelectAreaMode.DELETE_POINT;
-                }
-                if (GUILayout.Button("Reset Selecting"))
-                {
-                    flexibleSelectAreaPoints = new Vector4[POINT_MAX_NUM];
-                    pointCount = 0;
-
-                    editMat.SetVectorArray("_Points", flexibleSelectAreaPoints);
-                    editMat.SetInt("_PointNum", pointCount);
-                }
-            }
-
         }
 
         private void OutputMeshGUI()
@@ -1146,6 +1187,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
             computeShader.SetInts("Pos", posArray);
 
             computeShader.Dispatch(penKernelId, texture.width / 32, texture.height / 32, 1);
+
+            
             Repaint();
         }
 
@@ -1161,6 +1204,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
             computeShader.SetInts("Pos", posArray);
 
             computeShader.Dispatch(eraserKernelId, texture.width / 32, texture.height / 32, 1);
+
+            
             Repaint();
         }
 
@@ -1205,6 +1250,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             computeShader.Dispatch(fillKernelId, texture.width / 32, texture.height / 32, 1);
 
+            
             Repaint();
         }
 
@@ -1232,6 +1278,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             pointBuffer.Release();
 
+            
             Repaint();
         }
 
@@ -1338,6 +1385,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
             negaposiMat.SetTexture("_MaskTex", maskTexture);
             negaposiMat.SetFloat("_Inverse", 0);
             Graphics.Blit(texture, renderTexture, negaposiMat);
+
+            
             Repaint();
 
             return true;
@@ -1425,6 +1474,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
         private void ApplyTextureZoomScale(ref Material mat, float scale)
         {
             mat.SetFloat("_TextureScale", scale);
+
+            
             Repaint();
         }
 
@@ -1437,6 +1488,9 @@ namespace Gatosyocora.MeshDeleterWithTexture
             eraserKernelId = computeShader.FindKernel("CSEraser");
             fillKernelId = computeShader.FindKernel("CSFill");
             fill2KernelId = computeShader.FindKernel("CSFill2");
+
+            selectAreaComputeShader = Instantiate(Resources.Load<ComputeShader>("selectArea")) as ComputeShader;
+            selectAreaDrawsKernelId = selectAreaComputeShader.FindKernel("SelectAreaDraw");
         }
 
         private void InitComputeBuffer(Texture2D texture)
@@ -1466,7 +1520,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             computeShader.SetTexture(fill2KernelId, "PreviewTex", previewTexture);
         }
 
-        private void ResetDrawArea(ref Texture2D texture, ref Material mat, ref RenderTexture previewTexture)
+        private void ResetDrawArea(Texture2D texture, ref Material mat, ref RenderTexture previewTexture)
         {
             if (previewTexture != null) previewTexture.Release();
             previewTexture = new RenderTexture(texture.width, texture.height, 0, RenderTextureFormat.ARGB32);
@@ -1476,6 +1530,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             mat.SetVector("_StartPos", new Vector4(0, 0, 0, 0));
             mat.SetVector("_EndPos", new Vector4(texture.width - 1, texture.height - 1, 0, 0));
+
+            mat.SetTexture("_SelectTex", null);
         }
 
         private void DrawTypeSetting()
@@ -1540,13 +1596,15 @@ namespace Gatosyocora.MeshDeleterWithTexture
         /// <summary>
         /// 点を反時計回り順にソート
         /// </summary>
-        /// <param name="points"></param>
+        /// <param name="points">反時計または時計回りにソートされている点群</param>
         /// <param name="pointNum"></param>
-        /// <returns></returns>
+        /// <returns>ソートをおこなったらtrue</returns>
         // Surveyor’s Area Formula
+        // Surveyor’s Area FormulaE
         // https://web.archive.org/web/20121107190918/http://www.maa.org/pubs/Calc_articles/ma063.pdf
         private bool SortCounterclockwise(ref Vector4[] points, int pointNum)
         {
+            // 適当に3点取ってきて反時計回りか調べる
             Vector4 p0, p1, p2;
             p0 = points[0];
             p1 = points[pointNum / 3];
@@ -1600,6 +1658,125 @@ namespace Gatosyocora.MeshDeleterWithTexture
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }
+
+        // 範囲選択をするための準備
+        private void SelectAreaSetting (SELECT_AREA_TYPES type)
+        {
+            if (type == SELECT_AREA_TYPES.DRAW)
+            {
+                if (selectAreaRT != null) selectAreaRT.Release();
+                selectAreaRT = new RenderTexture(texture.width, texture.height, 0, RenderTextureFormat.ARGB32);
+                selectAreaRT.enableRandomWrite = true;
+                selectAreaRT.Create();
+
+                selectAreaComputeShader.SetTexture(selectAreaDrawsKernelId, "DrawTex", selectAreaRT);
+                isDrawBuffer = new ComputeBuffer(selectAreaRT.width * selectAreaRT.height, sizeof(int));
+                selectAreaComputeShader.SetBuffer(selectAreaDrawsKernelId, "isDraw", isDrawBuffer);
+                selectAreaComputeShader.SetInt("Width", texture.width);
+
+                editMat.SetTexture("_SelectTex", selectAreaRT);
+            }
+        }
+
+        // 範囲選択用の線を引く
+        private void SelectAreaWithDrawing(Vector2 pos)
+        {
+            var posArray = new int[2 * sizeof(int)];
+            posArray[0 * sizeof(int)] = (int)pos.x;
+            posArray[1 * sizeof(int)] = (int)pos.y;
+            selectAreaComputeShader.SetInts("Pos", posArray);
+
+            selectAreaComputeShader.Dispatch(selectAreaDrawsKernelId, selectAreaRT.width / 32, selectAreaRT.height / 32, 1);
+
+            
+            Repaint();
+        }
+
+        /// <summary>
+        /// 点群の凸包を計算する
+        /// Graham’s scan
+        /// http://www-ikn.ist.hokudai.ac.jp/~k-sekine/slides/convexhull.pdf
+        /// </summary>
+        /// <param name="isDrawBuffer"></param>
+        /// <returns></returns>
+        private Vector4[] EstimateAreaWithDrawResult(ComputeBuffer isDrawBuffer)
+        {
+            int width = selectAreaRT.width;
+
+            int[] isDraw = new int[selectAreaRT.width * selectAreaRT.height];
+            isDrawBuffer.GetData(isDraw);
+
+            var drawPos
+                = isDraw
+                    .Select((value, index) => new { Value = value, Pos = new Vector2(index % width, index / width) })
+                    .Where(v => v.Value == 1 && (v.Pos.x >= 0 && v.Pos.x < selectAreaRT.width) && (v.Pos.y >= 0 && v.Pos.y < selectAreaRT.height))
+                    .Select(v => ConvertTexturePosToUVPos(texture, v.Pos))
+                    .ToList();
+
+            // xが最大でyが最小な点を基点にする
+            var maxX = drawPos.Max(v => v.x);
+            var minY = drawPos.Where(v => v.x == maxX).Min(v => v.y);
+            var originPointIndex = drawPos.Select((value, index) => new {Value = value, Index = index }).Where(v => v.Value.x == maxX && v.Value.y == minY).First().Index;
+
+            // 基点を原点と見たときの偏角順に並べる
+            var pointIndexSortedByDeclination
+                = drawPos
+                    .Select((value, index) => new { Value = value, Index = index })
+                    .Where(v => v.Index != originPointIndex)
+                    .OrderBy(v => Mathf.Atan((v.Value - drawPos[originPointIndex]).y / (v.Value - drawPos[originPointIndex]).x))
+                    .Select(v => v.Index)
+                    .ToArray();
+
+            var pointIndexs = new List<int>();
+            pointIndexs.Add(originPointIndex);
+
+            var startIndex = 2;
+            var d = 0.01f;
+
+            pointIndexs.Add(pointIndexSortedByDeclination[0]);
+            pointIndexs.Add(pointIndexSortedByDeclination[1]);
+
+            // 各点に対して凸包多角形の頂点か調べる
+            // 最後は基点を新しい点として処理をおこなう
+            for (int i = startIndex; i <= pointIndexSortedByDeclination.Length; i++)
+            {
+                int nextPointIndex;
+
+                if (i < pointIndexSortedByDeclination.Length)
+                    nextPointIndex = pointIndexSortedByDeclination[i];
+                else
+                    nextPointIndex = originPointIndex;
+
+                var p2 = drawPos[nextPointIndex];
+
+                while(pointIndexs.Count >= 2)
+                {
+                    var p1 = drawPos[pointIndexs[pointIndexs.Count - 1]];
+                    var p0 = drawPos[pointIndexs[pointIndexs.Count - 2]];
+
+                    // p0, p1, p2が左回りならp2を追加
+                    // 右回りならp1を除外する
+                    var outer = Vector3.Normalize(Vector3.Cross(p0-p1, p2-p1)).z;
+
+                    if (outer < 0)
+                    {
+                        if (Vector2.Distance(p1, p2) > d && i < pointIndexSortedByDeclination.Length)
+                            pointIndexs.Add(nextPointIndex);
+
+                        break;
+                    }
+                    else
+                    {
+                        pointIndexs.RemoveAt(pointIndexs.Count - 1);
+                    }
+                }
+            }
+
+            return pointIndexs
+                        .Select(i => new Vector4(drawPos[i].x, drawPos[i].y, 0, 0)).ToArray();
+
+        }
+
 
         #endregion
 

@@ -1,0 +1,21 @@
+﻿#pragma kernel SelectAreaDraw
+
+int Width;
+int Pos[2];
+
+RWStructuredBuffer<int> isDraw;
+RWTexture2D<float4> DrawTex;
+
+[numthreads(32,32,1)]
+void SelectAreaDraw (uint2 id : SV_DispatchThreadID)
+{
+	int index = id.y * Width + id.x;
+
+	int2 currentPos = int2(Pos[0], Pos[1]);
+		
+	if (distance(currentPos, id) <= 5)
+		DrawTex[id.xy] = float4(1, 1, 1, 1);
+
+	if (uint(currentPos.x) == id.x && uint(currentPos.y) == id.y)
+		isDraw[index] = 1;
+}
