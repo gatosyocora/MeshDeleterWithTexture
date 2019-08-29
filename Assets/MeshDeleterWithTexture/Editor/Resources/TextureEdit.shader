@@ -69,7 +69,7 @@
 
 			float _ApplyGammaCorrection;
 
-			float4 _Points[100];
+			float4 _Points[1000];
 			int _PointNum;
 			float _IsSelectingArea;
 

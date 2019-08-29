@@ -98,7 +98,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
         private string saveFolder = "Assets/";
         private string meshName;
 
-        private const int POINT_MAX_NUM = 100;
+        private const int POINT_MAX_NUM = 1000;
         private Vector4[] flexibleSelectAreaPoints = new Vector4[POINT_MAX_NUM];
         private int pointCount = 0;
         private int movingPointIndex = -1;
@@ -147,6 +147,9 @@ namespace Gatosyocora.MeshDeleterWithTexture
             {
                 ResetMaterialTextures(ref renderer, ref textures);
             }
+
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
         }
 
         private void OnGUI()
@@ -248,30 +251,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 }
 
                 ToolGUI();
-                
-            }
-
-            EditorGUILayout.Space();
-
-            using (new EditorGUI.DisabledGroupScope(texture == null))
-            {
-                if (GUILayout.Button("Delete Mesh"))
-                {
-                    DeleteMesh(renderer, buffer, texture, textureIndex);
-
-                    var mesh = renderer.sharedMesh;
-                    if (mesh != null)
-                    {
-                        triangleCount = GetMeshTriangleCount(mesh);
-
-                        ResetDrawArea(texture, ref editMat, ref previewTexture);
-                        SetupComputeShader(ref texture, ref previewTexture);
-                        InitComputeBuffer(texture);
-
-                        uvMapTex = GetUVMap(mesh, textureIndex, texture);
-                        editMat.SetTexture("_UVMap", uvMapTex);
-                    }
-                }
             }
         }
 
@@ -615,7 +594,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     {
                         isDrawing = false;
 
-                        var points = EstimateAreaWithDrawResult3(isDrawBuffer);
+                        var points = EstimateAreaWithDrawResult0(isDrawBuffer);
                         pointCount = points.Length;
 
                         UnityEngine.Debug.Log(pointCount);
@@ -629,6 +608,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         isDrawBuffer.Release();
 
                         selectAreaType = SELECT_AREA_TYPES.FLEXIBLE;
+                        mode = SelectAreaMode.IDLE;
+                        editMat.SetFloat("_IsSelectingArea", 0);
                     }
 
                     if (isDrawing)
@@ -694,7 +675,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     if (GUILayout.Button("Export DeleteMask"))
                     {
                         ExportDeleteMaskTexture(buffer, originTexture);
-                        renderer.sharedMaterials[textureIndex].mainTexture = texture;
+                        renderer.sharedMaterials[textureIndex].mainTexture = previewTexture;
                     }
                 }
 
@@ -825,6 +806,33 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 if  (GUILayout.Button("Export UVMap"))
                 {
                     ExportUVMapTexture(uvMapTex);
+                    //renderer.sharedMaterials[textureIndex].mainTexture = previewTexture;
+
+                    //editMat.SetTexture("_UVMap", uvMapTex);
+                }
+
+
+                EditorGUILayout.Space();
+
+                using (new EditorGUI.DisabledGroupScope(texture == null))
+                {
+                    if (GUILayout.Button("Delete Mesh"))
+                    {
+                        DeleteMesh(renderer, buffer, texture, textureIndex);
+
+                        var mesh = renderer.sharedMesh;
+                        if (mesh != null)
+                        {
+                            triangleCount = GetMeshTriangleCount(mesh);
+
+                            ResetDrawArea(texture, ref editMat, ref previewTexture);
+                            SetupComputeShader(ref texture, ref previewTexture);
+                            InitComputeBuffer(texture);
+
+                            uvMapTex = GetUVMap(mesh, textureIndex, texture);
+                            editMat.SetTexture("_UVMap", uvMapTex);
+                        }
+                    }
                 }
             }
         }
@@ -1424,9 +1432,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             if (path.Length > 0)
                 File.WriteAllBytes(path, png);
-
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
         }
 
         /// <summary>
@@ -1639,7 +1644,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
             var original = RenderTexture.active;
             RenderTexture.active = uvMapRT;
             uvMapTexture.ReadPixels(new Rect(0, 0, uvMapRT.width, uvMapRT.height), 0, 0);
-            uvMapTexture.Apply();
             RenderTexture.active = original;
 
             var png = uvMapTexture.EncodeToPNG();
@@ -1652,9 +1656,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             if (path.Length > 0)
                 File.WriteAllBytes(path, png);
-
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
         }
 
         // 範囲選択をするための準備
@@ -1667,8 +1668,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 selectAreaRT.enableRandomWrite = true;
                 selectAreaRT.Create();
 
+                if (isDrawBuffer != null) isDrawBuffer.Release();
                 selectAreaComputeShader.SetTexture(selectAreaDrawsKernelId, "DrawTex", selectAreaRT);
                 isDrawBuffer = new ComputeBuffer(selectAreaRT.width * selectAreaRT.height, sizeof(int));
+                var isDraw = new int[selectAreaRT.width * selectAreaRT.height];
+                isDrawBuffer.SetData(isDraw);
                 selectAreaComputeShader.SetBuffer(selectAreaDrawsKernelId, "isDraw", isDrawBuffer);
                 selectAreaComputeShader.SetInt("Width", texture.width);
 
@@ -1887,12 +1891,25 @@ namespace Gatosyocora.MeshDeleterWithTexture
             var originPointIndex = drawPos.Select((value, index) => new { Value = value, Index = index }).Where(v => v.Value.x == minX).First().Index;
 
             // 基点を原点と見たときの偏角順に並べる
-            var pointIndexSortedByDeclination
+            /*var pointIndexSortedByDeclination
                 = drawPos
                     .Select((value, index) => new { Value = value, Index = index })
                     .OrderBy(v => Mathf.Atan((v.Value-drawPos[originPointIndex]).y / (v.Value- drawPos[originPointIndex]).x))
                     .Select(v => v.Index)
                     .ToArray();
+            */
+
+            var pointIndexSortedByDeclinationList = new List<int>();
+            var upArea = new List<int>();
+            var lowArea = new List<int>();
+
+            for (int i = 0; i < width; i++)
+            {
+                var enterPoints = drawPos.Where(v => v.x * width == i).OrderBy(v => v.y).ToArray();
+                //enterP
+            }
+
+            var pointIndexSortedByDeclination = pointIndexSortedByDeclinationList.ToArray();
 
             // 距離が十分に近いものは除外する
             /*
@@ -1938,6 +1955,99 @@ namespace Gatosyocora.MeshDeleterWithTexture
             return pointIndexs
                         .Select(i => new Vector4(drawPos[i].x, drawPos[i].y, 0, 0)).ToArray();
 
+        }
+
+        private Vector4[] EstimateAreaWithDrawResult0(ComputeBuffer isDrawBuffer)
+        {
+            int width = selectAreaRT.width;
+
+            int[] isDraw = new int[selectAreaRT.width * selectAreaRT.height];
+            isDrawBuffer.GetData(isDraw);
+
+            // 画像上に描かれた線を構成する点のuv座標位置のリスト
+            var drawPos
+                = isDraw
+                    .Select((value, index) => new { Value = value, Pos = new Vector2(index % width, index / width) })
+                    .Where(v => v.Value == 1 && (v.Pos.x >= 0 && v.Pos.x < selectAreaRT.width) && (v.Pos.y >= 0 && v.Pos.y < selectAreaRT.height))
+                    .Select(v => ConvertTexturePosToUVPos(texture, v.Pos))
+                    .Select(v => new Vector4(v.x, v.y, 0, 0))
+                    .ToList();
+
+            // xが最小な点を基点とする
+            var minX = drawPos.Min(v => v.x);
+            var originPointIndex = drawPos.Select((value, index) => new { Value = value, Index = index }).Where(v => v.Value.x == minX).First().Index;
+
+            var pointIndexSortedByDeclinationList = new List<int>();
+
+            var upAreaIndexs = new List<int>(); // 上用のリスト
+            var lowAreaIndexs = new List<int>(); // 下用のリスト
+
+            upAreaIndexs.Add(originPointIndex);
+
+            var areaList = new List<List<int>>();
+
+            areaList.Add(upAreaIndexs);
+            areaList.Add(lowAreaIndexs);
+
+            for (int i = 0; i < width; i++)
+            {
+                // 同じx座標にある点のインデックスを取得する(y座標で降順ソート)
+                var enterPointIndexs 
+                    = drawPos
+                        .Select((value, index) => new { Value = value, Index = index })
+                        .Where(v => v.Value.x * width == i)
+                        .OrderByDescending(v => v.Value.y)
+                        .Select(v => v.Index)
+                        .ToArray();
+
+                /*
+                if (enterPointIndexs.Length == 3)
+                {
+                    var newUpAreaIndexs = new List<int>();
+                    var newLowAreaIndexs = new List<int>();
+
+
+
+                    areaList.Add(newUpAreaIndexs);
+                    areaList.Add(newLowAreaIndexs);
+                }
+                */
+
+                // 2つのエリアのリストの最後の点のy座標の平均でどちらに入れるか決める
+                for (int j = 0; j < enterPointIndexs.Count(); j++)
+                {
+                    float centerY = drawPos[areaList[0].Last()].y;
+
+                    if (areaList[1].Count >= 1)
+                        centerY = (centerY + drawPos[areaList[1].Last()].y) / 2f;
+
+                    if (centerY < drawPos[enterPointIndexs[j]].y)
+                        areaList[0].Add(enterPointIndexs[j]);
+                    else
+                        areaList[1].Add(enterPointIndexs[j]);
+                }
+            }
+
+            pointIndexSortedByDeclinationList.AddRange(areaList[0]);
+            areaList[1].Reverse();
+            pointIndexSortedByDeclinationList.AddRange(areaList[1]);
+
+            /*
+            for (int i = 2; i < areaList.Count; i++)
+            {
+                if (i % 2 == 0)
+                    areaList[i].Reverse();
+
+                pointIndexSortedByDeclinationList.AddRange(areaList[i]);
+            }
+            */
+
+            var pointIndexSortedByDeclination = pointIndexSortedByDeclinationList.ToArray();
+
+
+            drawPos = pointIndexSortedByDeclination.Select(i => drawPos[i]).ToList();
+
+            return drawPos.ToArray();
         }
 
         #endregion
