@@ -615,7 +615,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     {
                         isDrawing = false;
 
-                        var points = EstimateAreaWithDrawResult(isDrawBuffer);
+                        var points = EstimateAreaWithDrawResult3(isDrawBuffer);
                         pointCount = points.Length;
 
                         UnityEngine.Debug.Log(pointCount);
@@ -1614,10 +1614,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             if (!isCounterclockwise)
             {
-                var existPoints = new Vector4[pointNum];
-                Array.Copy(points, existPoints, pointNum);
-                existPoints = existPoints.Reverse().ToArray();
-                Array.Copy(existPoints, points, pointNum);
+                var reversePoints = points.Take(pointNum).Reverse().ToArray();
+                Array.Copy(reversePoints, points, pointNum);
 
                 return true;
             }
@@ -1706,6 +1704,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             int[] isDraw = new int[selectAreaRT.width * selectAreaRT.height];
             isDrawBuffer.GetData(isDraw);
 
+            // 画像上に描かれた線を構成する点のuv座標位置のリスト
             var drawPos
                 = isDraw
                     .Select((value, index) => new { Value = value, Pos = new Vector2(index % width, index / width) })
@@ -1776,6 +1775,12 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         .Select(i => new Vector4(drawPos[i].x, drawPos[i].y, 0, 0)).ToArray();
 
         }
+
+        /// <summary>
+        /// 点群の凹包を計算する（k近傍法）
+        /// </summary>
+        /// <param name="isDrawBuffer"></param>
+        /// <returns></returns>
         private Vector4[] EstimateAreaWithDrawResult2(ComputeBuffer isDrawBuffer)
         {
             int width = selectAreaRT.width;
@@ -1811,7 +1816,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                                 .Where(v => v.Index != originPointIndex)
                                 .OrderBy(v => Vector2.Distance(v.Value, p1))
                                 .Where(v => Vector2.Distance(v.Value, p1) >= 0.05f)
-                                .Where((v, index) => index < k)
+                                .Take(k)
                                 .ToList();
 
                 if (kNearPoints.Count() <= 0) continue;
@@ -1857,7 +1862,83 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
         }
 
+        /// <summary>
+        /// 点群の凹包を計算する（直線近似）
+        /// </summary>
+        /// <param name="isDrawBuffer"></param>
+        /// <returns></returns>
+        private Vector4[] EstimateAreaWithDrawResult3(ComputeBuffer isDrawBuffer)
+        {
+            int width = selectAreaRT.width;
 
+            int[] isDraw = new int[selectAreaRT.width * selectAreaRT.height];
+            isDrawBuffer.GetData(isDraw);
+
+            // 画像上に描かれた線を構成する点のuv座標位置のリスト
+            var drawPos
+                = isDraw
+                    .Select((value, index) => new { Value = value, Pos = new Vector2(index % width, index / width) })
+                    .Where(v => v.Value == 1 && (v.Pos.x >= 0 && v.Pos.x < selectAreaRT.width) && (v.Pos.y >= 0 && v.Pos.y < selectAreaRT.height))
+                    .Select(v => ConvertTexturePosToUVPos(texture, v.Pos))
+                    .ToList();
+
+            // xが最小な点を基点とする
+            var minX = drawPos.Min(v => v.x);
+            var originPointIndex = drawPos.Select((value, index) => new { Value = value, Index = index }).Where(v => v.Value.x == minX).First().Index;
+
+            // 基点を原点と見たときの偏角順に並べる
+            var pointIndexSortedByDeclination
+                = drawPos
+                    .Select((value, index) => new { Value = value, Index = index })
+                    .OrderBy(v => Mathf.Atan((v.Value-drawPos[originPointIndex]).y / (v.Value- drawPos[originPointIndex]).x))
+                    .Select(v => v.Index)
+                    .ToArray();
+
+            // 距離が十分に近いものは除外する
+            /*
+            var pointIndexSortedByDeclinationList = pointIndexSortedByDeclination.ToList();
+            for (int i = pointIndexSortedByDeclinationList.Count-1; i > 0; i--)
+            {
+                if (Vector2.Distance(drawPos[pointIndexSortedByDeclinationList[i]], drawPos[pointIndexSortedByDeclinationList[i - 1]]) <= 0.01f)
+                    pointIndexSortedByDeclinationList.RemoveAt(i);
+            }
+            pointIndexSortedByDeclination = pointIndexSortedByDeclinationList.ToArray();
+            */
+
+            var pointIndexs = new List<int>();
+            pointIndexs.Add(originPointIndex);
+            pointIndexs.Add(pointIndexSortedByDeclination[0]);
+
+            float t = 0.6f;
+
+            int nextPointIndex;
+            // リストに入った2点p0, p1の線分01と新しい点p2とp1からできる線分12が
+            // ある程度まっすぐならp1を除去する
+            for (int i = 1; i <= pointIndexSortedByDeclination.Length; i++)
+            {
+
+                if (i < pointIndexSortedByDeclination.Length)
+                    nextPointIndex = pointIndexSortedByDeclination[i];
+                else
+                    nextPointIndex = originPointIndex;
+
+                var p2 = drawPos[nextPointIndex];
+
+                var p1 = drawPos[pointIndexs[pointIndexs.Count - 1]];
+                var p0 = drawPos[pointIndexs[pointIndexs.Count - 2]];
+
+                // ある程度まっすぐならp1を除去
+                if (Vector3.Dot(Vector3.Normalize(p1-p0), Vector3.Normalize(p2-p1)) > t)
+                    pointIndexs.RemoveAt(pointIndexs.Count - 1);
+
+                if (i != pointIndexSortedByDeclination.Length)
+                    pointIndexs.Add(nextPointIndex);
+            }
+
+            return pointIndexs
+                        .Select(i => new Vector4(drawPos[i].x, drawPos[i].y, 0, 0)).ToArray();
+
+        }
 
         #endregion
 
