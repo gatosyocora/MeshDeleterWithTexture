@@ -1982,12 +1982,14 @@ namespace Gatosyocora.MeshDeleterWithTexture
             var upAreaIndexs = new List<int>(); // 上用のリスト
             var lowAreaIndexs = new List<int>(); // 下用のリスト
 
-            upAreaIndexs.Add(originPointIndex);
-
             var areaList = new List<List<int>>();
+
+            upAreaIndexs.Add(originPointIndex);
 
             areaList.Add(upAreaIndexs);
             areaList.Add(lowAreaIndexs);
+
+            float e = 0.05f;
 
             for (int i = 0; i < width; i++)
             {
@@ -2000,50 +2002,94 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         .Select(v => v.Index)
                         .ToArray();
 
-                /*
-                if (enterPointIndexs.Length == 3)
-                {
-                    var newUpAreaIndexs = new List<int>();
-                    var newLowAreaIndexs = new List<int>();
-
-
-
-                    areaList.Add(newUpAreaIndexs);
-                    areaList.Add(newLowAreaIndexs);
-                }
-                */
-
-                // 2つのエリアのリストの最後の点のy座標の平均でどちらに入れるか決める
+                // 各頂点をどのエリアのリストに入れるか決める
                 for (int j = 0; j < enterPointIndexs.Count(); j++)
                 {
-                    float centerY = drawPos[areaList[0].Last()].y;
+                    // 初めて入れる場合は最初の点の上下で決める
+                    if (areaList[0].Count <= 1 || areaList[1].Count <= 0)
+                    {
+                        if (drawPos[originPointIndex].y >= drawPos[enterPointIndexs[j]].y)
+                            areaList[0].Add(enterPointIndexs[j]);
+                        else
+                            areaList[1].Add(enterPointIndexs[j]);
 
-                    if (areaList[1].Count >= 1)
-                        centerY = (centerY + drawPos[areaList[1].Last()].y) / 2f;
+                        continue;
+                    }
 
-                    if (centerY < drawPos[enterPointIndexs[j]].y)
-                        areaList[0].Add(enterPointIndexs[j]);
-                    else
-                        areaList[1].Add(enterPointIndexs[j]);
+                    var minDistAreaIndex = -1;
+                    float minDistance = width;
+
+                    // 一番近くのリストに入れる
+                    for (int a = 0; a < areaList.Count; a++)
+                    {
+                        float dist;
+                        int areaIndex = a;
+                        int calcIndex = a;
+
+                        if (areaList[a].Count <= 0)
+                        {
+                            // リストが空なのが上方向だったら下方向の値で上下を計算する
+                            if (a % 2 == 0)
+                            {
+                                calcIndex = a + 1;
+
+                                if (drawPos[areaList[calcIndex].Last()].y < drawPos[enterPointIndexs[j]].y)
+                                {
+                                    areaIndex = a + 1;
+                                }
+                            }
+                            else
+                            {
+                                calcIndex = a - 1;
+
+                                if (drawPos[areaList[calcIndex].Last()].y >= drawPos[enterPointIndexs[j]].y)
+                                {
+                                    areaIndex = a - 1;
+                                }
+                            }
+                        }
+
+                        dist = Vector4.Distance(drawPos[areaList[calcIndex].Last()], drawPos[enterPointIndexs[j]]);
+
+                        if (minDistance > dist)
+                        {
+                            minDistAreaIndex = areaIndex;
+                            minDistance = dist;
+                        }
+                    }
+
+                    // どのリストの最後の頂点よりもeより距離があったら
+                    // 凸の頂点であるとして処理する
+                    if (minDistance > e)
+                    {
+                        var newUpAreaIndexs = new List<int>();
+                        var newLowAreaIndexs = new List<int>();
+
+                        areaList.Add(newUpAreaIndexs);
+                        areaList.Add(newLowAreaIndexs);
+
+                        minDistAreaIndex = areaList.Count - 1;
+                    }
+
+                    areaList[minDistAreaIndex].Add(enterPointIndexs[j]);
                 }
             }
 
             pointIndexSortedByDeclinationList.AddRange(areaList[0]);
-            areaList[1].Reverse();
-            pointIndexSortedByDeclinationList.AddRange(areaList[1]);
 
-            /*
-            for (int i = 2; i < areaList.Count; i++)
+            bool isReverse = true;
+
+            for (int i = areaList.Count-1; i >= 1; i--)
             {
-                if (i % 2 == 0)
+                if (isReverse)
                     areaList[i].Reverse();
 
                 pointIndexSortedByDeclinationList.AddRange(areaList[i]);
+
+                isReverse = !isReverse;
             }
-            */
 
             var pointIndexSortedByDeclination = pointIndexSortedByDeclinationList.ToArray();
-
 
             drawPos = pointIndexSortedByDeclination.Select(i => drawPos[i]).ToList();
 
