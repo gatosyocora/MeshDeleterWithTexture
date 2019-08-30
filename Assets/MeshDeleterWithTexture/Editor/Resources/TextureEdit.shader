@@ -19,6 +19,7 @@
 
 		_SelectTex ("Select Area Texture", 2D) = "black"{}
 
+		[Toggle]
 		_ApplyGammaCorrection ("Apply Gamma Correction", Float) = 1
 	}
 	SubShader
