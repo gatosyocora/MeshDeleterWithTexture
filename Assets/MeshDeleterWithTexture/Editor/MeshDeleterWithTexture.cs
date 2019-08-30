@@ -475,6 +475,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                                 SortCounterclockwise(ref flexibleSelectAreaPoints, pointCount);
                                 editMat.SetVectorArray("_Points", flexibleSelectAreaPoints);
+
+                                editMat.SetVector("_CurrentPos", new Vector4(0, 0, 0, 0));
                             }
                             else
                             {
@@ -609,6 +611,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         selectAreaType = SELECT_AREA_TYPES.FLEXIBLE;
                         mode = SelectAreaMode.IDLE;
                         editMat.SetFloat("_IsSelectingArea", 0);
+
+                        editMat.SetVector("_CurrentPos", new Vector4(0, 0, 0, 0));
                     }
 
                     if (isDrawing)
@@ -805,9 +809,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 if  (GUILayout.Button("Export UVMap"))
                 {
                     ExportUVMapTexture(uvMapTex);
-                    //renderer.sharedMaterials[textureIndex].mainTexture = previewTexture;
-
-                    //editMat.SetTexture("_UVMap", uvMapTex);
                 }
 
 
@@ -1987,7 +1988,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             areaList.Add(upAreaIndexs);
             areaList.Add(lowAreaIndexs);
 
-            float e = 0.05f;
+            float e = 0.1f;
 
             for (int i = 0; i < width; i++)
             {
@@ -2091,7 +2092,50 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             drawPos = pointIndexSortedByDeclination.Select(i => drawPos[i]).ToList();
 
-            return drawPos.ToArray();
+            var points = drawPos.ToArray();
+
+            AdjustmentAreaPoints(ref points);
+
+            return points;
+        }
+
+        /// <summary>
+        /// 範囲選択用の図形の点を減らす
+        /// </summary>
+        /// <param name="points"></param>
+        private void AdjustmentAreaPoints(ref Vector4[] points)
+        {
+            if (points.Length <= 2) return;
+
+            var d = 0.01f;
+
+            var angle = 10;
+            var r = 1f - (angle / 180f);
+
+            var pointList = points.ToList();
+
+            for (int i = pointList.Count - 2; i >= 1; i--)
+            {
+                var p2 = pointList[i + 1];
+                var p1 = pointList[i];
+                var p0 = pointList[i - 1];
+
+                // 3点が直線に並んでいたら真ん中の点を削除
+                if (Mathf.Abs(Vector4.Dot(Vector4.Normalize(p2 - p1), Vector4.Normalize(p1 - p0))) > r)
+                    pointList.RemoveAt(i);
+            }
+
+            for (int i = pointList.Count - 1; i >= 1; i--)
+            {
+                var p0 = pointList[i];
+                var p1 = pointList[i-1];
+
+                // 3点が直線に並んでいたら真ん中の点を削除
+                if (Vector4.Distance(p0, p1) < d)
+                    pointList.RemoveAt(i);
+            }
+
+            points = pointList.ToArray();
         }
 
         #endregion
