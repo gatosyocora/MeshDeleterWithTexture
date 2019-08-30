@@ -186,7 +186,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
                                     DrawTypeSetting();
                                     ResetDrawArea(texture, ref editMat, ref previewTexture);
                                     SetupComputeShader(ref texture, ref previewTexture);
-                                    InitComputeBuffer(texture);
 
                                     uvMapTex = GetUVMap(mesh, textureIndex, texture);
                                     editMat.SetTexture("_UVMap", uvMapTex);
@@ -700,7 +699,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
                                 DrawTypeSetting();
                                 ResetDrawArea(texture, ref editMat, ref previewTexture);
                                 SetupComputeShader(ref texture, ref previewTexture);
-                                InitComputeBuffer(texture);
 
                                 var mesh = renderer.sharedMesh;
                                 if (mesh != null)
@@ -799,7 +797,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         DrawTypeSetting();
                         ResetDrawArea(texture, ref editMat,ref previewTexture);
                         SetupComputeShader(ref texture, ref previewTexture);
-                        InitComputeBuffer(texture);
+
+                        renderer.sharedMaterials[textureIndex].mainTexture = previewTexture;
                     }
                 }
 
@@ -827,7 +826,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                             ResetDrawArea(texture, ref editMat, ref previewTexture);
                             SetupComputeShader(ref texture, ref previewTexture);
-                            InitComputeBuffer(texture);
 
                             uvMapTex = GetUVMap(mesh, textureIndex, texture);
                             editMat.SetTexture("_UVMap", uvMapTex);
