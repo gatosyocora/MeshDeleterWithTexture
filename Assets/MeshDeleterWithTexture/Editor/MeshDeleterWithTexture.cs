@@ -1988,7 +1988,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
             areaList.Add(upAreaIndexs);
             areaList.Add(lowAreaIndexs);
 
-            float e = 0.1f;
+            float e = 0.05f;
+
 
             for (int i = 0; i < width; i++)
             {
@@ -2007,7 +2008,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     // 初めて入れる場合は最初の点の上下で決める
                     if (areaList[0].Count <= 1 || areaList[1].Count <= 0)
                     {
-                        if (drawPos[originPointIndex].y >= drawPos[enterPointIndexs[j]].y)
+                        if (drawPos[originPointIndex].y <= drawPos[enterPointIndexs[j]].y)
                             areaList[0].Add(enterPointIndexs[j]);
                         else
                             areaList[1].Add(enterPointIndexs[j]);
@@ -2025,30 +2026,20 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         int areaIndex = a;
                         int calcIndex = a;
 
+                        // 下エリアのリストは要素がないことがある
+                        // そのときは
                         if (areaList[a].Count <= 0)
                         {
-                            // リストが空なのが上方向だったら下方向の値で上下を計算する
-                            if (a % 2 == 0)
-                            {
-                                calcIndex = a + 1;
+                            calcIndex = a - 1;
 
-                                if (drawPos[areaList[calcIndex].Last()].y < drawPos[enterPointIndexs[j]].y)
-                                {
-                                    areaIndex = a + 1;
-                                }
-                            }
-                            else
-                            {
-                                calcIndex = a - 1;
-
-                                if (drawPos[areaList[calcIndex].Last()].y >= drawPos[enterPointIndexs[j]].y)
-                                {
-                                    areaIndex = a - 1;
-                                }
-                            }
+                            if (drawPos[areaList[calcIndex].First()].y <= drawPos[enterPointIndexs[j]].y)
+                                areaIndex = a - 1;
                         }
 
-                        dist = Vector4.Distance(drawPos[areaList[calcIndex].Last()], drawPos[enterPointIndexs[j]]);
+                        if (areaIndex == a)
+                            dist = Vector4.Distance(drawPos[areaList[calcIndex].Last()], drawPos[enterPointIndexs[j]]);
+                        else
+                            dist = Vector4.Distance(drawPos[areaList[calcIndex].First()], drawPos[enterPointIndexs[j]]);
 
                         if (minDistance > dist)
                         {
@@ -2067,13 +2058,15 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         areaList.Add(newUpAreaIndexs);
                         areaList.Add(newLowAreaIndexs);
 
-                        minDistAreaIndex = areaList.Count - 1;
+                        // 新しい点は上エリアに入れる
+                        minDistAreaIndex = areaList.Count - 2;
                     }
 
                     areaList[minDistAreaIndex].Add(enterPointIndexs[j]);
                 }
             }
 
+            /*
             pointIndexSortedByDeclinationList.AddRange(areaList[0]);
 
             bool isReverse = true;
@@ -2087,6 +2080,41 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                 isReverse = !isReverse;
             }
+            */
+
+            float distLF, distFL;
+            for (int i = 0; i < areaList.Count / 2; i++)
+            {
+                if (areaList[i * 2 + 1].Count() > 0)
+                {
+
+                    areaList[i * 2].Reverse();
+
+                    distLF = Vector4.Distance(drawPos[areaList[i * 2].Last()], drawPos[areaList[i * 2 + 1].First()]);
+                    distFL = Vector4.Distance(drawPos[areaList[i * 2].First()], drawPos[areaList[i * 2 + 1].Last()]);
+
+                    // 始点でつながる場合, 上エリアのリストのあとに下エリアのリストをつける
+                    if (distLF < distFL)
+                        areaList[i * 2].AddRange(areaList[i * 2 + 1]);
+                    else
+                        areaList[i * 2].InsertRange(0, areaList[i * 2 + 1]);
+                }
+
+                if (i == 0)
+                    pointIndexSortedByDeclinationList.AddRange(areaList[0]);
+                else
+                {
+                    distLF = Vector4.Distance(drawPos[pointIndexSortedByDeclinationList.Last()], drawPos[areaList[i * 2].First()]);
+                    distFL = Vector4.Distance(drawPos[pointIndexSortedByDeclinationList.First()], drawPos[areaList[i * 2].Last()]);
+
+                    if (distLF < distFL)
+                        pointIndexSortedByDeclinationList.AddRange(areaList[i * 2]);
+                    else
+                        pointIndexSortedByDeclinationList.InsertRange(0, areaList[i * 2]);
+                }
+            }
+
+            //pointIndexSortedByDeclinationList.AddRange(areaList[2]);
 
             var pointIndexSortedByDeclination = pointIndexSortedByDeclinationList.ToArray();
 
