@@ -209,71 +209,60 @@ namespace Gatosyocora.MeshDeleterWithTexture
             EventType mouseEventType = 0;
             Rect rect = new Rect(0, 0, 0, 0);
             var delta = GatoGUILayout.MiniMonitor(previewTexture, width, height, ref rect, ref mouseEventType, true);
-
-            if (mouseEventType == EventType.ScrollWheel)
-            {
-                zoomScale += Mathf.Sign(delta.y) * 0.1f;
-
-                if (zoomScale > 1) zoomScale = 1;
-                else if (zoomScale < 0.1f) zoomScale = 0.1f;
-
-                // 縮小ではOffsetも中心に戻していく
-                if (Mathf.Sign(delta.y) > 0)
-                {
-                    if (zoomScale < 1)
-                        textureOffset *= zoomScale;
-                    else
-                        textureOffset = Vector4.zero;
-
-                    editMat.SetVector("_Offset", textureOffset);
-                }
-
-                ApplyTextureZoomScale(ref editMat, zoomScale);
-            }
-            else if (Event.current.button == 1 &&
-                mouseEventType == EventType.MouseDrag)
-            {
-                if (delta.x != 0)
-                {
-                    textureOffset.x -= delta.x / rect.width;
-
-                    if (textureOffset.x > 1 - zoomScale)
-                        textureOffset.x = 1 - zoomScale;
-                    else if (textureOffset.x < -(1 - zoomScale))
-                        textureOffset.x = -(1 - zoomScale);
-                }
-
-                if (delta.y != 0)
-                {
-                    textureOffset.y += delta.y / rect.height;
-
-                    if (textureOffset.y > 1 - zoomScale)
-                        textureOffset.y = 1 - zoomScale;
-                    else if (textureOffset.y < -(1 - zoomScale))
-                        textureOffset.y = -(1 - zoomScale);
-                }
-
-                editMat.SetVector("_Offset", textureOffset);
-
-                
-                Repaint();
-            }
-
-            if (Event.current.type == EventType.MouseDown &&
-                Event.current.button == 0 &&
-                !isMouseDowning && rect.Contains(Event.current.mousePosition))
-            {
-                isMouseDowning = true;
-            }
-            else if (Event.current.type == EventType.MouseUp &&
-                Event.current.button == 0 &&
-                isMouseDowning)
-            {
-                isMouseDowning = false;
-            }
-
+            
             if (rect.Contains(Event.current.mousePosition))
             {
+                // テクスチャの拡大縮小機能
+                if (mouseEventType == EventType.ScrollWheel)
+                {
+                    zoomScale += Mathf.Sign(delta.y) * 0.1f;
+
+                    if (zoomScale > 1) zoomScale = 1;
+                    else if (zoomScale < 0.1f) zoomScale = 0.1f;
+
+                    // 縮小ではOffsetも中心に戻していく
+                    if (Mathf.Sign(delta.y) > 0)
+                    {
+                        if (zoomScale < 1)
+                            textureOffset *= zoomScale;
+                        else
+                            textureOffset = Vector4.zero;
+
+                        editMat.SetVector("_Offset", textureOffset);
+                    }
+
+                    ApplyTextureZoomScale(ref editMat, zoomScale);
+                }
+                // テクスチャの表示箇所を移動する機能
+                else if (Event.current.button == 1 &&
+                    mouseEventType == EventType.MouseDrag)
+                {
+                    if (delta.x != 0)
+                    {
+                        textureOffset.x -= delta.x / rect.width;
+
+                        if (textureOffset.x > 1 - zoomScale)
+                            textureOffset.x = 1 - zoomScale;
+                        else if (textureOffset.x < -(1 - zoomScale))
+                            textureOffset.x = -(1 - zoomScale);
+                    }
+
+                    if (delta.y != 0)
+                    {
+                        textureOffset.y += delta.y / rect.height;
+
+                        if (textureOffset.y > 1 - zoomScale)
+                            textureOffset.y = 1 - zoomScale;
+                        else if (textureOffset.y < -(1 - zoomScale))
+                            textureOffset.y = -(1 - zoomScale);
+                    }
+
+                    editMat.SetVector("_Offset", textureOffset);
+                    
+                    Repaint();
+                }
+
+
                 var pos = ConvertWindowPosToTexturePos(texture, Event.current.mousePosition, rect);
                 
                 if (drawType == DRAW_TYPES.PEN || drawType == DRAW_TYPES.ERASER)
@@ -281,11 +270,15 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     var uvPos = ConvertTexturePosToUVPos(texture, pos);
                     editMat.SetVector("_CurrentPos", new Vector4(uvPos.x, uvPos.y, 0, 0));
 
-                    if (Event.current.type == EventType.MouseDown)
+                    if (Event.current.type == EventType.MouseDown &&
+                        Event.current.button == 0 &&
+                        !isDrawing)
                     {
                         isDrawing = true;
                     }
-                    else if (Event.current.type == EventType.MouseUp)
+                    else if (Event.current.type == EventType.MouseUp &&
+                        Event.current.button == 0 &&
+                        isDrawing)
                     {
                         isDrawing = false;
                     }
@@ -909,7 +902,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
         private void ApplyTextureZoomScale(ref Material mat, float scale)
         {
             mat.SetFloat("_TextureScale", scale);
-
             
             Repaint();
         }
