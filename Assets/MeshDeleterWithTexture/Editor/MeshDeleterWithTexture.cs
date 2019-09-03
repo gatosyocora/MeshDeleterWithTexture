@@ -296,10 +296,9 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
         private void ToolGUI()
         {
-
+            using (new EditorGUI.DisabledGroupScope(texture == null))
             using (new EditorGUILayout.VerticalScope())
             {
-                using (new EditorGUI.DisabledGroupScope(texture == null))
                 using (new EditorGUILayout.HorizontalScope())
                 {
                     if (GUILayout.Button("Import DeleteMask"))
@@ -310,6 +309,16 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     {
                         ExportDeleteMaskTexture(buffer, originTexture);
                         renderer.sharedMaterials[textureIndex].mainTexture = previewTexture;
+                    }
+                }
+                
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    GUILayout.FlexibleSpace();
+                    
+                    if (GUILayout.Button("Export UVMap"))
+                    {
+                        ExportUVMapTexture(uvMapTex);
                     }
                 }
 
@@ -351,7 +360,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 GUILayout.Space(20);
 
                 EditorGUILayout.LabelField("DrawType");
-                using (new EditorGUI.DisabledGroupScope(texture == null))
                 using (new EditorGUILayout.HorizontalScope())
                 {
                     using (var check = new EditorGUI.ChangeCheckScope())
@@ -383,13 +391,12 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 OutputMeshGUI();
 
                 GUILayout.Space(50);
-
-                using (new EditorGUI.DisabledGroupScope(texture == null))
+                
                 using (new EditorGUILayout.HorizontalScope())
                 {
                     GUILayout.FlexibleSpace();
 
-                    if (GUILayout.Button("Reset All"))
+                    if (GUILayout.Button("Clear All"))
                     {
                         DrawTypeSetting();
                         ResetDrawArea(texture, ref editMat,ref previewTexture);
@@ -398,32 +405,23 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         renderer.sharedMaterials[textureIndex].mainTexture = previewTexture;
                     }
                 }
-
-                if  (GUILayout.Button("Export UVMap"))
-                {
-                    ExportUVMapTexture(uvMapTex);
-                }
-
-
+                
                 EditorGUILayout.Space();
 
-                using (new EditorGUI.DisabledGroupScope(texture == null))
+                if (GUILayout.Button("Delete Mesh"))
                 {
-                    if (GUILayout.Button("Delete Mesh"))
+                    DeleteMesh(renderer, buffer, texture, textureIndex);
+
+                    var mesh = renderer.sharedMesh;
+                    if (mesh != null)
                     {
-                        DeleteMesh(renderer, buffer, texture, textureIndex);
+                        triangleCount = GetMeshTriangleCount(mesh);
 
-                        var mesh = renderer.sharedMesh;
-                        if (mesh != null)
-                        {
-                            triangleCount = GetMeshTriangleCount(mesh);
+                        ResetDrawArea(texture, ref editMat, ref previewTexture);
+                        SetupComputeShader(ref texture, ref previewTexture);
 
-                            ResetDrawArea(texture, ref editMat, ref previewTexture);
-                            SetupComputeShader(ref texture, ref previewTexture);
-
-                            uvMapTex = GetUVMap(mesh, textureIndex, texture);
-                            editMat.SetTexture("_UVMap", uvMapTex);
-                        }
+                        uvMapTex = GetUVMap(mesh, textureIndex, texture);
+                        editMat.SetTexture("_UVMap", uvMapTex);
                     }
                 }
             }
