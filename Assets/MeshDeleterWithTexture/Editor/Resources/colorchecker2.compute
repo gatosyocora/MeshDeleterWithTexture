@@ -1,7 +1,5 @@
 ﻿#pragma kernel CSPen
 #pragma kernel CSEraser
-#pragma kernel CSFill
-#pragma kernel CSFill2
 
 Texture2D<float4> Tex;
 RWStructuredBuffer<int> Result;
@@ -9,28 +7,10 @@ RWTexture2D<float4> PreviewTex;
 
 int Width;
 int Height;
-float TargetCol[3];
 int Pos[2];
-float Pos1[2];
-float Pos2[2];
-
-float HsvThreshold[3];
 
 float4 PenColor;
 int PenSize;
-
-StructuredBuffer<float4> Points;
-int PointNum;
-
-#include "color.cginc"
-
-CGPROGRAM
-
-float outer(float3 p0, float3 p1, float3 p2) {
-	return normalize(cross(p2-p1, p1-p0)).z;
-}
-
-ENDCG
 
 [numthreads(32,32,1)]
 void CSPen (uint2 id : SV_DispatchThreadID)
@@ -62,82 +42,6 @@ void CSEraser (uint2 id : SV_DispatchThreadID)
 
 	PreviewTex[id.xy] = Tex[id.xy];
 	Result[index] = false;
-}
-
-[numthreads(32,32,1)]
-void CSFill (uint2 id : SV_DispatchThreadID)
-{
-	bool result;
-	
-	int index = id.y * Width + id.x;
-
-	// scope outside ?
-	if(	min(Pos1[0], Pos2[0]) > id.x || max(Pos1[0], Pos2[0]) < id.x ||
-		min(Pos1[1], Pos2[1]) > id.y || max(Pos1[1], Pos2[1]) < id.y ) return;
-
-	// same color ?
-	float4 col = Tex[id.xy];
-	float3 hsv = rgb2hsv(col.rgb);
-	float3 targetHsv = rgb2hsv(float3(TargetCol[0], TargetCol[1], TargetCol[2]));
-	result = (	abs(hsv.x - targetHsv.x) < HsvThreshold[0] &&
-				abs(hsv.y - targetHsv.y) < HsvThreshold[1] &&
-				abs(hsv.z - targetHsv.z) < HsvThreshold[2]);
-		
-	PreviewTex[id.xy] = (result)? PenColor : Tex[id.xy];
-	Result[index] = result;
-}
-
-[numthreads(32,32,1)]
-void CSFill2 (uint2 id : SV_DispatchThreadID)
-{
-	bool result;
-	
-	int index = id.y * Width + id.x;
-
-	float otherSign = 0;
-
-	// scope outside ?
-	float3 outP = Points[0].xyz;
-	int count = 0;
-	
-	for (int i = 0; i < PointNum; i++) {
-		float4 p1, p2;
-
-		if (i != PointNum-1) {
-			p1 = Points[i];
-			p2 = Points[i+1];
-		}
-		else {
-			p1 = Points[PointNum-1];
-			p2 = Points[0];
-		}
-
-		p1.xy *= float2(Width, Height);
-		p2.xy *= float2(Width, Height);
-
-		float outerUV = outer(p1.xyz, p2.xyz, float3(id, 0));
-		float outerOutP = outer(p1.xyz, p2.xyz, outP);
-
-		float outer1 = outer(float3(id, 0), outP, p1.xyz);
-		float outer2 = outer(float3(id, 0), outP, p2.xyz);
-
-		if (outerUV * outerOutP < 0 && outer1 * outer2 < 0)
-			count++;
-	}
-
-	if (count % 2 == 0)
-		return;
-
-	// same color ?
-	float4 col = Tex[id.xy];
-	float3 hsv = rgb2hsv(col.rgb);
-	float3 targetHsv = rgb2hsv(float3(TargetCol[0], TargetCol[1], TargetCol[2]));
-	result = (	abs(hsv.x - targetHsv.x) < HsvThreshold[0] &&
-				abs(hsv.y - targetHsv.y) < HsvThreshold[1] &&
-				abs(hsv.z - targetHsv.z) < HsvThreshold[2]);
-		
-	PreviewTex[id.xy] = (result)? PenColor : Tex[id.xy];
-	Result[index] = result;
 }
 
         
