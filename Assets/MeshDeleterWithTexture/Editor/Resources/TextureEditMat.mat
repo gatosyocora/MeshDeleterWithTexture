@@ -93,7 +93,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _Color: {r: 0.32412776, g: 1, b: 0, a: 1}
-    - _CurrentPos: {r: 0.99365234, g: 0.5776367, b: 0, a: 0}
+    - _CurrentPos: {r: 0.9916992, g: 0.4663086, b: 0, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _EndPos: {r: 2047, g: 2047, b: 0, a: 0}
     - _MousePos: {r: 382.19995, g: 646.7999, b: 0, a: 0}

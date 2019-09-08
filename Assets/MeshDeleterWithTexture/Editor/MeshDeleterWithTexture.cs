@@ -406,6 +406,16 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     }
                 }
 
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    GUILayout.FlexibleSpace();
+
+                    if (GUILayout.Button("Reset to Default Mesh"))
+                    {
+                        RevertMeshToPrefab(renderer);
+                    }
+                }
+
                 EditorGUILayout.Space();
 
                 if (GUILayout.Button("Delete Mesh"))
@@ -917,6 +927,18 @@ namespace Gatosyocora.MeshDeleterWithTexture
             mat.SetFloat("_TextureScale", scale);
             
             Repaint();
+        }
+
+        private void RevertMeshToPrefab(SkinnedMeshRenderer renderer)
+        {
+            PrefabUtility.ReconnectToLastPrefab(renderer.gameObject);
+
+            var so = new SerializedObject(renderer);
+            so.Update();
+
+            var sp = so.FindProperty("m_Mesh");
+            sp.prefabOverride = false;
+            sp.serializedObject.ApplyModifiedProperties();
         }
 
 
