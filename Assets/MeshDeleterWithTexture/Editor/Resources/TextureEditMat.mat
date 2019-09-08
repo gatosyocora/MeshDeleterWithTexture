@@ -81,11 +81,11 @@ Material:
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _PenSize: 0.033203125
+    - _PenSize: 0.009765625
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
-    - _TextureScale: 0.592
+    - _TextureScale: 1
     - _Threshold: 0
     - _UVSec: 0
     - _WireframeSmoothing: 1
@@ -93,7 +93,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _Color: {r: 0.32412776, g: 1, b: 0, a: 1}
-    - _CurrentPos: {r: 0.50925, g: 0.32396093, b: 0, a: 0}
+    - _CurrentPos: {r: 0.99365234, g: 0.5776367, b: 0, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _EndPos: {r: 2047, g: 2047, b: 0, a: 0}
     - _MousePos: {r: 382.19995, g: 646.7999, b: 0, a: 0}

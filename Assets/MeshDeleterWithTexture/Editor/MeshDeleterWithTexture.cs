@@ -405,7 +405,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         renderer.sharedMaterials[textureIndex].mainTexture = previewTexture;
                     }
                 }
-                
+
                 EditorGUILayout.Space();
 
                 if (GUILayout.Button("Delete Mesh"))
@@ -882,7 +882,26 @@ namespace Gatosyocora.MeshDeleterWithTexture
             var textures = new Texture2D[materials.Length];
             for (int i = 0; i < materials.Length; i++)
             {
-                textures[i] = materials[i].mainTexture as Texture2D;
+                var mainTex = materials[i].mainTexture as Texture2D;
+
+                // シェーダーに_MainTexが含まれていない時, nullになるため
+                // Materialの一番始めに設定されているTextureを取得する
+                if (mainTex == null)
+                {
+                    var shaderPropertyNum = ShaderUtil.GetPropertyCount(materials[i].shader);
+                    string shaderPropertyName;
+
+                    for (int shaderaPropertyIndex = 0; shaderaPropertyIndex < shaderPropertyNum; shaderaPropertyIndex++)
+                    {
+                        shaderPropertyName = ShaderUtil.GetPropertyName(materials[i].shader, shaderaPropertyIndex);
+                        mainTex = materials[i].GetTexture(shaderPropertyName) as Texture2D;
+
+                        if (mainTex != null) break;
+                    }
+                }
+
+                // この時点でmainTexがnullならmaterialにテクスチャが設定されていない
+                textures[i] = mainTex;
             }
             return textures;
         }
