@@ -16,7 +16,7 @@ using System.Runtime.InteropServices;
  * see LICENSE.txt
  */
 
-// MeshDeleterWithTexture v0.4b
+// MeshDeleterWithTexture v0.5b
 
 namespace Gatosyocora.MeshDeleterWithTexture
 {
@@ -32,7 +32,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
         private Texture2D[] textures;
         private int textureIndex = 0;
 
-        private UnityEngine.Color penColor = UnityEngine.Color.black;
+        private Color penColor = Color.black;
         private int penSize = 20;
         private bool isMouseDowning = false;
         private float zoomScale = 1;
@@ -413,6 +413,9 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     if (GUILayout.Button("Reset to Default Mesh"))
                     {
                         RevertMeshToPrefab(renderer);
+                        var mesh = renderer.sharedMesh;
+                        uvMapTex = GetUVMap(mesh, textureIndex, texture);
+                        editMat.SetTexture("_UVMap", uvMapTex);
                     }
                 }
 
