@@ -100,7 +100,8 @@
 				float2 startPos = (float2(0.5, 0.5) * (1-_TextureScale) + _Offset.xy * 0.5) + _StartPos.xy * _TextureScale;
 				float2 endPos = (float2(0.5, 0.5) * (1-_TextureScale) + _Offset.xy * 0.5) + _EndPos.xy * _TextureScale;
 				
-				// 範囲選択用の枠を表示				
+				// 範囲選択用の枠を表示
+				/*
 				if ((abs(uv.x - _StartPos.x) <= _LineWidth || abs(uv.x - _EndPos.x) <= _LineWidth) && uv.y >= min(_StartPos.y, _EndPos.y)-_LineWidth && uv.y <= max(_StartPos.y, _EndPos.y)+_LineWidth ||
 					(abs(uv.y - _StartPos.y) <= _LineWidth || abs(uv.y - _EndPos.y) <= _LineWidth) && uv.x >= min(_StartPos.x, _EndPos.x)-_LineWidth && uv.x <= max(_StartPos.x, _EndPos.x)+_LineWidth
 				)
@@ -156,6 +157,7 @@
 				}
 
 				col.rgb = lerp(col.rgb, fixed3(1, 0.7, 0), tex2D(_SelectTex, uv));
+				*/
 
 				// ペンカーソルを表示
 				float raito = _MainTex_TexelSize.x / _MainTex_TexelSize.y;
