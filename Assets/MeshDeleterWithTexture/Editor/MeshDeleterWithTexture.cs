@@ -55,6 +55,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
         private bool isDrawing = false;
 
+        private bool isLinearColorSpace = false;
+
         private enum DRAW_TYPES
         {
             PEN,
@@ -86,6 +88,13 @@ namespace Gatosyocora.MeshDeleterWithTexture
             saveFolder = "Assets/";
 
             editMat.SetInt("_PointNum", 0);
+
+            isLinearColorSpace = (PlayerSettings.colorSpace == ColorSpace.Linear);
+            
+            if (isLinearColorSpace)
+                editMat.SetFloat("_ApplyGammaCorrection", 1);
+            else
+                editMat.SetFloat("_ApplyGammaCorrection", 1);
 
             InitComputeShader();
         }
@@ -1030,9 +1039,15 @@ namespace Gatosyocora.MeshDeleterWithTexture
         private void ResetDrawArea(Texture2D texture, ref Material mat, ref RenderTexture previewTexture)
         {
             if (previewTexture != null) previewTexture.Release();
-            previewTexture = new RenderTexture(texture.width, texture.height, 0, RenderTextureFormat.ARGB32);
+
+            if (isLinearColorSpace)
+                previewTexture = new RenderTexture(texture.width, texture.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
+            else
+                previewTexture = new RenderTexture(texture.width, texture.height, 0, RenderTextureFormat.ARGB32);
+
             previewTexture.enableRandomWrite = true;
             previewTexture.Create();
+            
             Graphics.Blit(texture, previewTexture);
 
             mat.SetVector("_StartPos", new Vector4(0, 0, 0, 0));
