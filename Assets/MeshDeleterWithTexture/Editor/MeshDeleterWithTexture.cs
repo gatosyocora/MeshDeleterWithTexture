@@ -31,6 +31,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
         //private bool[,] drawPos;
         private Texture2D[] textures;
         private int textureIndex = 0;
+        private string[] textureNames;
 
         private Color penColor = Color.black;
         private int penSize = 20;
@@ -131,6 +132,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                             triangleCount = GetMeshTriangleCount(mesh);
                             saveFolder = GetMeshPath(mesh);
                             textures = GetTextures(renderer);
+                            textureNames = GetTextureNames(textures);
                             meshName = mesh.name + "_deleteMesh";
 
                             if (textures != null)
@@ -336,7 +338,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 using (var check = new EditorGUI.ChangeCheckScope())
                 {
                     if (textures != null)
-                        textureIndex = EditorGUILayout.Popup("Texture", textureIndex, textures.Select(x => x.name).ToArray());
+                        textureIndex = EditorGUILayout.Popup("Texture", textureIndex, textureNames);
 
                     if (check.changed)
                     {
@@ -926,6 +928,27 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 textures[i] = mainTex;
             }
             return textures;
+        }
+
+        private string[] GetTextureNames(Texture2D[] textures)
+        {
+            var textureNames = textures.Select(x => x.name).ToArray();
+            var processedItems = new List<string>();
+
+            for (int texIndex = 0; texIndex < textureNames.Length; texIndex++)
+            {
+                var sameNameCount =
+                    processedItems
+                    .Where(x => x == textureNames[texIndex])
+                    .Count();
+
+                processedItems.Add(textureNames[texIndex]);
+
+                if (sameNameCount > 0)
+                    textureNames[texIndex] += "_" + sameNameCount;
+            }
+
+            return textureNames;
         }
 
         private void ResetMaterialTextures(ref SkinnedMeshRenderer renderer, ref Texture2D[] textures)
