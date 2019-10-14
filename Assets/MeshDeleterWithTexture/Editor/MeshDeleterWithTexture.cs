@@ -628,7 +628,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
             mesh_custom.SetUVs(3, nonDeleteUV4s);
 
             // サブメッシュごとにポリゴンを処理
-            int count = 0;
 
             // 削除する頂点のインデックスのリスト（重複なし, 降順）
             var deleteIndexListUniqueDescending
@@ -637,10 +636,12 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     .ToArray();
 
             mesh_custom.subMeshCount = mesh.subMeshCount;
+
+            float progressMaxCount = mesh.subMeshCount * deleteIndexListUniqueDescending.Count();
+            float count = 0;
+
             for (int subMeshIndex = 0; subMeshIndex < mesh.subMeshCount; subMeshIndex++)
             {
-                count = 0;
-
                 var subMeshTriangles = mesh.GetTriangles(subMeshIndex);
                 // インデックスがずれるので各頂点への対応付けが必要
                 // インデックスが大きいものから順に処理していく
@@ -668,10 +669,9 @@ namespace Gatosyocora.MeshDeleterWithTexture
                                 subMeshTriangles[i + 2]--;
                         }
                     }
-
-                    EditorUtility.DisplayProgressBar("search deleted triangles", 
-                                                        "submesh "+ (subMeshIndex+1) + "/" +mesh.subMeshCount+ "  " + count + " / " + deleteIndexListUniqueDescending.Count(), 
-                                                        (count++) / (float)deleteIndexListUniqueDescending.Count());
+                    
+                    EditorUtility.DisplayProgressBar("search deleted triangles",
+                        Mathf.Floor(count/progressMaxCount * 100) + "%", count++/progressMaxCount);
                 }
 
                 // 不要なポリゴンを削除する
@@ -998,6 +998,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             Repaint();
         }
 
+        // TODO: メッシュ単位で戻ってしまう（サブメッシュ単位で戻したい）
         private void RevertMeshToPrefab(SkinnedMeshRenderer renderer)
         {
             PrefabUtility.ReconnectToLastPrefab(renderer.gameObject);
