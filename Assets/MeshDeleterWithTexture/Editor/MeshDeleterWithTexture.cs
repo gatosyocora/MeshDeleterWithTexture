@@ -1006,8 +1006,12 @@ namespace Gatosyocora.MeshDeleterWithTexture
             so.Update();
 
             var sp = so.FindProperty("m_Mesh");
+#if UNITY_2018_3_OR_NEWER
+            PrefabUtility.RevertPropertyOverride(sp, InteractionMode.UserAction);
+#else
             sp.prefabOverride = false;
             sp.serializedObject.ApplyModifiedProperties();
+#endif
         }
 
 
