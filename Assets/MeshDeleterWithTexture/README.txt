@@ -5,6 +5,9 @@ MeshDeleterWithTexture
 MeshDeleterWithTexture.cs : ソースコードです
 Resources/TextureEdit.shader : テクスチャ補正用のシェーダーです
 Resources/TextureEditMat.mat : テクスチャ補正用のマテリアルです
+Resources/colorcheck2.compute : メインのコンピュートシェーダーです
+Resources/getUVMap.compute : UVMap取得用のコンピュートシェーダーです
+
 
 〇仕組み
 複製したメッシュに対して
@@ -16,7 +19,7 @@ Resources/TextureEditMat.mat : テクスチャ補正用のマテリアルです
 2.  メニューバーのGatoTool > MeshDeleter with Textureを選択します。
 3.  "Renderer"に削除したい箇所を持つメッシュのオブジェクトを設定します。
 	（SkinnedMeshRendererコンポーネントがついたオブジェクト）
-4.  "Texture"のテクスチャ名を選択して削除したい箇所を持つテクスチャを選択してください。
+4.  "Texture(Material)"のテクスチャ名を選択して削除したい箇所を持つテクスチャを選択してください。
 5.  "DrawType"を"Pen"にするように選択してテクスチャの削除したいところを塗りつぶします。
 	"Eraser"を選択することで一部の塗りつぶしを消したり, "Reset All"ですべての塗りつぶしを削除したりできます。
 	また, "Pen/Eraser size"を変更することでペンの大きさを変えられます。
