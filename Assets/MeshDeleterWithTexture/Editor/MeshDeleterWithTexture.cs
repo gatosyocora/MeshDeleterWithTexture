@@ -16,7 +16,6 @@ using System.Runtime.InteropServices;
  * see LICENSE.txt
  */
 
-// MeshDeleterWithTexture v0.5.1b
 
 namespace Gatosyocora.MeshDeleterWithTexture
 {
@@ -136,7 +135,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
         {
             using (var check = new EditorGUI.ChangeCheckScope())
             {
-                renderer = EditorGUILayout.ObjectField("Renderer", renderer, typeof(SkinnedMeshRenderer)) as SkinnedMeshRenderer;
+                renderer = EditorGUILayout.ObjectField("Renderer", renderer, typeof(SkinnedMeshRenderer), true) as SkinnedMeshRenderer;
 
                 if (check.changed)
                 {
