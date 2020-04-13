@@ -685,6 +685,9 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 mesh_custom.SetTriangles(triangleList, subMeshIndex);
             }
 
+            //BindPoseをコピー
+            mesh_custom.bindposes = mesh.bindposes;
+
             // BlendShapeを設定する
             string blendShapeName;
             float frameWeight;
