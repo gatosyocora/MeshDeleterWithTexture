@@ -608,11 +608,15 @@ namespace Gatosyocora.MeshDeleterWithTexture
             var boneWeights = mesh.boneWeights.ToList();
             var normals = mesh.normals.ToList();
             var tangents = mesh.tangents.ToList();
+            var colors = mesh.colors.ToList();
+            var color32s = mesh.colors32.ToList();
 
             var nonDeleteVertices = vertices.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
             var nonDeleteWeights = boneWeights.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
             var nonDeleteNormals = normals.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
             var nonDeleteTangents = tangents.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
+            var nonDeleteColors = colors.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
+            var nonDeleteColor32s = color32s.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
             var nonDeleteUVs = uvs.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
             var nonDeleteUV2s = uv2s.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
             var nonDeleteUV3s = uv3s.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
@@ -622,6 +626,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
             mesh_custom.boneWeights = nonDeleteWeights;
             mesh_custom.normals = nonDeleteNormals;
             mesh_custom.tangents = nonDeleteTangents;
+            mesh_custom.colors = nonDeleteColors;
+            mesh_custom.colors32 = nonDeleteColor32s;
             mesh_custom.SetUVs(0, nonDeleteUVs);
             mesh_custom.SetUVs(1, nonDeleteUV2s);
             mesh_custom.SetUVs(2, nonDeleteUV3s);
