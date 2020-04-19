@@ -1111,22 +1111,34 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
         private void ResetDrawArea(Texture2D texture, ref Material mat, ref RenderTexture previewTexture)
         {
-            if (previewTexture != null) previewTexture.Release();
-
-            if (isLinearColorSpace)
-                previewTexture = new RenderTexture(texture.width, texture.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
-            else
-                previewTexture = new RenderTexture(texture.width, texture.height, 0, RenderTextureFormat.ARGB32);
-
-            previewTexture.enableRandomWrite = true;
-            previewTexture.Create();
-            
-            Graphics.Blit(texture, previewTexture);
+            CopyTexture2DToRenderTexture(texture, ref previewTexture);
 
             mat.SetVector("_StartPos", new Vector4(0, 0, 0, 0));
             mat.SetVector("_EndPos", new Vector4(texture.width - 1, texture.height - 1, 0, 0));
 
             mat.SetTexture("_SelectTex", null);
+        }
+
+        private void CopyTexture2DToRenderTexture(Texture2D texture, ref RenderTexture renderTexture)
+        {
+            if (renderTexture != null) renderTexture.Release();
+
+            if (isLinearColorSpace)
+                renderTexture = new RenderTexture(texture.width, texture.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
+            else
+                renderTexture = new RenderTexture(texture.width, texture.height, 0, RenderTextureFormat.ARGB32);
+
+            renderTexture.enableRandomWrite = true;
+            renderTexture.anisoLevel = texture.anisoLevel;
+            renderTexture.mipMapBias = texture.mipMapBias;
+            renderTexture.filterMode = texture.filterMode;
+            renderTexture.wrapMode = texture.wrapMode;
+            renderTexture.wrapModeU = texture.wrapModeU;
+            renderTexture.wrapModeV = texture.wrapModeV;
+            renderTexture.wrapModeW = texture.wrapModeW;
+            renderTexture.Create();
+
+            Graphics.Blit(texture, renderTexture);
         }
 
         private void DrawTypeSetting()
