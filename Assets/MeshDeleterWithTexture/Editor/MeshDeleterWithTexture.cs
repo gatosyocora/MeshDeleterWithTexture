@@ -444,6 +444,16 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 {
                     GUILayout.FlexibleSpace();
 
+                    if (GUILayout.Button("Inverse FillArea"))
+                    {
+                        InverseSiroKuro(ref buffer, texture, ref previewTexture);
+                    }
+                }
+
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    GUILayout.FlexibleSpace();
+
                     if (GUILayout.Button("Reset to Default Mesh"))
                     {
                         RevertMeshToPrefab(renderer);
@@ -1209,6 +1219,34 @@ namespace Gatosyocora.MeshDeleterWithTexture
             return matInfos.ToArray();
         }
 
+        private void InverseSiroKuro(ref ComputeBuffer buffer, Texture2D texture, ref RenderTexture renderTexture)
+        {
+            var height = texture.height;
+            var width = texture.width;
+            var maskTexture = new Texture2D(width, height);
+
+            var deletePos = new int[texture.width * texture.height];
+            buffer.GetData(deletePos);
+            deletePos = deletePos.Select(x => Mathf.Abs(x - 1)).ToArray();
+            buffer.SetData(deletePos);
+
+            for (int j = 0; j < height; j++)
+            {
+                for (int i = 0; i < width; i++)
+                {
+                    var c = (deletePos[j * width + i] == 1) ? UnityEngine.Color.black : UnityEngine.Color.white;
+                    maskTexture.SetPixel(i, j, c);
+                }
+            }
+            maskTexture.Apply();
+
+            Material negaposiMat = new Material(Shader.Find("Gato/NegaPosi"));
+            negaposiMat.SetTexture("_MaskTex", maskTexture);
+            negaposiMat.SetFloat("_Inverse", 0);
+            Graphics.Blit(texture, renderTexture, negaposiMat);
+
+            Repaint();
+        }
     }
 #endif
 }
