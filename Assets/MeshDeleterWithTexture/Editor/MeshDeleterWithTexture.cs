@@ -1073,8 +1073,15 @@ namespace Gatosyocora.MeshDeleterWithTexture
             ComputeShader cs = Instantiate(Resources.Load<ComputeShader>("getUVMap")) as ComputeShader;
             int kernel = cs.FindKernel("CSMain");
 
-            RenderTexture uvMapRT = new RenderTexture(texture.width, texture.height, 0);
+            var uvMapRT = new RenderTexture(texture.width, texture.height, 0, RenderTextureFormat.ARGB32);
             uvMapRT.enableRandomWrite = true;
+            uvMapRT.anisoLevel = texture.anisoLevel;
+            uvMapRT.mipMapBias = texture.mipMapBias;
+            uvMapRT.filterMode = texture.filterMode;
+            uvMapRT.wrapMode = texture.wrapMode;
+            uvMapRT.wrapModeU = texture.wrapModeU;
+            uvMapRT.wrapModeV = texture.wrapModeV;
+            uvMapRT.wrapModeW = texture.wrapModeW;
             uvMapRT.Create();
 
             var triangleBuffer = new ComputeBuffer(triangles.Count(), sizeof(int));
