@@ -458,6 +458,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                     if (GUILayout.Button("Clear All Drawing"))
                     {
+                        RegisterUndoTexture(previewTexture);
+
                         DrawTypeSetting();
                         ResetDrawArea(texture, ref editMat, ref previewTexture);
                         SetupComputeShader(ref texture, ref previewTexture);
