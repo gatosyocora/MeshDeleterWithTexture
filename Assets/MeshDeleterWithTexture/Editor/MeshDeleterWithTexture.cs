@@ -1274,6 +1274,10 @@ namespace Gatosyocora.MeshDeleterWithTexture
             Repaint();
         }
 
+        /// <summary>
+        /// 履歴に追加する
+        /// </summary>
+        /// <param name="texture"></param>
         private void RegisterUndoTexture(RenderTexture texture)
         {
             undoIndex++;
@@ -1286,6 +1290,10 @@ namespace Gatosyocora.MeshDeleterWithTexture
             undoBuffers[undoIndex] = undoBuffer;
         }
 
+        /// <summary>
+        /// 履歴を使って変更を1つ戻す
+        /// </summary>
+        /// <param name="previewTexture"></param>
         private void UndoPreviewTexture(ref RenderTexture previewTexture)
         {
             if (undoIndex == -1) return;
