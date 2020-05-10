@@ -943,6 +943,10 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             if (path.Length > 0)
                 File.WriteAllBytes(path, png);
+
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+        }
         }
 
         /// <summary>
