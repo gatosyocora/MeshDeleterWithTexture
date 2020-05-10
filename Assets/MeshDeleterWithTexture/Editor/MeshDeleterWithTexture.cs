@@ -87,6 +87,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
         private DRAW_TYPES drawType;
 
+        private RenderTexture[] undoTextures;
+        private int[][] undoBuffers;
+        private int undoIndex = 0;
+        private const int MAX_UNDO_COUNT = 10;
+
         private int triangleCount = 0;
         private string saveFolder = "Assets/";
         private string meshName;
@@ -103,6 +108,10 @@ namespace Gatosyocora.MeshDeleterWithTexture
             texture = null;
             renderer = null;
             textures = null;
+
+            undoTextures = new RenderTexture[MAX_UNDO_COUNT];
+            undoBuffers = new int[MAX_UNDO_COUNT][];
+            undoIndex = -1;
             
             drawType = DRAW_TYPES.PEN;
 
@@ -234,6 +243,12 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                 ToolGUI();
             }
+
+            if (Event.current.type == EventType.KeyDown && 
+                Event.current.keyCode == KeyCode.Z)
+            {
+                UndoPreviewTexture(ref previewTexture);
+            }
         }
 
         private void CanvasGUI()
@@ -306,6 +321,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         Event.current.button == 0 &&
                         !isDrawing)
                     {
+                        RegisterUndoTexture(previewTexture);
                         isDrawing = true;
                     }
                     else if (Event.current.type == EventType.MouseUp &&
@@ -452,6 +468,16 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 {
                     GUILayout.FlexibleSpace();
 
+                    if (GUILayout.Button("Undo"))
+                    {
+                        UndoPreviewTexture(ref previewTexture);
+                    }
+                }
+
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    GUILayout.FlexibleSpace();
+
                     if (GUILayout.Button("Reset to Default Mesh"))
                     {
                         RevertMeshToPrefab(renderer);
@@ -477,6 +503,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         
                         uvMapTex = GetUVMap(mesh, matInfos[materialInfoIndex], texture);
                         editMat.SetTexture("_UVMap", uvMapTex);
+
                     }
                 }
             }
@@ -1244,6 +1271,30 @@ namespace Gatosyocora.MeshDeleterWithTexture
             negaposiMat.SetFloat("_Inverse", 0);
             Graphics.Blit(texture, renderTexture, negaposiMat);
 
+            Repaint();
+        }
+
+        private void RegisterUndoTexture(RenderTexture texture)
+        {
+            undoIndex++;
+            if (undoIndex >= MAX_UNDO_COUNT) undoIndex = 0;
+            var undoTexture = new RenderTexture(texture);
+            Graphics.CopyTexture(texture, undoTexture);
+            undoTextures[undoIndex] = undoTexture;
+            var undoBuffer = new int[texture.width * texture.height];
+            buffer.GetData(undoBuffer);
+            undoBuffers[undoIndex] = undoBuffer;
+        }
+
+        private void UndoPreviewTexture(ref RenderTexture previewTexture)
+        {
+            if (undoIndex == -1) return;
+
+            var undoTexture = undoTextures[undoIndex];
+            var undoBuffer = undoBuffers[undoIndex];
+            undoIndex--;
+            Graphics.CopyTexture(undoTexture, previewTexture);
+            buffer.SetData(undoBuffer);
             Repaint();
         }
     }
