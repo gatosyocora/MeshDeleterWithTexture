@@ -16,7 +16,7 @@ using System.Runtime.InteropServices;
  * see LICENSE.txt
  */
 
-// MeshDeleterWithTexture v0.5.2b
+// MeshDeleterWithTexture v0.6b
 
 namespace Gatosyocora.MeshDeleterWithTexture
 {
