@@ -465,6 +465,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     }
                 }
 
+                using (new EditorGUI.DisabledGroupScope(undoIndex == -1))
                 using (new EditorGUILayout.HorizontalScope())
                 {
                     GUILayout.FlexibleSpace();
