@@ -139,6 +139,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 ResetMaterialTextures(ref renderer, ref textures);
             }
 
+            if (buffer != null) buffer.Dispose();
+
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }
