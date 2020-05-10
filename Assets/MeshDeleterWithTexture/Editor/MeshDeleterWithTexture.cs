@@ -116,7 +116,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             if (isLinearColorSpace)
                 editMat.SetFloat("_ApplyGammaCorrection", 1);
             else
-                editMat.SetFloat("_ApplyGammaCorrection", 1);
+                editMat.SetFloat("_ApplyGammaCorrection", 0);
 
             InitComputeShader();
         }
