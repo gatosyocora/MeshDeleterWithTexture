@@ -460,6 +460,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                     if (GUILayout.Button("Inverse FillArea"))
                     {
+                        RegisterUndoTexture(previewTexture);
                         InverseSiroKuro(ref buffer, texture, ref previewTexture);
                     }
                 }
