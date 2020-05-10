@@ -75,6 +75,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
         #endregion
 
+        private readonly string[] deleteMaskTextureExtensions = {".png", ".jpg", ".jpeg" };
+
         private bool isDrawing = false;
 
         private bool isLinearColorSpace = false;
@@ -357,6 +359,16 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     {
                         ExportDeleteMaskTexture(buffer, originTexture);
                         renderer.sharedMaterials[matInfos[materialInfoIndex].materialSlotIndices[0]].mainTexture = previewTexture;
+                    }
+                }
+
+                using (var check = new EditorGUI.ChangeCheckScope())
+                {
+                    var path = GatoGUILayout.DragAndDropableArea("Drag & Drop DeleteMaskTexture", 300, 30, deleteMaskTextureExtensions);
+
+                    if (check.changed)
+                    {
+                        ApplyDeleteMaskTexturetToBuffer(ref texture, ref buffer, ref previewTexture, path);
                     }
                 }
                 
@@ -875,40 +887,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             if (string.IsNullOrEmpty(path)) return false;
 
-            var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read);
-            var bin = new BinaryReader(fileStream);
-            var binaryData = bin.ReadBytes((int)bin.BaseStream.Length);
-            bin.Close();
-            
-            var maskTexture = new Texture2D(0, 0);
-            maskTexture.LoadImage(binaryData);
-
-            if (maskTexture == null || texture.width != maskTexture.width || texture.height != maskTexture.height) return false;
-
-            var deletePos = new int[maskTexture.width * maskTexture.height];
-            computeBuffer.GetData(deletePos);
-
-            for (int j = 0; j < maskTexture.height; j++)
-            {
-                for (int i = 0; i < maskTexture.width; i++)
-                {
-                    var col = maskTexture.GetPixel(i, j);
-                    var isDelete = (col == UnityEngine.Color.black)? 1:0;
-                    deletePos[j * maskTexture.width + i] = isDelete;
-                }
-            }
-
-            computeBuffer.SetData(deletePos);
-
-            Material negaposiMat = new Material(Shader.Find("Gato/NegaPosi"));
-            negaposiMat.SetTexture("_MaskTex", maskTexture);
-            negaposiMat.SetFloat("_Inverse", 0);
-            Graphics.Blit(texture, renderTexture, negaposiMat);
-
-            
-            Repaint();
-
-            return true;
+            return ApplyDeleteMaskTexturetToBuffer(ref texture, ref computeBuffer, ref renderTexture, path);
         }
 
         /// <summary>
@@ -947,6 +926,42 @@ namespace Gatosyocora.MeshDeleterWithTexture
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }
+
+        private bool ApplyDeleteMaskTexturetToBuffer(ref Texture2D texture, ref ComputeBuffer computeBuffer, ref RenderTexture renderTexture, string maskTexturePath)
+        {
+            var fileStream = new FileStream(maskTexturePath, FileMode.Open, FileAccess.Read);
+            var bin = new BinaryReader(fileStream);
+            var binaryData = bin.ReadBytes((int)bin.BaseStream.Length);
+            bin.Close();
+
+            var maskTexture = new Texture2D(0, 0);
+            maskTexture.LoadImage(binaryData);
+
+            if (maskTexture == null || texture.width != maskTexture.width || texture.height != maskTexture.height) return false;
+
+            var deletePos = new int[maskTexture.width * maskTexture.height];
+            computeBuffer.GetData(deletePos);
+
+            for (int j = 0; j < maskTexture.height; j++)
+            {
+                for (int i = 0; i < maskTexture.width; i++)
+                {
+                    var col = maskTexture.GetPixel(i, j);
+                    var isDelete = (col == UnityEngine.Color.black) ? 1 : 0;
+                    deletePos[j * maskTexture.width + i] = isDelete;
+                }
+            }
+
+            computeBuffer.SetData(deletePos);
+
+            Material negaposiMat = new Material(Shader.Find("Gato/NegaPosi"));
+            negaposiMat.SetTexture("_MaskTex", maskTexture);
+            negaposiMat.SetFloat("_Inverse", 0);
+            Graphics.Blit(texture, renderTexture, negaposiMat);
+
+            Repaint();
+
+            return true;
         }
 
         /// <summary>
