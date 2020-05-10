@@ -323,8 +323,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
                             ClearOnTexture(pos);
                     }
                 }
-
-                Repaint();
             }
         }
 
@@ -746,7 +744,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             computeShader.Dispatch(penKernelId, texture.width / 32, texture.height / 32, 1);
 
-            
             Repaint();
         }
 
@@ -763,7 +760,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             computeShader.Dispatch(eraserKernelId, texture.width / 32, texture.height / 32, 1);
 
-            
             Repaint();
         }
 
