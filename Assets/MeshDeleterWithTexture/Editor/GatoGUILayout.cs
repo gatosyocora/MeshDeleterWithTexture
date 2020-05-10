@@ -36,7 +36,7 @@ namespace Gatosyocora
             return Vector2.zero;
         }
 
-        public static string DragAndDropableArea(string text, float width, float height, string permissonExtension)
+        public static string DragAndDropableArea(string text, float width, float height, string[] permissonExtensions)
         {
             var rect = GUILayoutUtility.GetRect(width, height);
             GUI.Label(rect, text, GUI.skin.box);
@@ -44,13 +44,13 @@ namespace Gatosyocora
             if ((e.type == EventType.DragPerform || e.type == EventType.DragUpdated) &&
                 rect.Contains(e.mousePosition))
             {
-                if (Path.GetExtension(DragAndDrop.paths.FirstOrDefault()) == permissonExtension)
+                if (permissonExtensions.Contains(Path.GetExtension(DragAndDrop.paths.FirstOrDefault())))
                     DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
             }
             else if (e.type == EventType.DragExited && rect.Contains(e.mousePosition))
             {
                 var path = DragAndDrop.paths.FirstOrDefault();
-                if (Path.GetExtension(path) != permissonExtension)
+                if (!permissonExtensions.Contains(Path.GetExtension(path)))
                     return string.Empty;
 
                 DragAndDrop.AcceptDrag();
