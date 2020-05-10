@@ -522,21 +522,24 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
         private void OutputMeshGUI()
         {
-            EditorGUILayout.LabelField("Output Mesh");
-            using (new EditorGUILayout.HorizontalScope())
+            EditorGUILayout.LabelField("Output Mesh", EditorStyles.boldLabel);
+            using (new EditorGUI.IndentLevelScope())
             {
-                EditorGUILayout.LabelField("SaveFolder", saveFolder);
-
-                if (GUILayout.Button("Select Folder", GUILayout.Width(100)))
+                using (new EditorGUILayout.HorizontalScope())
                 {
-                    saveFolder = EditorUtility.OpenFolderPanel("Select saved folder", saveFolder, "");
-                    var match = Regex.Match(saveFolder, @"Assets/.*");
-                    saveFolder = match.Value + "/";
-                    if (saveFolder == "/") saveFolder = "Assets/";
-                }
-            }
+                    EditorGUILayout.LabelField("SaveFolder", saveFolder);
 
-            meshName = EditorGUILayout.TextField("Name", meshName);
+                    if (GUILayout.Button("Select Folder", GUILayout.Width(100)))
+                    {
+                        saveFolder = EditorUtility.OpenFolderPanel("Select saved folder", saveFolder, "");
+                        var match = Regex.Match(saveFolder, @"Assets/.*");
+                        saveFolder = match.Value + "/";
+                        if (saveFolder == "/") saveFolder = "Assets/";
+                    }
+                }
+
+                meshName = EditorGUILayout.TextField("Name", meshName);
+            }
         }
 
         /// <summary>
