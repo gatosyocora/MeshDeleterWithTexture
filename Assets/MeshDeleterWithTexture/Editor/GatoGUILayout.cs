@@ -36,9 +36,9 @@ namespace Gatosyocora
             return Vector2.zero;
         }
 
-        public static string DragAndDropableArea(string text, float width, float height, string[] permissonExtensions)
+        public static string DragAndDropableArea(string text, string[] permissonExtensions)
         {
-            var rect = GUILayoutUtility.GetRect(width, height);
+            var rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight * 2);
             GUI.Label(rect, text, GUI.skin.box);
             var e = Event.current;
             if ((e.type == EventType.DragPerform || e.type == EventType.DragUpdated) &&
