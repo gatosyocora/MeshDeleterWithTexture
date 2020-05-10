@@ -1,4 +1,7 @@
 ﻿using UnityEngine;
+using UnityEditor;
+using System.Linq;
+using System.IO;
 
 namespace Gatosyocora
 {
@@ -31,6 +34,31 @@ namespace Gatosyocora
             }
 
             return Vector2.zero;
+        }
+
+        public static string DragAndDropableArea(string text, float width, float height, string permissonExtension)
+        {
+            var rect = GUILayoutUtility.GetRect(width, height);
+            GUI.Label(rect, text, GUI.skin.box);
+            var e = Event.current;
+            if ((e.type == EventType.DragPerform || e.type == EventType.DragUpdated) &&
+                rect.Contains(e.mousePosition))
+            {
+                if (Path.GetExtension(DragAndDrop.paths.FirstOrDefault()) == permissonExtension)
+                    DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+            }
+            else if (e.type == EventType.DragExited && rect.Contains(e.mousePosition))
+            {
+                var path = DragAndDrop.paths.FirstOrDefault();
+                if (Path.GetExtension(path) != permissonExtension)
+                    return string.Empty;
+
+                DragAndDrop.AcceptDrag();
+                GUI.changed = true;
+                return path;
+            }
+
+            return string.Empty;
         }
     }
 }
