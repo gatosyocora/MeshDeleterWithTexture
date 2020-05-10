@@ -3,6 +3,7 @@ MeshDeleterWithTexture
 
 〇内容物
 MeshDeleterWithTexture.cs : ソースコードです
+GatoGUILayout.cs : gatosyocoraオリジナルのEditor拡張用GUIのソースコードです
 Resources/TextureEdit.shader : テクスチャ補正用のシェーダーです
 Resources/TextureEditMat.mat : テクスチャ補正用のマテリアルです
 Resources/colorcheck2.compute : メインのコンピュートシェーダーです
@@ -21,11 +22,10 @@ Resources/getUVMap.compute : UVMap取得用のコンピュートシェーダー�
 	（SkinnedMeshRendererコンポーネントがついたオブジェクト）
 4.  "Texture(Material)"のテクスチャ名を選択して削除したい箇所を持つテクスチャを選択してください。
 5.  "DrawType"を"Pen"にするように選択してテクスチャの削除したいところを塗りつぶします。
-	"Eraser"を選択することで一部の塗りつぶしを消したり, "Reset All"ですべての塗りつぶしを削除したりできます。
+	"Eraser"を選択することで一部の塗りつぶしを消したり, "Clear All Drawing"ですべての塗りつぶしを削除したりできます。
 	また, "Pen/Eraser size"を変更することでペンの大きさを変えられます。
 	塗りつぶしの際にマウスのホイールを動かしたり, "Scale"を変更することでテクスチャ表示画面の拡大縮小ができます。
 	さらに右クリックをしながらマウスを動かすことで表示箇所を移動できます。
-	"Reset"で表示状態をデフォルトに戻します。
 6.  削除したい箇所の塗りつぶしが終わったら"Output Mesh"の"SaveFolder"と"Name"でメッシュ書き出しの設定をおこないます。
 7.  "Delete Mesh"を押すと塗りつぶしの場所に対応した箇所を削除したメッシュが書き出され, 自動的に設定されます。
 
@@ -37,8 +37,15 @@ Resources/getUVMap.compute : UVMap取得用のコンピュートシェーダー�
 マスク画像はテクスチャと同じ大きさで黒の部分が塗りつぶされます。
 現在, png形式とjpg形式に対応しています。
 また, "Export DeleteMask"で塗りつぶした箇所を黒色, それ以外を白色としたマスク画像をpng形式で出力できます。
+"Drag & Drop DeleteMeskTexture"にマスク画像をドラッグアンドドロップしても読み込むことができます。
+現在はpngとjpgに対応しています。
 
 "Export UVMap"でUVマップテクスチャを出力できます。
+
+"Inverse FillArea"で塗りつぶされた箇所が反転します（塗られている箇所→塗られていない、塗られていない箇所→塗られている）
+
+"Undo Drawing"でPenでの塗りつぶしやInverse FillArea, Clear All Drawingを実行前の状態に戻せます。
+Zキーでもこの機能を使えます。最大10回まで遡れます。
 
 エディタを閉じたり、メッシュを変えたりしてもアバターの塗りつぶしが残っている場合は
 マテリアルのテクスチャを元のものに戻してください。
@@ -63,6 +70,10 @@ ComputeShaderが動かず、本ツールが動作しない
 Unity 2018.4.20f1
 
 〇更新履歴
+v0.6	* 塗りつぶし箇所を反転する機能を追加
+		* 塗りつぶしのUndo機能の追加
+		* ドラッグ&ドロップでDeleteMaskTextureを読み込めるように
+		* UIの調整
 v0.5.2b * VRChat/Mobile/ToonLit.shaderなど頂点カラーを使うシェーダーで削除後のメッシュが黒くなる不具合を修正
 v0.5.1b	* 同じテクスチャや同じマテリアルが適用されているメッシュにも対応
 v0.5b	* ペンカーソルを表示
