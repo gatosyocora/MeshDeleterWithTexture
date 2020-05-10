@@ -518,6 +518,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         uvMapTex = GetUVMap(mesh, matInfos[materialInfoIndex], texture);
                         editMat.SetTexture("_UVMap", uvMapTex);
 
+                        renderer.sharedMaterials[matInfos[materialInfoIndex].materialSlotIndices[0]].mainTexture = previewTexture;
                     }
                 }
             }
@@ -769,8 +770,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             Undo.RecordObject(renderer, "Change mesh " + mesh_custom.name);
             renderer.sharedMesh = mesh_custom;
-            
-            renderer.sharedMaterials[matInfos[materialInfoIndex].materialSlotIndices[0]].mainTexture = texture;
 
             EditorUtility.ClearProgressBar();
         }
