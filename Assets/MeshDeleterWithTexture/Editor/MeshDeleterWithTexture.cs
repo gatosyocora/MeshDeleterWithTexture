@@ -419,7 +419,9 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     }
                 }
 
-                GUILayout.Space(20);
+                EditorGUILayout.Space();
+
+                EditorGUILayout.LabelField("Tools", EditorStyles.boldLabel);
 
                 EditorGUILayout.LabelField("DrawType");
                 using (new EditorGUILayout.HorizontalScope())
@@ -435,38 +437,14 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     }
                 }
 
-                // DrawTypeによるGUIの表示
-                if (texture != null)
-                {
-                    GUILayout.Space(20);
+                EditorGUILayout.Space();
 
-                    if (drawType == DRAW_TYPES.PEN || drawType == DRAW_TYPES.ERASER)
-                    {
-                        PenEraserGUI();
-                    }
+                if (drawType == DRAW_TYPES.PEN || drawType == DRAW_TYPES.ERASER)
+                {
+                    PenEraserGUI();
                 }
 
-                EditorGUILayout.LabelField("Triangle Count", triangleCount + "");
-
-                GUILayout.Space(10);
-
-                OutputMeshGUI();
-
-                GUILayout.Space(50);
-                
-                using (new EditorGUILayout.HorizontalScope())
-                {
-                    GUILayout.FlexibleSpace();
-
-                    if (GUILayout.Button("Clear All"))
-                    {
-                        DrawTypeSetting();
-                        ResetDrawArea(texture, ref editMat,ref previewTexture);
-                        SetupComputeShader(ref texture, ref previewTexture);
-                        
-                        renderer.sharedMaterials[matInfos[materialInfoIndex].materialSlotIndices[0]].mainTexture = previewTexture;
-                    }
-                }
+                EditorGUILayout.Space();
 
                 using (new EditorGUILayout.HorizontalScope())
                 {
@@ -477,18 +455,41 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         RegisterUndoTexture(previewTexture);
                         InverseSiroKuro(ref buffer, texture, ref previewTexture);
                     }
-                }
 
-                using (new EditorGUI.DisabledGroupScope(undoIndex == -1))
-                using (new EditorGUILayout.HorizontalScope())
-                {
-                    GUILayout.FlexibleSpace();
-
-                    if (GUILayout.Button("Undo"))
+                    if (GUILayout.Button("Clear All Drawing"))
                     {
-                        UndoPreviewTexture(ref previewTexture);
+                        DrawTypeSetting();
+                        ResetDrawArea(texture, ref editMat, ref previewTexture);
+                        SetupComputeShader(ref texture, ref previewTexture);
+
+                        renderer.sharedMaterials[matInfos[materialInfoIndex].materialSlotIndices[0]].mainTexture = previewTexture;
                     }
+
+                    using (new EditorGUI.DisabledGroupScope(undoIndex == -1))
+                    {
+                        GUILayout.FlexibleSpace();
+
+                        if (GUILayout.Button("Undo Drawing"))
+                        {
+                            UndoPreviewTexture(ref previewTexture);
+                        }
+                    }
+
                 }
+
+                GUILayout.Space(20);
+
+                EditorGUILayout.LabelField("Model Information", EditorStyles.boldLabel);
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    EditorGUILayout.LabelField("Triangle Count", triangleCount + "");
+                }
+
+                GUILayout.Space(20);
+
+                OutputMeshGUI();
+
+                GUILayout.Space(50);
 
                 using (new EditorGUILayout.HorizontalScope())
                 {
@@ -528,10 +529,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
         private void PenEraserGUI()
         {
-            EditorGUILayout.LabelField("PenColor");
             using (new EditorGUI.DisabledGroupScope(texture == null))
             using (new EditorGUILayout.HorizontalScope())
             {
+                EditorGUILayout.LabelField("PenColor");
+
                 if (GUILayout.Button("Black"))
                 {
                     penColor = UnityEngine.Color.black;
@@ -555,9 +557,12 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 penColor = EditorGUILayout.ColorField(penColor);
             }
 
+            EditorGUILayout.Space();
+
             using (var check = new EditorGUI.ChangeCheckScope())
             {
-                penSize = EditorGUILayout.IntSlider("Pen/Eraser size", penSize, 1, texture.width / 20);
+                var maxValue = (texture == null) ? 100 : texture.width / 20;
+                penSize = EditorGUILayout.IntSlider("Pen/Eraser size", penSize, 1, maxValue);
 
                 if (check.changed)
                     SetupDrawing(penSize, penColor, texture);
