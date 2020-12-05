@@ -147,6 +147,20 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
         private void OnGUI()
         {
+            // TODO: ComputeShaderがAndroidBuildだと使えないから警告文を出す
+            if (EditorUserBuildSettings.activeBuildTarget == BuildTarget.Android)
+            {
+                GUILayout.FlexibleSpace();
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    GUILayout.FlexibleSpace();
+                    GUILayout.Label("Can't use with BuildTarget 'Android'.\nPlease switch BuildTarget to PC");
+                    GUILayout.FlexibleSpace();
+                }
+                GUILayout.FlexibleSpace();
+                return;
+            }
+
             using (var check = new EditorGUI.ChangeCheckScope())
             {
                 renderer = EditorGUILayout.ObjectField("Renderer", renderer, typeof(SkinnedMeshRenderer), true) as SkinnedMeshRenderer;
