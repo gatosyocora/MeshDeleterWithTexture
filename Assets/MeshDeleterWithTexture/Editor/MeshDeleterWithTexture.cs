@@ -299,7 +299,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     }
                     
                     editMat.SetFloat("_TextureScale", zoomScale);
-                    Repaint();
                 }
                 // テクスチャの表示箇所を移動する機能
                 else if (Event.current.button == 1 &&
@@ -326,7 +325,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     }
 
                     editMat.SetVector("_Offset", textureOffset);
-                    Repaint();
                 }
 
 
@@ -359,6 +357,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
                             ClearOnTexture(pos);
                     }
                 }
+
+                Repaint();
             }
         }
 
