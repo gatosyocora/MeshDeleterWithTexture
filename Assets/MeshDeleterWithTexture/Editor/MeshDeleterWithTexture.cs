@@ -1125,7 +1125,15 @@ namespace Gatosyocora.MeshDeleterWithTexture
         {
             PrefabUtility.ReconnectToLastPrefab(renderer.gameObject);
 
-            var so = new SerializedObject(renderer);
+            SerializedObject so = null;
+            if (renderer is SkinnedMeshRenderer)
+            {
+                so = new SerializedObject(renderer);
+            }
+            else if (renderer is MeshRenderer)
+            {
+                so = new SerializedObject(renderer.GetComponent<MeshFilter>());
+            }
             so.Update();
 
             var sp = so.FindProperty("m_Mesh");
