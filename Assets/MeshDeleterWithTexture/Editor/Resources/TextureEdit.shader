@@ -16,6 +16,7 @@
 		_PenSize("Pen Size", Float) = 0.01
 
 		_UVMap ("UVMap Texture", 2D) = "black"{}
+		_UVMapLineColor ("UVMap Line Color", Color) = (0, 0, 0, 1)
 
 		_SelectTex ("Select Area Texture", 2D) = "black"{}
 
@@ -67,6 +68,7 @@
 			float _PenSize;
 
 			sampler2D _UVMap;
+			float4 _UVMapLineColor;
 
 			float _ApplyGammaCorrection;
 
@@ -93,9 +95,6 @@
 				// ガンマ補正を適用
 				if (_ApplyGammaCorrection)
 					col = pow(col, 1/2.2);
-				
-				// UVMapを表示
-				col.rgb *= 1-tex2D(_UVMap, uv).rgb;
 
 				float2 startPos = (float2(0.5, 0.5) * (1-_TextureScale) + _Offset.xy * 0.5) + _StartPos.xy * _TextureScale;
 				float2 endPos = (float2(0.5, 0.5) * (1-_TextureScale) + _Offset.xy * 0.5) + _EndPos.xy * _TextureScale;
@@ -158,6 +157,9 @@
 
 				col.rgb = lerp(col.rgb, fixed3(1, 0.7, 0), tex2D(_SelectTex, uv));
 				*/
+
+				// UVMapを表示
+				col.rgb = lerp(col.rgb, _UVMapLineColor, tex2D(_UVMap, uv).r);
 
 				// ペンカーソルを表示
 				float raito = _MainTex_TexelSize.x / _MainTex_TexelSize.y;

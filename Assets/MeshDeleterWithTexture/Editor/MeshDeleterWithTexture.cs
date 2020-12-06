@@ -58,6 +58,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
         private int penSize = 20;
         private float zoomScale = 1;
         private Vector4 textureOffset = Vector4.zero;
+        private Color uvMapLineColor = Color.black;
 
         private static Material editMat;
 
@@ -198,7 +199,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
                                     
                                     uvMapTex = GetUVMap(mesh, matInfos[materialInfoIndex], texture);
                                     editMat.SetTexture("_UVMap", uvMapTex);
-                                    
+                                    editMat.SetColor("_UVMapLineColor", uvMapLineColor);
+
                                     // TODO: _MainTexが存在しないマテリアルは違うやつに入れないといけない
                                     renderer.sharedMaterials[matInfos[materialInfoIndex].MaterialSlotIndices[0]].mainTexture = previewTexture;
                                 }
@@ -383,11 +385,20 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         ApplyDeleteMaskTexturetToBuffer(ref texture, ref buffer, ref previewTexture, path);
                     }
                 }
-                
+
+                GUILayout.Space(10f);
+
                 using (new EditorGUILayout.HorizontalScope())
                 {
-                    GUILayout.FlexibleSpace();
-                    
+                    using (var check = new EditorGUI.ChangeCheckScope())
+                    {
+                        uvMapLineColor = EditorGUILayout.ColorField("UVMap LineColor", uvMapLineColor);
+                        if (check.changed)
+                        {
+                            editMat.SetColor("_UVMapLineColor", uvMapLineColor);
+                        }
+                    }
+
                     if (GUILayout.Button("Export UVMap"))
                     {
                         ExportUVMapTexture(uvMapTex);
@@ -421,6 +432,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                                 {
                                     uvMapTex = GetUVMap(mesh, matInfos[materialInfoIndex], texture);
                                     editMat.SetTexture("_UVMap", uvMapTex);
+                                    editMat.SetColor("_UVMapLineColor", uvMapLineColor);
                                 }
                                 
                                 renderer.sharedMaterials[matInfos[materialInfoIndex].MaterialSlotIndices[0]].mainTexture = previewTexture;
@@ -513,6 +525,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         var mesh = GetMesh(renderer);
                         uvMapTex = GetUVMap(mesh, matInfos[materialInfoIndex], texture);
                         editMat.SetTexture("_UVMap", uvMapTex);
+                        editMat.SetColor("_UVMapLineColor", uvMapLineColor);
                     }
                 }
 
@@ -532,6 +545,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         
                         uvMapTex = GetUVMap(mesh, matInfos[materialInfoIndex], texture);
                         editMat.SetTexture("_UVMap", uvMapTex);
+                        editMat.SetColor("_UVMapLineColor", uvMapLineColor);
 
                         renderer.sharedMaterials[matInfos[materialInfoIndex].MaterialSlotIndices[0]].mainTexture = previewTexture;
                     }
