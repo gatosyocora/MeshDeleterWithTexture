@@ -203,10 +203,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                                     renderer.sharedMaterials[matInfos[materialInfoIndex].MaterialSlotIndices[0]].mainTexture = previewTexture;
                                 }
 
-                                textureOffset = Vector4.zero;
-                                editMat.SetVector("_Offset", textureOffset);
-                                zoomScale = 1;
-                                ApplyTextureZoomScale(ref editMat, zoomScale);
+                                ResetDrawAreaOffsetAndZoom();
                             }
                         }
 
@@ -251,10 +248,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                         if (GUILayout.Button("Reset"))
                         {
-                            textureOffset = Vector4.zero;
-                            editMat.SetVector("_Offset", textureOffset);
-                            zoomScale = 1;
-                            ApplyTextureZoomScale(ref editMat, zoomScale);
+                            ResetDrawAreaOffsetAndZoom();
                         }
                     }
                 }
@@ -1003,6 +997,14 @@ namespace Gatosyocora.MeshDeleterWithTexture
             Repaint();
 
             return true;
+        }
+
+        private void ResetDrawAreaOffsetAndZoom()
+        {
+            textureOffset = Vector4.zero;
+            editMat.SetVector("_Offset", textureOffset);
+            zoomScale = 1;
+            ApplyTextureZoomScale(ref editMat, zoomScale);
         }
 
         /// <summary>
