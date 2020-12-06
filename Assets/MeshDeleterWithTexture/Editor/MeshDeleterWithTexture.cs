@@ -595,8 +595,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     {
                         saveFolder = EditorUtility.OpenFolderPanel("Select saved folder", saveFolder, "");
                         var match = Regex.Match(saveFolder, @"Assets/.*");
-                        saveFolder = match.Value + "/";
-                        if (saveFolder == "/") saveFolder = "Assets/";
+                        saveFolder = match.Value;
+                        if (saveFolder == "") saveFolder = "Assets/";
                     }
                 }
 
@@ -787,7 +787,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             }
 
             if (meshName == "") meshName = mesh.name+"_deleteMesh";
-            AssetDatabase.CreateAsset(mesh_custom, AssetDatabase.GenerateUniqueAssetPath(saveFolder + meshName + ".asset"));
+            AssetDatabase.CreateAsset(mesh_custom, AssetDatabase.GenerateUniqueAssetPath(Path.Combine(saveFolder, $"{meshName}.asset")));
             AssetDatabase.SaveAssets();
 
             Undo.RecordObject(renderer, "Change mesh " + mesh_custom.name);
@@ -1010,7 +1010,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
         /// <returns></returns>
         private string GetMeshPath(Mesh mesh)
         {
-            return Path.GetDirectoryName(AssetDatabase.GetAssetPath(mesh)) + "/";
+            return Path.GetDirectoryName(AssetDatabase.GetAssetPath(mesh));
         }
 
         /// <summary>
