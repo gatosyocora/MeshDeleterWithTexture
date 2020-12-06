@@ -522,7 +522,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 {
                     GUILayout.FlexibleSpace();
 
-                    if (GUILayout.Button("Reset to Default Mesh"))
+                    if (GUILayout.Button("Revert Mesh to Prefab"))
                     {
                         RevertMeshToPrefab(renderer);
                         var mesh = GetMesh(renderer);
@@ -540,7 +540,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                     using (new EditorGUI.DisabledGroupScope(previousMesh == null))
                     {
-                        if (GUILayout.Button("Reset to Previous Mesh"))
+                        if (GUILayout.Button("Revert Mesh to previously"))
                         {
                             SetMesh(renderer, previousMesh);
                             previousMesh = null;
