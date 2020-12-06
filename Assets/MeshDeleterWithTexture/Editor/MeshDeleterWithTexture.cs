@@ -748,7 +748,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     }
                 }
 
-                if (EditorUtility.DisplayCancelableProgressBar("search deleted triangles",
+                if (EditorUtility.DisplayCancelableProgressBar("Delete triangles",
                         Mathf.Floor(count / progressMaxCount * 100) + "%", count++ / progressMaxCount))
                 {
                     EditorUtility.ClearProgressBar();
