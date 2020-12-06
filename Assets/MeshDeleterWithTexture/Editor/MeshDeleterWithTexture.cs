@@ -56,12 +56,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
         private Color penColor = Color.black;
         private int penSize = 20;
-        private bool isMouseDowning = false;
         private float zoomScale = 1;
         private Vector4 textureOffset = Vector4.zero;
-
-        private bool isAreaSizeChanging = false;
-        private int changingLine = 0;
 
         private static Material editMat;
 
