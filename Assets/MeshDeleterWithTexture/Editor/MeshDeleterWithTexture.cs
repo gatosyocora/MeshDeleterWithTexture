@@ -146,14 +146,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             // TODO: ComputeShaderがAndroidBuildだと使えないから警告文を出す
             if (EditorUserBuildSettings.activeBuildTarget == BuildTarget.Android)
             {
-                GUILayout.FlexibleSpace();
-                using (new EditorGUILayout.HorizontalScope())
-                {
-                    GUILayout.FlexibleSpace();
-                    GUILayout.Label("Can't use with BuildTarget 'Android'.\nPlease switch BuildTarget to PC");
-                    GUILayout.FlexibleSpace();
-                }
-                GUILayout.FlexibleSpace();
+                DrawNotSupportBuildTarget();
                 return;
             }
 
@@ -615,6 +608,18 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                 meshName = EditorGUILayout.TextField("Name", meshName);
             }
+        }
+
+        private void DrawNotSupportBuildTarget()
+        {
+            GUILayout.FlexibleSpace();
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.FlexibleSpace();
+                GUILayout.Label("Can't use with BuildTarget 'Android'.\nPlease switch BuildTarget to PC");
+                GUILayout.FlexibleSpace();
+            }
+            GUILayout.FlexibleSpace();
         }
 
         /// <summary>
