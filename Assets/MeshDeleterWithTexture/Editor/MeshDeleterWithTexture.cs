@@ -634,18 +634,9 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             // 削除する頂点のリストを取得
             var uvs = mesh.uv.ToList();
-            var uv2s = mesh.uv2.ToList();
-            var uv3s = mesh.uv3.ToList();
-            var uv4s = mesh.uv4.ToList();
+            // TODO: uv2以降はどうするか
             int x, y;
             List<int> deleteIndexList = new List<int>();
-
-            var alluvs = new List<Vector2>();
-            alluvs.AddRange(uvs);
-            alluvs.AddRange(uv2s);
-            alluvs.AddRange(uv3s);
-            alluvs.AddRange(uv4s);
-            alluvs = alluvs.Distinct().ToList();
 
             var deletePos = new int[texture.width * texture.height];
             computeBuffer.GetData(deletePos);
@@ -703,9 +694,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
             var nonDeleteColors = colors.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
             var nonDeleteColor32s = color32s.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
             var nonDeleteUVs = uvs.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
-            var nonDeleteUV2s = uv2s.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
-            var nonDeleteUV3s = uv3s.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
-            var nonDeleteUV4s = uv4s.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
 
             mesh_custom.SetVertices(nonDeleteVertices);
             mesh_custom.boneWeights = nonDeleteWeights;
@@ -714,9 +702,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
             mesh_custom.colors = nonDeleteColors;
             mesh_custom.colors32 = nonDeleteColor32s;
             mesh_custom.SetUVs(0, nonDeleteUVs);
-            mesh_custom.SetUVs(1, nonDeleteUV2s);
-            mesh_custom.SetUVs(2, nonDeleteUV3s);
-            mesh_custom.SetUVs(3, nonDeleteUV4s);
 
             // サブメッシュごとにポリゴンを処理
 
