@@ -97,7 +97,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
         [MenuItem("GatoTool/MeshDeleter with Texture")]
         private static void Open()
         {
-            GetWindow<MeshDeleterWithTexture>("MeshDeleter with Texture");
+            GetWindow<MeshDeleterWithTexture>(nameof(MeshDeleterWithTexture));
         }
 
         private void OnEnable()
