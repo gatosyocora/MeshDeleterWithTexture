@@ -543,6 +543,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                         renderer.sharedMaterials[matInfos[materialInfoIndex].MaterialSlotIndices[0]].mainTexture = previewTexture;
                     }
+                    GUIUtility.ExitGUI();
                 }
             }
         }
