@@ -1043,14 +1043,9 @@ namespace Gatosyocora.MeshDeleterWithTexture
             // Materialの一番始めに設定されているTextureを取得する
             if (mainTex == null)
             {
-                var shaderPropertyNum = ShaderUtil.GetPropertyCount(mat.shader);
-                string shaderPropertyName;
-
-                for (int shaderaPropertyIndex = 0; shaderaPropertyIndex < shaderPropertyNum; shaderaPropertyIndex++)
+                foreach (var textureName in mat.GetTexturePropertyNames())
                 {
-                    shaderPropertyName = ShaderUtil.GetPropertyName(mat.shader, shaderaPropertyIndex);
-                    mainTex = mat.GetTexture(shaderPropertyName) as Texture2D;
-
+                    mainTex = mat.GetTexture(textureName) as Texture2D;
                     if (mainTex != null) break;
                 }
             }
