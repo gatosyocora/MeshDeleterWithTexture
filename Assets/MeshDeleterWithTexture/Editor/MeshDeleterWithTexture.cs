@@ -95,6 +95,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
         private string saveFolder = "Assets/";
         private string meshName;
 
+        private Mesh previousMesh = null;
+
         [MenuItem("GatoTool/MeshDeleter with Texture")]
         private static void Open()
         {
@@ -174,6 +176,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         }
 
                         editRenderer = renderer;
+                        previousMesh = null;
 
                         var mesh = GetMesh(renderer);
                         if (mesh != null)
@@ -529,6 +532,27 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     }
                 }
 
+                GUILayout.Space(10f);
+
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    GUILayout.FlexibleSpace();
+
+                    using (new EditorGUI.DisabledGroupScope(previousMesh == null))
+                    {
+                        if (GUILayout.Button("Reset to Previous Mesh"))
+                        {
+                            SetMesh(renderer, previousMesh);
+                            previousMesh = null;
+
+                            var mesh = GetMesh(renderer);
+                            uvMapTex = GetUVMap(mesh, matInfos[materialInfoIndex], texture);
+                            editMat.SetTexture("_UVMap", uvMapTex);
+                            editMat.SetColor("_UVMapLineColor", uvMapLineColor);
+                        }
+                    }
+                }
+
                 EditorGUILayout.Space();
 
                 if (GUILayout.Button("Delete Mesh"))
@@ -808,6 +832,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             AssetDatabase.SaveAssets();
 
             Undo.RecordObject(renderer, "Change mesh " + mesh_custom.name);
+            previousMesh = mesh;
             SetMesh(renderer, mesh_custom);
 
             EditorUtility.ClearProgressBar();
