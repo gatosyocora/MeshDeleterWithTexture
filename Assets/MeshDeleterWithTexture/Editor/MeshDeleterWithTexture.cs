@@ -1159,6 +1159,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
         // TODO: メッシュ単位で戻ってしまう（サブメッシュ単位で戻したい）
         private void RevertMeshToPrefab(Renderer renderer)
         {
+            if (!PrefabUtility.IsPartOfPrefabAsset(renderer)) return;
+
             PrefabUtility.ReconnectToLastPrefab(renderer.gameObject);
 
             SerializedObject so = null;
