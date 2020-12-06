@@ -376,6 +376,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     {
                         ExportDeleteMaskTexture(buffer, originTexture);
                         renderer.sharedMaterials[matInfos[materialInfoIndex].MaterialSlotIndices[0]].mainTexture = previewTexture;
+
+                        var mesh = GetMesh(renderer);
+                        uvMapTex = GetUVMap(mesh, matInfos[materialInfoIndex], texture);
+                        editMat.SetTexture("_UVMap", uvMapTex);
+                        editMat.SetColor("_UVMapLineColor", uvMapLineColor);
                     }
                 }
 
