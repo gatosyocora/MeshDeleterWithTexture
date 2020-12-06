@@ -672,7 +672,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             // 削除する頂点のリストを取得
             var uvs = mesh.uv.ToList();
-            int x, y;
             List<int> deleteIndexList = new List<int>();
 
             var deletePos = new int[texture.width * texture.height];
@@ -680,8 +679,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             for (int i = 0; i < uvs.Count(); i++)
             {
-                x = (int)(Mathf.Abs(uvs[i].x % 1.0f) * texture.width);
-                y = (int)(Mathf.Abs(uvs[i].y % 1.0f) * texture.height);
+                var x = (int)(Mathf.Abs(uvs[i].x % 1.0f) * texture.width);
+                var y = (int)(Mathf.Abs(uvs[i].y % 1.0f) * texture.height);
 
                 if (x == texture.width || y == texture.height) continue;
 
