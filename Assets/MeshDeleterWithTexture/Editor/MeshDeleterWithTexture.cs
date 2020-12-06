@@ -665,10 +665,10 @@ namespace Gatosyocora.MeshDeleterWithTexture
         {
 
             var mesh = GetMesh(renderer);
-            var mesh_custom = Instantiate(mesh);
+            var deletedMesh = Instantiate(mesh);
 
-            mesh_custom.Clear();
-            mesh_custom.MarkDynamic();
+            deletedMesh.Clear();
+            deletedMesh.MarkDynamic();
 
             // 削除する頂点のリストを取得
             var uvs = mesh.uv.ToList();
@@ -732,16 +732,16 @@ namespace Gatosyocora.MeshDeleterWithTexture
             var nonDeleteUV3s = mesh.uv3.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
             var nonDeleteUV4s = mesh.uv4.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
 
-            mesh_custom.SetVertices(nonDeleteVertices);
-            mesh_custom.boneWeights = nonDeleteWeights;
-            mesh_custom.normals = nonDeleteNormals;
-            mesh_custom.tangents = nonDeleteTangents;
-            mesh_custom.colors = nonDeleteColors;
-            mesh_custom.colors32 = nonDeleteColor32s;
-            mesh_custom.SetUVs(0, nonDeleteUVs);
-            mesh_custom.SetUVs(1, nonDeleteUV2s);
-            mesh_custom.SetUVs(2, nonDeleteUV3s);
-            mesh_custom.SetUVs(3, nonDeleteUV4s);
+            deletedMesh.SetVertices(nonDeleteVertices);
+            deletedMesh.boneWeights = nonDeleteWeights;
+            deletedMesh.normals = nonDeleteNormals;
+            deletedMesh.tangents = nonDeleteTangents;
+            deletedMesh.colors = nonDeleteColors;
+            deletedMesh.colors32 = nonDeleteColor32s;
+            deletedMesh.SetUVs(0, nonDeleteUVs);
+            deletedMesh.SetUVs(1, nonDeleteUV2s);
+            deletedMesh.SetUVs(2, nonDeleteUV3s);
+            deletedMesh.SetUVs(3, nonDeleteUV4s);
 
             // サブメッシュごとにポリゴンを処理
 
@@ -751,7 +751,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     .OrderByDescending(value => value)
                     .ToArray();
 
-            mesh_custom.subMeshCount = mesh.subMeshCount;
+            deletedMesh.subMeshCount = mesh.subMeshCount;
 
             float progressMaxCount = mesh.subMeshCount;
             float count = 0;
@@ -796,11 +796,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                 // 不要なポリゴンを削除する
                 var triangleList = subMeshTriangles.Where(v => v != -1).ToArray();
-                mesh_custom.SetTriangles(triangleList, subMeshIndex);
+                deletedMesh.SetTriangles(triangleList, subMeshIndex);
             }
 
             //BindPoseをコピー
-            mesh_custom.bindposes = mesh.bindposes;
+            deletedMesh.bindposes = mesh.bindposes;
 
             // BlendShapeを設定する
             string blendShapeName;
@@ -819,19 +819,19 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 var deltaNonDeleteNormalsList = deltaNormals.Where((value, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
                 var deltaNonDeleteTangentsList = deltaTangents.Where((value, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
 
-                mesh_custom.AddBlendShapeFrame(blendShapeName, frameWeight,
+                deletedMesh.AddBlendShapeFrame(blendShapeName, frameWeight,
                     deltaNonDeleteVerteicesList,
                     deltaNonDeleteNormalsList,
                     deltaNonDeleteTangentsList);
             }
 
             if (meshName == "") meshName = mesh.name+"_deleteMesh";
-            AssetDatabase.CreateAsset(mesh_custom, AssetDatabase.GenerateUniqueAssetPath(Path.Combine(saveFolder, $"{meshName}.asset")));
+            AssetDatabase.CreateAsset(deletedMesh, AssetDatabase.GenerateUniqueAssetPath(Path.Combine(saveFolder, $"{meshName}.asset")));
             AssetDatabase.SaveAssets();
 
-            Undo.RecordObject(renderer, "Change mesh " + mesh_custom.name);
+            Undo.RecordObject(renderer, "Change mesh " + deletedMesh.name);
             previousMesh = mesh;
-            SetMesh(renderer, mesh_custom);
+            SetMesh(renderer, deletedMesh);
 
             EditorUtility.ClearProgressBar();
         }
