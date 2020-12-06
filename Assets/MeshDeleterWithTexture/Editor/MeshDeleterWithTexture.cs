@@ -171,7 +171,12 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         if (!(renderer is SkinnedMeshRenderer ||
                             renderer is MeshRenderer))
                         {
-                            // TODO: SkinnedMeshRendererとMeshRenderer以外は対応していない
+                            EditorUtility.DisplayDialog(
+                                string.Empty, 
+                                $"Support {nameof(SkinnedMeshRenderer)}, {nameof(MeshRenderer)}.",
+                                "OK");
+                            renderer = null;
+                            return;
                         }
 
                         editRenderer = renderer;
