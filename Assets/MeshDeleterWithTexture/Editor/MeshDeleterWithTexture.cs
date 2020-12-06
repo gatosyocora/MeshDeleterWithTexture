@@ -665,7 +665,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 if (matInfo.MaterialSlotIndices.BinarySearch(subMeshIndex) < 0)
                     nonDeleteVertexIndexs.AddRange(mesh.GetIndices(subMeshIndex));
             }
-            nonDeleteVertexIndexs = nonDeleteVertexIndexs.Distinct().OrderBy(v => v).ToList();
+            nonDeleteVertexIndexs = nonDeleteVertexIndexs.Distinct().ToList();
+            nonDeleteVertexIndexs.Sort();
 
             // 削除する頂点のインデックスのリスト(重複なし)
             var deleteIndexListUnique
@@ -676,8 +677,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
             // 削除する頂点のインデックスのリスト (重複なし, 昇順)
             var deleteIndexsOrdered
                 = deleteIndexListUnique
-                    .OrderBy(value => value)
                     .ToList();
+            deleteIndexsOrdered.Sort();
 
             // 頂点を削除
             var vertices = mesh.vertices.ToList();
