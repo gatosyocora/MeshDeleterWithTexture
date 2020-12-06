@@ -714,7 +714,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             mesh_custom.subMeshCount = mesh.subMeshCount;
 
-            float progressMaxCount = mesh.subMeshCount * deleteIndexListUniqueDescending.Count();
+            float progressMaxCount = mesh.subMeshCount;
             float count = 0;
 
             for (int subMeshIndex = 0; subMeshIndex < mesh.subMeshCount; subMeshIndex++)
@@ -746,13 +746,13 @@ namespace Gatosyocora.MeshDeleterWithTexture
                                 subMeshTriangles[i + 2]--;
                         }
                     }
-                    
-                    if (EditorUtility.DisplayCancelableProgressBar("search deleted triangles",
-                            Mathf.Floor(count/progressMaxCount * 100) + "%", count++ / progressMaxCount))
-                    {
-                        EditorUtility.ClearProgressBar();
-                        return;
-                    }
+                }
+
+                if (EditorUtility.DisplayCancelableProgressBar("search deleted triangles",
+                        Mathf.Floor(count / progressMaxCount * 100) + "%", count++ / progressMaxCount))
+                {
+                    EditorUtility.ClearProgressBar();
+                    return;
                 }
 
                 // 不要なポリゴンを削除する
