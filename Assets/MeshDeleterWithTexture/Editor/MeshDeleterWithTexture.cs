@@ -680,6 +680,9 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     .ToList();
             deleteIndexsOrdered.Sort();
 
+            // 削除する頂点がないので終了する
+            if (deleteIndexsOrdered.Count == 0) return;
+
             // 頂点を削除
             var vertices = mesh.vertices.ToList();
             var boneWeights = mesh.boneWeights.ToList();
