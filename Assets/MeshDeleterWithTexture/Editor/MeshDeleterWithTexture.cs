@@ -672,9 +672,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             // 削除する頂点のリストを取得
             var uvs = mesh.uv.ToList();
-            var uv2s = mesh.uv2.ToList();
-            var uv3s = mesh.uv3.ToList();
-            var uv4s = mesh.uv4.ToList();
             int x, y;
             List<int> deleteIndexList = new List<int>();
 
@@ -724,23 +721,16 @@ namespace Gatosyocora.MeshDeleterWithTexture
             if (deleteIndexsOrdered.Count == 0) return;
 
             // 頂点を削除
-            var vertices = mesh.vertices.ToList();
-            var boneWeights = mesh.boneWeights.ToList();
-            var normals = mesh.normals.ToList();
-            var tangents = mesh.tangents.ToList();
-            var colors = mesh.colors.ToList();
-            var color32s = mesh.colors32.ToList();
-
-            var nonDeleteVertices = vertices.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
-            var nonDeleteWeights = boneWeights.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
-            var nonDeleteNormals = normals.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
-            var nonDeleteTangents = tangents.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
-            var nonDeleteColors = colors.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
-            var nonDeleteColor32s = color32s.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
+            var nonDeleteVertices = mesh.vertices.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
+            var nonDeleteWeights = mesh.boneWeights.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
+            var nonDeleteNormals = mesh.normals.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
+            var nonDeleteTangents = mesh.tangents.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
+            var nonDeleteColors = mesh.colors.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
+            var nonDeleteColor32s = mesh.colors32.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
             var nonDeleteUVs = uvs.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
-            var nonDeleteUV2s = uv2s.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
-            var nonDeleteUV3s = uv3s.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
-            var nonDeleteUV4s = uv4s.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
+            var nonDeleteUV2s = mesh.uv2.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
+            var nonDeleteUV3s = mesh.uv3.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
+            var nonDeleteUV4s = mesh.uv4.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
 
             mesh_custom.SetVertices(nonDeleteVertices);
             mesh_custom.boneWeights = nonDeleteWeights;
