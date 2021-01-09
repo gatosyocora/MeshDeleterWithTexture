@@ -96,6 +96,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
         private string meshName;
 
         private Mesh previousMesh = null;
+        private Material[] previousMaterials = null;
 
         [MenuItem("GatoTool/MeshDeleter with Texture")]
         private static void Open()
@@ -549,6 +550,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         {
                             SetMesh(renderer, previousMesh);
                             previousMesh = null;
+                            renderer.sharedMaterials = previousMaterials;
+                            previousMaterials = null;
 
                             var mesh = GetMesh(renderer);
                             uvMapTex = GetUVMap(mesh, matInfos[materialInfoIndex], texture);
@@ -671,6 +674,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             var mesh = GetMesh(renderer);
             var deletedMesh = Instantiate(mesh);
+            var materials = renderer.sharedMaterials.ToArray();
 
             deletedMesh.Clear();
             deletedMesh.MarkDynamic();
@@ -755,10 +759,12 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     .OrderByDescending(value => value)
                     .ToArray();
 
+            // Mesh.GetTrianglesでアクセスするために一旦最大値を入れる
             deletedMesh.subMeshCount = mesh.subMeshCount;
 
             float progressMaxCount = mesh.subMeshCount;
             float count = 0;
+            int addSubMeshIndex = 0;
 
             for (int subMeshIndex = 0; subMeshIndex < mesh.subMeshCount; subMeshIndex++)
             {
@@ -800,8 +806,19 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                 // 不要なポリゴンを削除する
                 var triangleList = subMeshTriangles.Where(v => v != -1).ToArray();
-                deletedMesh.SetTriangles(triangleList, subMeshIndex);
+
+                // ポリゴン数0のサブメッシュは追加しない
+                if (!triangleList.Any())
+                {
+                    materials[subMeshIndex] = null;
+                    continue;
+                }
+
+                deletedMesh.SetTriangles(triangleList, addSubMeshIndex++);
             }
+
+            // ポリゴン削除の結果, ポリゴン数0になったSubMeshは含めない
+            deletedMesh.subMeshCount = addSubMeshIndex;
 
             //BindPoseをコピー
             deletedMesh.bindposes = mesh.bindposes;
@@ -835,7 +852,9 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             Undo.RecordObject(renderer, "Change mesh " + deletedMesh.name);
             previousMesh = mesh;
+            previousMaterials = renderer.sharedMaterials;
             SetMesh(renderer, deletedMesh);
+            renderer.sharedMaterials = materials.Where(m => m != null).ToArray();
 
             EditorUtility.ClearProgressBar();
         }
