@@ -1139,7 +1139,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             {
                 skinnedMeshRenderer.sharedMesh = mesh;
             }
-            else if (renderer is MeshRenderer meshRenderer)
+            else if (renderer is MeshRenderer)
             {
                 renderer.GetComponent<MeshFilter>().sharedMesh = mesh;
             }
@@ -1234,15 +1234,17 @@ namespace Gatosyocora.MeshDeleterWithTexture
             ComputeShader cs = Instantiate(Resources.Load<ComputeShader>("getUVMap")) as ComputeShader;
             int kernel = cs.FindKernel("CSMain");
 
-            var uvMapRT = new RenderTexture(texture.width, texture.height, 0, RenderTextureFormat.ARGB32);
-            uvMapRT.enableRandomWrite = true;
-            uvMapRT.anisoLevel = texture.anisoLevel;
-            uvMapRT.mipMapBias = texture.mipMapBias;
-            uvMapRT.filterMode = texture.filterMode;
-            uvMapRT.wrapMode = texture.wrapMode;
-            uvMapRT.wrapModeU = texture.wrapModeU;
-            uvMapRT.wrapModeV = texture.wrapModeV;
-            uvMapRT.wrapModeW = texture.wrapModeW;
+            var uvMapRT = new RenderTexture(texture.width, texture.height, 0, RenderTextureFormat.ARGB32)
+            {
+                enableRandomWrite = true,
+                anisoLevel = texture.anisoLevel,
+                mipMapBias = texture.mipMapBias,
+                filterMode = texture.filterMode,
+                wrapMode = texture.wrapMode,
+                wrapModeU = texture.wrapModeU,
+                wrapModeV = texture.wrapModeV,
+                wrapModeW = texture.wrapModeW
+            };
             uvMapRT.Create();
 
             var triangleBuffer = new ComputeBuffer(triangles.Count(), sizeof(int));
@@ -1261,8 +1263,10 @@ namespace Gatosyocora.MeshDeleterWithTexture
             triangleBuffer.Release();
             uvBuffer.Release();
 
-            Texture2D uvMapTex = new Texture2D(texture.width, texture.height, TextureFormat.RGB24, false);
-            uvMapTex.name = texture.name;
+            Texture2D uvMapTex = new Texture2D(texture.width, texture.height, TextureFormat.RGB24, false)
+            {
+                name = texture.name
+            };
 
             var original = RenderTexture.active;
             RenderTexture.active = uvMapRT;
