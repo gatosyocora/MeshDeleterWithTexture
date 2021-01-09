@@ -1229,7 +1229,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 triangles.AddRange(mesh.GetTriangles(slotIndex));
             var uvs = mesh.uv;
 
-            if (uvs.Count() <= 0) return null;
+            if (uvs.Count() <= 0 || triangles.Count() <= 0) return null;
 
             ComputeShader cs = Instantiate(Resources.Load<ComputeShader>("getUVMap")) as ComputeShader;
             int kernel = cs.FindKernel("CSMain");
