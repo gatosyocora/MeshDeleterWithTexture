@@ -136,7 +136,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
         {
             if (renderer != null && textures != null)
             {
-                ResetMaterialTextures(ref renderer, ref textures);
+                RendererUtility.ResetMaterialTextures(renderer, textures);
             }
 
             if (buffer != null) buffer.Dispose();
@@ -161,7 +161,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 if (check.changed)
                 {
                     if (textures != null)
-                        ResetMaterialTextures(ref editRenderer, ref textures);
+                        RendererUtility.ResetMaterialTextures(renderer, textures);
 
                     if (renderer != null)
                     {
@@ -393,7 +393,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     {
                         if (textures != null)
                         {
-                            ResetMaterialTextures(ref renderer, ref textures);
+                            RendererUtility.ResetMaterialTextures(renderer, textures);
                             InitializeDrawingArea(materialInfoIndex);
                         }
                     }
@@ -1041,33 +1041,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
             editMat.SetVector("_Offset", textureOffset);
             zoomScale = 1;
             ApplyTextureZoomScale(ref editMat, zoomScale);
-        }
-
-        private string[] GetTextureNames(Texture2D[] textures)
-        {
-            var textureNames = textures.Select(x => x.name).ToArray();
-            var processedItems = new List<string>();
-
-            for (int texIndex = 0; texIndex < textureNames.Length; texIndex++)
-            {
-                var sameNameCount =
-                    processedItems
-                    .Where(x => x == textureNames[texIndex])
-                    .Count();
-
-                processedItems.Add(textureNames[texIndex]);
-
-                if (sameNameCount > 0)
-                    textureNames[texIndex] += "_" + sameNameCount;
-            }
-
-            return textureNames;
-        }
-
-        private void ResetMaterialTextures(ref Renderer renderer, ref Texture2D[] textures)
-        {
-            for (int i = 0; i < textures.Length; i++)
-                renderer.sharedMaterials[i].mainTexture = textures[i];
         }
 
         private void ApplyTextureZoomScale(ref Material mat, float scale)

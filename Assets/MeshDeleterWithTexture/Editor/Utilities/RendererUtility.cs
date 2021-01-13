@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -136,6 +138,34 @@ namespace Gatosyocora.MeshDeleterWithTexture.Utilities
             sp.prefabOverride = false;
             sp.serializedObject.ApplyModifiedProperties();
 #endif
+        }
+
+
+        public static string[] GetTextureNames(Texture2D[] textures)
+        {
+            var textureNames = textures.Select(x => x.name).ToArray();
+            var processedItems = new List<string>();
+
+            for (int texIndex = 0; texIndex < textureNames.Length; texIndex++)
+            {
+                var sameNameCount =
+                    processedItems
+                    .Where(x => x == textureNames[texIndex])
+                    .Count();
+
+                processedItems.Add(textureNames[texIndex]);
+
+                if (sameNameCount > 0)
+                    textureNames[texIndex] += "_" + sameNameCount;
+            }
+
+            return textureNames;
+        }
+
+        public static void ResetMaterialTextures(Renderer renderer, Texture2D[] textures)
+        {
+            for (int i = 0; i < textures.Length; i++)
+                renderer.sharedMaterials[i].mainTexture = textures[i];
         }
     }
 }
