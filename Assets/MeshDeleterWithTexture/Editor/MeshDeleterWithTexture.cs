@@ -829,7 +829,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             textures = RendererUtility.GetMainTextures(renderer);
             matInfos = GetMaterialInfos(renderer);
             textureNames = matInfos.Select(x => x.Name).ToArray();
-            meshName = mesh.name + "_deleteMesh";
+            meshName = AddKeywordToEnd(mesh.name, "_deleteMesh");
         }
 
         /// <summary>
@@ -1313,6 +1313,18 @@ namespace Gatosyocora.MeshDeleterWithTexture
             Graphics.CopyTexture(undoTexture, previewTexture);
             buffer.SetData(undoBuffer);
             Repaint();
+        }
+
+        /// <summary>
+        /// 最後にキーワードを追加する（重複なし）
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="keyword"></param>
+        /// <returns></returns>
+        public static string AddKeywordToEnd(string target, string keyword)
+        {
+            var normalString = Regex.Replace(target, keyword + ".*", string.Empty);
+            return normalString + keyword;
         }
     }
 #endif
