@@ -791,6 +791,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
             previousMesh = mesh;
             previousMaterials = renderer.sharedMaterials;
             RendererUtility.SetMesh(renderer, deletedMesh);
+
+            RendererUtility.ResetMaterialTextures(renderer, textures);
             renderer.sharedMaterials = materials.Where(m => m != null).ToArray();
 
             EditorUtility.ClearProgressBar();
