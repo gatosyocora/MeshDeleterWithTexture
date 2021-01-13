@@ -516,20 +516,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 {
                     DeleteMesh(renderer, buffer, texture, matInfos[materialInfoIndex]);
 
-                    var mesh = RendererUtility.GetMesh(renderer);
-                    if (mesh != null)
-                    {
-                        triangleCount = RendererUtility.GetMeshTriangleCount(mesh);
+                    LoadRendererData(renderer);
 
-                        ResetDrawArea(texture, ref editMat, ref previewTexture);
-                        SetupComputeShader(ref texture, ref previewTexture);
-                        
-                        uvMapTex = GetUVMap(mesh, matInfos[materialInfoIndex], texture);
-                        editMat.SetTexture("_UVMap", uvMapTex);
-                        editMat.SetColor("_UVMapLineColor", uvMapLineColor);
+                    materialInfoIndex = 0;
+                    InitializeDrawingArea(materialInfoIndex);
 
-                        renderer.sharedMaterials[matInfos[materialInfoIndex].MaterialSlotIndices[0]].mainTexture = previewTexture;
-                    }
                     GUIUtility.ExitGUI();
                 }
             }
