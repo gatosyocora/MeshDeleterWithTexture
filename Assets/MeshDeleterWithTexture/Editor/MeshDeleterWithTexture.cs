@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -9,6 +8,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System;
 using System.Runtime.InteropServices;
+using Gatosyocora.MeshDeleterWithTexture.Utilities;
 
 /*
  * Copyright (c) 2019 gatosyocora
@@ -35,7 +35,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 MaterialSlotIndices = new List<int>();
                 AddSlotIndex(slotIndex);
                 Name = mat.name;
-                Texture = GetMainTexture(mat);
+                Texture = RendererUtility.GetMainTexture(mat);
             }
 
             public void AddSlotIndex(int index)
@@ -179,12 +179,12 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         editRenderer = renderer;
                         previousMesh = null;
 
-                        var mesh = GetMesh(renderer);
+                        var mesh = RendererUtility.GetMesh(renderer);
                         if (mesh != null)
                         {
-                            triangleCount = GetMeshTriangleCount(mesh);
-                            saveFolder = GetMeshPath(mesh);
-                            textures = GetTextures(renderer);
+                            triangleCount = RendererUtility.GetMeshTriangleCount(mesh);
+                            saveFolder = RendererUtility.GetMeshPath(mesh);
+                            textures = RendererUtility.GetMainTextures(renderer);
                             matInfos = GetMaterialInfos(renderer);
                             textureNames = matInfos.Select(x => x.Name).ToArray();
                             meshName = mesh.name + "_deleteMesh";
@@ -378,7 +378,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         ExportDeleteMaskTexture(buffer, originTexture);
                         renderer.sharedMaterials[matInfos[materialInfoIndex].MaterialSlotIndices[0]].mainTexture = previewTexture;
 
-                        var mesh = GetMesh(renderer);
+                        var mesh = RendererUtility.GetMesh(renderer);
                         uvMapTex = GetUVMap(mesh, matInfos[materialInfoIndex], texture);
                         editMat.SetTexture("_UVMap", uvMapTex);
                         editMat.SetColor("_UVMapLineColor", uvMapLineColor);
@@ -436,7 +436,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                                 ResetDrawArea(texture, ref editMat, ref previewTexture);
                                 SetupComputeShader(ref texture, ref previewTexture);
 
-                                var mesh = GetMesh(renderer);
+                                var mesh = RendererUtility.GetMesh(renderer);
                                 if (mesh != null)
                                 {
                                     uvMapTex = GetUVMap(mesh, matInfos[materialInfoIndex], texture);
@@ -530,8 +530,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                     if (GUILayout.Button("Revert Mesh to Prefab"))
                     {
-                        RevertMeshToPrefab(renderer);
-                        var mesh = GetMesh(renderer);
+                        RendererUtility.RevertMeshToPrefab(renderer);
+                        var mesh = RendererUtility.GetMesh(renderer);
                         uvMapTex = GetUVMap(mesh, matInfos[materialInfoIndex], texture);
                         editMat.SetTexture("_UVMap", uvMapTex);
                         editMat.SetColor("_UVMapLineColor", uvMapLineColor);
@@ -548,12 +548,12 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     {
                         if (GUILayout.Button("Revert Mesh to previously"))
                         {
-                            SetMesh(renderer, previousMesh);
+                            RendererUtility.SetMesh(renderer, previousMesh);
                             previousMesh = null;
                             renderer.sharedMaterials = previousMaterials;
                             previousMaterials = null;
 
-                            var mesh = GetMesh(renderer);
+                            var mesh = RendererUtility.GetMesh(renderer);
                             uvMapTex = GetUVMap(mesh, matInfos[materialInfoIndex], texture);
                             editMat.SetTexture("_UVMap", uvMapTex);
                             editMat.SetColor("_UVMapLineColor", uvMapLineColor);
@@ -567,10 +567,10 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 {
                     DeleteMesh(renderer, buffer, texture, matInfos[materialInfoIndex]);
 
-                    var mesh = GetMesh(renderer);
+                    var mesh = RendererUtility.GetMesh(renderer);
                     if (mesh != null)
                     {
-                        triangleCount = GetMeshTriangleCount(mesh);
+                        triangleCount = RendererUtility.GetMeshTriangleCount(mesh);
 
                         ResetDrawArea(texture, ref editMat, ref previewTexture);
                         SetupComputeShader(ref texture, ref previewTexture);
@@ -672,7 +672,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
         private void DeleteMesh(Renderer renderer, ComputeBuffer computeBuffer, Texture2D texture, MaterialInfo matInfo)
         {
 
-            var mesh = GetMesh(renderer);
+            var mesh = RendererUtility.GetMesh(renderer);
             var deletedMesh = Instantiate(mesh);
             var materials = renderer.sharedMaterials.ToArray();
 
@@ -853,7 +853,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             Undo.RecordObject(renderer, "Change mesh " + deletedMesh.name);
             previousMesh = mesh;
             previousMaterials = renderer.sharedMaterials;
-            SetMesh(renderer, deletedMesh);
+            RendererUtility.SetMesh(renderer, deletedMesh);
             renderer.sharedMaterials = materials.Where(m => m != null).ToArray();
 
             EditorUtility.ClearProgressBar();
@@ -1056,67 +1056,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
             ApplyTextureZoomScale(ref editMat, zoomScale);
         }
 
-        /// <summary>
-        /// Meshのポリゴン数を取得する
-        /// </summary>
-        /// <param name="mesh"></param>
-        /// <returns></returns>
-        private int GetMeshTriangleCount(Mesh mesh)
-        {
-            return mesh.triangles.Length / 3;
-        }
-
-        /// <summary>
-        /// mesh保存先のパスを取得する
-        /// </summary>
-        /// <param name="Mesh"></param>
-        /// <returns></returns>
-        private string GetMeshPath(Mesh mesh)
-        {
-            return Path.GetDirectoryName(AssetDatabase.GetAssetPath(mesh));
-        }
-
-        /// <summary>
-        /// テクスチャを取得する
-        /// </summary>
-        /// <param name="renderer"></param>
-        /// <returns></returns>
-        private Texture2D[] GetTextures(Renderer renderer)
-        {
-            var materials = renderer.sharedMaterials;
-            var textures = new Texture2D[materials.Length];
-            for (int i = 0; i < materials.Length; i++)
-            {
-                textures[i] = GetMainTexture(materials[i]);
-            }
-            return textures;
-        }
-
-        /// <summary>
-        /// MainTexを取得する
-        /// _MainTexプロパティがなければ一番最初のテクスチャを取得する
-        /// </summary>
-        /// <param name="mat"></param>
-        /// <returns></returns>
-        public static Texture2D GetMainTexture(Material mat)
-        {
-            var mainTex = mat.mainTexture as Texture2D;
-
-            // シェーダーに_MainTexが含まれていない時, nullになるため
-            // Materialの一番始めに設定されているTextureを取得する
-            if (mainTex == null)
-            {
-                foreach (var textureName in mat.GetTexturePropertyNames())
-                {
-                    mainTex = mat.GetTexture(textureName) as Texture2D;
-                    if (mainTex != null) break;
-                }
-            }
-
-            // この時点でmainTexがnullならmaterialにテクスチャが設定されていない
-            return mainTex;
-        }
-
         private string[] GetTextureNames(Texture2D[] textures)
         {
             var textureNames = textures.Select(x => x.name).ToArray();
@@ -1138,32 +1077,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
             return textureNames;
         }
 
-        private Mesh GetMesh(Renderer renderer)
-        {
-            Mesh mesh = null;
-            if (renderer is SkinnedMeshRenderer skinnedMeshRenderer)
-            {
-                mesh = skinnedMeshRenderer.sharedMesh;
-            }
-            else if (renderer is MeshRenderer meshRenderer)
-            {
-                mesh = renderer.GetComponent<MeshFilter>().sharedMesh;
-            }
-            return mesh;
-        }
-
-        private void SetMesh(Renderer renderer, Mesh mesh)
-        {
-            if (renderer is SkinnedMeshRenderer skinnedMeshRenderer)
-            {
-                skinnedMeshRenderer.sharedMesh = mesh;
-            }
-            else if (renderer is MeshRenderer)
-            {
-                renderer.GetComponent<MeshFilter>().sharedMesh = mesh;
-            }
-        }
-
         private void ResetMaterialTextures(ref Renderer renderer, ref Texture2D[] textures)
         {
             for (int i = 0; i < textures.Length; i++)
@@ -1175,33 +1088,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
             mat.SetFloat("_TextureScale", scale);
             
             Repaint();
-        }
-
-        // TODO: メッシュ単位で戻ってしまう（サブメッシュ単位で戻したい）
-        private void RevertMeshToPrefab(Renderer renderer)
-        {
-            if (!PrefabUtility.IsPartOfPrefabAsset(renderer)) return;
-
-            PrefabUtility.ReconnectToLastPrefab(renderer.gameObject);
-
-            SerializedObject so = null;
-            if (renderer is SkinnedMeshRenderer)
-            {
-                so = new SerializedObject(renderer);
-            }
-            else if (renderer is MeshRenderer)
-            {
-                so = new SerializedObject(renderer.GetComponent<MeshFilter>());
-            }
-            so.Update();
-
-            var sp = so.FindProperty("m_Mesh");
-#if UNITY_2018_3_OR_NEWER
-            PrefabUtility.RevertPropertyOverride(sp, InteractionMode.UserAction);
-#else
-            sp.prefabOverride = false;
-            sp.serializedObject.ApplyModifiedProperties();
-#endif
         }
 
 
@@ -1339,7 +1225,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 SetupDrawing(penSize, penColor, texture);
             }
         }
-
 
         /// <summary>
         ///　UVマップを書き出す
