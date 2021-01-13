@@ -471,17 +471,25 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 GUILayout.Space(50);
 
                 using (new EditorGUILayout.HorizontalScope())
-                using (new EditorGUI.DisabledGroupScope(renderer == null || !PrefabUtility.IsPartOfPrefabAsset(renderer)))
+                using (new EditorGUI.DisabledGroupScope(renderer == null || !PrefabUtility.IsPartOfAnyPrefab(renderer)))
                 {
                     GUILayout.FlexibleSpace();
 
                     if (GUILayout.Button("Revert Mesh to Prefab"))
                     {
+                        RendererUtility.ResetMaterialTextures(renderer, textures);
                         RendererUtility.RevertMeshToPrefab(renderer);
                         var mesh = RendererUtility.GetMesh(renderer);
                         uvMapTex = GetUVMap(mesh, matInfos[materialInfoIndex], texture);
                         editMat.SetTexture("_UVMap", uvMapTex);
                         editMat.SetColor("_UVMapLineColor", uvMapLineColor);
+
+                        LoadRendererData(renderer);
+                        materialInfoIndex = 0;
+                        InitializeDrawingArea(materialInfoIndex);
+
+                        previousMesh = null;
+                        previousMaterials = null;
                     }
                 }
 
