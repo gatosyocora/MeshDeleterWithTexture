@@ -48,7 +48,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
         private int materialInfoIndex = 0;
 
         private Renderer renderer;
-        private Renderer editRenderer;
         private Texture2D originTexture;
         private Texture2D texture;
         private Texture2D[] textures;
@@ -176,7 +175,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
                             return;
                         }
 
-                        editRenderer = renderer;
                         previousMesh = null;
 
                         LoadRendererData(renderer);
@@ -190,7 +188,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     else
                     {
                         texture = null;
-                        editRenderer = null;
                     }
                 }
             }
