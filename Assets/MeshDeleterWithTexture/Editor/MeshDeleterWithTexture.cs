@@ -471,6 +471,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 GUILayout.Space(50);
 
                 using (new EditorGUILayout.HorizontalScope())
+                using (new EditorGUI.DisabledGroupScope(renderer == null || !PrefabUtility.IsPartOfPrefabAsset(renderer)))
                 {
                     GUILayout.FlexibleSpace();
 
