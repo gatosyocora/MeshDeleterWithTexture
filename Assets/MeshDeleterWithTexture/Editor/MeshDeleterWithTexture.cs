@@ -179,40 +179,13 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         editRenderer = renderer;
                         previousMesh = null;
 
-                        var mesh = RendererUtility.GetMesh(renderer);
-                        if (mesh != null)
+                        LoadRendererData(renderer);
+
+                        if (textures != null)
                         {
-                            triangleCount = RendererUtility.GetMeshTriangleCount(mesh);
-                            saveFolder = RendererUtility.GetMeshPath(mesh);
-                            textures = RendererUtility.GetMainTextures(renderer);
-                            matInfos = GetMaterialInfos(renderer);
-                            textureNames = matInfos.Select(x => x.Name).ToArray();
-                            meshName = mesh.name + "_deleteMesh";
-
-                            if (textures != null)
-                            {
-                                materialInfoIndex = 0;
-                                originTexture = matInfos[materialInfoIndex].Texture;
-                                if (originTexture != null)
-                                {
-                                    texture = LoadSettingToTexture(originTexture);
-
-                                    DrawTypeSetting();
-                                    ResetDrawArea(texture, ref editMat, ref previewTexture);
-                                    SetupComputeShader(ref texture, ref previewTexture);
-                                    
-                                    uvMapTex = GetUVMap(mesh, matInfos[materialInfoIndex], texture);
-                                    editMat.SetTexture("_UVMap", uvMapTex);
-                                    editMat.SetColor("_UVMapLineColor", uvMapLineColor);
-
-                                    // TODO: _MainTexが存在しないマテリアルは違うやつに入れないといけない
-                                    renderer.sharedMaterials[matInfos[materialInfoIndex].MaterialSlotIndices[0]].mainTexture = previewTexture;
-                                }
-
-                                ResetDrawAreaOffsetAndZoom();
-                            }
+                            materialInfoIndex = 0;
+                            InitializeDrawingArea(materialInfoIndex);
                         }
-
                     }
                     else
                     {
@@ -426,26 +399,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         if (textures != null)
                         {
                             ResetMaterialTextures(ref renderer, ref textures);
-                            
-                            originTexture = matInfos[materialInfoIndex].Texture;
-                            if (originTexture != null)
-                            {
-                                texture = LoadSettingToTexture(originTexture);
-
-                                DrawTypeSetting();
-                                ResetDrawArea(texture, ref editMat, ref previewTexture);
-                                SetupComputeShader(ref texture, ref previewTexture);
-
-                                var mesh = RendererUtility.GetMesh(renderer);
-                                if (mesh != null)
-                                {
-                                    uvMapTex = GetUVMap(mesh, matInfos[materialInfoIndex], texture);
-                                    editMat.SetTexture("_UVMap", uvMapTex);
-                                    editMat.SetColor("_UVMapLineColor", uvMapLineColor);
-                                }
-                                
-                                renderer.sharedMaterials[matInfos[materialInfoIndex].MaterialSlotIndices[0]].mainTexture = previewTexture;
-                            }
+                            InitializeDrawingArea(materialInfoIndex);
                         }
                     }
                 }
@@ -857,6 +811,53 @@ namespace Gatosyocora.MeshDeleterWithTexture
             renderer.sharedMaterials = materials.Where(m => m != null).ToArray();
 
             EditorUtility.ClearProgressBar();
+        }
+
+        /// <summary>
+        /// Rendererから必要な情報を取得
+        /// </summary>
+        /// <param name="renderer"></param>
+        /// <param name="mesh"></param>
+        private void LoadRendererData(Renderer renderer)
+        {
+            var mesh = RendererUtility.GetMesh(renderer);
+            if (mesh == null) return;
+            triangleCount = RendererUtility.GetMeshTriangleCount(mesh);
+            saveFolder = RendererUtility.GetMeshPath(mesh);
+            textures = RendererUtility.GetMainTextures(renderer);
+            matInfos = GetMaterialInfos(renderer);
+            textureNames = matInfos.Select(x => x.Name).ToArray();
+            meshName = mesh.name + "_deleteMesh";
+        }
+
+        /// <summary>
+        /// DrawAreaを初期化
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="mesh"></param>
+        private void InitializeDrawingArea(int index)
+        {
+            originTexture = matInfos[index].Texture;
+            if (originTexture != null)
+            {
+                texture = LoadSettingToTexture(originTexture);
+
+                DrawTypeSetting();
+                ResetDrawArea(texture, ref editMat, ref previewTexture);
+                SetupComputeShader(ref texture, ref previewTexture);
+
+                var mesh = RendererUtility.GetMesh(renderer);
+                if (mesh != null)
+                {
+                    uvMapTex = GetUVMap(mesh, matInfos[materialInfoIndex], texture);
+                    editMat.SetTexture("_UVMap", uvMapTex);
+                    editMat.SetColor("_UVMapLineColor", uvMapLineColor);
+                }
+
+                // TODO: _MainTexが存在しないマテリアルは違うやつに入れないといけない
+                renderer.sharedMaterials[matInfos[materialInfoIndex].MaterialSlotIndices[0]].mainTexture = previewTexture;
+            }
+            ResetDrawAreaOffsetAndZoom();
         }
 
         /// <summary>
