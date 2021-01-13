@@ -494,15 +494,16 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     {
                         if (GUILayout.Button("Revert Mesh to previously"))
                         {
+                            RendererUtility.ResetMaterialTextures(renderer, textures);
+
                             RendererUtility.SetMesh(renderer, previousMesh);
                             previousMesh = null;
                             renderer.sharedMaterials = previousMaterials;
                             previousMaterials = null;
 
-                            var mesh = RendererUtility.GetMesh(renderer);
-                            uvMapTex = GetUVMap(mesh, matInfos[materialInfoIndex], texture);
-                            editMat.SetTexture("_UVMap", uvMapTex);
-                            editMat.SetColor("_UVMapLineColor", uvMapLineColor);
+                            LoadRendererData(renderer);
+                            materialInfoIndex = 0;
+                            InitializeDrawingArea(materialInfoIndex);
                         }
                     }
                 }
@@ -797,10 +798,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
             previousMaterials = renderer.sharedMaterials;
             RendererUtility.SetMesh(renderer, deletedMesh);
 
+            // 削除したサブメッシュに対応したマテリアルにテクスチャを戻すためにここでおこなう
+            RendererUtility.ResetMaterialTextures(renderer, textures);
+
             if (deletedSubMesh)
             {
-                // 削除したサブメッシュに対応したマテリアルにテクスチャを戻すためにここでおこなう
-                RendererUtility.ResetMaterialTextures(renderer, textures);
                 // サブメッシュ削除によってマテリアルの対応を変更する必要がある
                 renderer.sharedMaterials = materials.Where(m => m != null).ToArray();
             }
