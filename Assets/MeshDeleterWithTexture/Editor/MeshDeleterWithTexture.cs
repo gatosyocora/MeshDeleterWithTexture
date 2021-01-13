@@ -512,11 +512,14 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                 if (GUILayout.Button("Delete Mesh"))
                 {
-                    DeleteMesh(renderer, buffer, texture, matInfos[materialInfoIndex]);
+                    var deletedSubMesh = DeleteMesh(renderer, buffer, texture, matInfos[materialInfoIndex]);
 
                     LoadRendererData(renderer);
 
-                    materialInfoIndex = 0;
+                    if (deletedSubMesh)
+                    {
+                        materialInfoIndex = 0;
+                    }
                     InitializeDrawingArea(materialInfoIndex);
 
                     GUIUtility.ExitGUI();
@@ -607,7 +610,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
         /// <param name="deleteTexPos"></param>
         /// <param name="texture"></param>
         /// <param name="subMeshIndexInDeletedVertex"></param>
-        private void DeleteMesh(Renderer renderer, ComputeBuffer computeBuffer, Texture2D texture, MaterialInfo matInfo)
+        private bool DeleteMesh(Renderer renderer, ComputeBuffer computeBuffer, Texture2D texture, MaterialInfo matInfo)
         {
 
             var mesh = RendererUtility.GetMesh(renderer);
@@ -664,7 +667,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             deleteIndexsOrdered.Sort();
 
             // 削除する頂点がないので終了する
-            if (deleteIndexsOrdered.Count == 0) return;
+            if (deleteIndexsOrdered.Count == 0) return false;
 
             // 頂点を削除
             var nonDeleteVertices = mesh.vertices.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
@@ -740,7 +743,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         Mathf.Floor(count / progressMaxCount * 100) + "%", count++ / progressMaxCount))
                 {
                     EditorUtility.ClearProgressBar();
-                    return;
+                    return false;
                 }
 
                 // 不要なポリゴンを削除する
@@ -808,6 +811,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
             }
 
             EditorUtility.ClearProgressBar();
+
+            return deletedSubMesh;
         }
 
         /// <summary>
