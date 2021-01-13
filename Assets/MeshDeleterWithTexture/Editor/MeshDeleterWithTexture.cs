@@ -160,11 +160,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                 if (check.changed)
                 {
+                    if (textures != null)
+                        ResetMaterialTextures(ref editRenderer, ref textures);
+
                     if (renderer != null)
                     {
-                        if (textures != null)
-                            ResetMaterialTextures(ref editRenderer, ref textures);
-
                         if (!(renderer is SkinnedMeshRenderer ||
                             renderer is MeshRenderer))
                         {
@@ -190,13 +190,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     else
                     {
                         texture = null;
-                        
-                        if (textures != null)
-                            ResetMaterialTextures(ref editRenderer, ref textures);
-
                         editRenderer = null;
                     }
-
                 }
             }
 
