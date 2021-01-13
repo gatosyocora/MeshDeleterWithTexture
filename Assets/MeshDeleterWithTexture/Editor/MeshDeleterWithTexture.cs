@@ -702,6 +702,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             float progressMaxCount = mesh.subMeshCount;
             float count = 0;
             int addSubMeshIndex = 0;
+            bool deletedSubMesh = false;
 
             for (int subMeshIndex = 0; subMeshIndex < mesh.subMeshCount; subMeshIndex++)
             {
@@ -748,14 +749,18 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 if (!triangleList.Any())
                 {
                     materials[subMeshIndex] = null;
+                    deletedSubMesh = true;
                     continue;
                 }
 
                 deletedMesh.SetTriangles(triangleList, addSubMeshIndex++);
             }
 
-            // ポリゴン削除の結果, ポリゴン数0になったSubMeshは含めない
-            deletedMesh.subMeshCount = addSubMeshIndex;
+            if (deletedSubMesh)
+            {
+                // ポリゴン削除の結果, ポリゴン数0になったSubMeshは含めない
+                deletedMesh.subMeshCount = addSubMeshIndex;
+            }
 
             //BindPoseをコピー
             deletedMesh.bindposes = mesh.bindposes;
@@ -792,8 +797,13 @@ namespace Gatosyocora.MeshDeleterWithTexture
             previousMaterials = renderer.sharedMaterials;
             RendererUtility.SetMesh(renderer, deletedMesh);
 
-            RendererUtility.ResetMaterialTextures(renderer, textures);
-            renderer.sharedMaterials = materials.Where(m => m != null).ToArray();
+            if (deletedSubMesh)
+            {
+                // 削除したサブメッシュに対応したマテリアルにテクスチャを戻すためにここでおこなう
+                RendererUtility.ResetMaterialTextures(renderer, textures);
+                // サブメッシュ削除によってマテリアルの対応を変更する必要がある
+                renderer.sharedMaterials = materials.Where(m => m != null).ToArray();
+            }
 
             EditorUtility.ClearProgressBar();
         }
