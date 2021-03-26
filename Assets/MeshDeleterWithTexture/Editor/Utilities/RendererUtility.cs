@@ -107,7 +107,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Utilities
         /// <param name="Mesh"></param>
         /// <returns></returns>
         public static string GetMeshPath(Mesh mesh)
-            => Path.GetDirectoryName(AssetDatabase.GetAssetPath(mesh));
+            => Path.GetDirectoryName(AssetDatabase.GetAssetPath(mesh)).Replace("\\", "/");
 
         // TODO: メッシュ単位で戻ってしまう（サブメッシュ単位で戻したい）
         /// <summary>
