@@ -20,7 +20,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         public Color penColor { get; private set; } = Color.black;
         public int penSize { get; private set; } = 20;
 
-        private Texture2D uvMapTex;
         public Color uvMapLineColor { get; private set; } = Color.black;
 
         private Vector4 textureOffset;
