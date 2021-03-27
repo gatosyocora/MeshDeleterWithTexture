@@ -74,6 +74,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
             AssetDatabase.Refresh();
         }
 
+        private void Update()
+        {
+            Repaint();
+        }
+
         private void OnGUI()
         {
             // TODO: ComputeShaderがAndroidBuildだと使えないから警告文を出す

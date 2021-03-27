@@ -146,8 +146,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                             ClearOnTexture(pos);
                     }
                 }
-
-                Repaint();
             }
         }
 
@@ -267,8 +265,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         private void DrawOnTexture(Vector2 pos)
         {
             canvasModel.Draw(pos, texture);
-
-            Repaint();
         }
 
         /// <summary>
@@ -278,8 +274,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         private void ClearOnTexture(Vector2 pos)
         {
             canvasModel.Clear(pos, texture);
-
-            Repaint();
         }
 
         public void SetPenColor(Color penColor)
@@ -298,8 +292,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         {
             zoomScale = scale;
             editMat.SetFloat("_TextureScale", scale);
-
-            Repaint();
         }
 
         public void ResetDrawAreaOffsetAndZoom()
@@ -395,8 +387,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             negaposiMat.SetFloat("_Inverse", 0);
             Graphics.Blit(texture, previewTexture, negaposiMat);
 
-            Repaint();
-
             return true;
         }
 
@@ -447,8 +437,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             negaposiMat.SetTexture("_MaskTex", maskTexture);
             negaposiMat.SetFloat("_Inverse", 0);
             Graphics.Blit(texture, previewTexture, negaposiMat);
-
-            Repaint();
         }
 
         public int[] GetDeleteData(int width, int height)
