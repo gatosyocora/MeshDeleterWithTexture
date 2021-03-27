@@ -13,6 +13,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
         private Material editMat;
 
         private Texture2D uvMapTexture;
+        public Color uvMapLineColor { get; private set; } = Color.black;
 
         public UVMapCanvas(ref Material editMat)
         {
@@ -21,11 +22,13 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
         public void SetUVMapTexture(Texture2D uvMapTexture)
         {
+            this.uvMapTexture = uvMapTexture;
             editMat.SetTexture("_UVMap", uvMapTexture);
         }
 
         public void SetUVMapLineColor(Color uvMapLineColor)
         {
+            this.uvMapLineColor = uvMapLineColor;
             editMat.SetColor("_UVMapLineColor", uvMapLineColor);
         }
 

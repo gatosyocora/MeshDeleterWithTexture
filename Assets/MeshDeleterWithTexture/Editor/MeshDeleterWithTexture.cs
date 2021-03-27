@@ -210,7 +210,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 {
                     using (var check = new EditorGUI.ChangeCheckScope())
                     {
-                        var uvMapLineColor = EditorGUILayout.ColorField("UVMap LineColor", canvasView.uvMapLineColor);
+                        var uvMapLineColor = EditorGUILayout.ColorField("UVMap LineColor", canvasView.uvMap.uvMapLineColor);
                         if (check.changed)
                         {
                             canvasView.uvMap.SetUVMapLineColor(uvMapLineColor);
