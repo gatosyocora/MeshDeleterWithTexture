@@ -87,7 +87,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                         if (GUILayout.Button("Reset"))
                         {
-                            canvasView.ResetDrawAreaOffsetAndZoom();
+                            canvasView.ResetScrollOffsetAndZoomScale();
                         }
                     }
                 }

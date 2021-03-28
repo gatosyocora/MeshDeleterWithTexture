@@ -68,7 +68,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         {
             this.materialInfo = materialInfo;
             textureSize = new Vector2Int(materialInfo.Texture.width, materialInfo.Texture.height);
-            ResetDrawAreaOffsetAndZoom();
+            ResetScrollOffsetAndZoomScale();
 
             editMat.SetFloat("_ApplyGammaCorrection", Convert.ToInt32(PlayerSettings.colorSpace == ColorSpace.Linear));
             editMat.SetInt("_PointNum", 0);
@@ -170,7 +170,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         /// </summary>
         /// <param name="index"></param>
         /// <param name="mesh"></param>
-        public void InitializeDrawingArea(MaterialInfo materialInfo, Renderer renderer)
+        public void InitializeDrawArea(MaterialInfo materialInfo, Renderer renderer)
         {
             if (materialInfo.Texture != null)
             {
@@ -190,7 +190,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 // TODO: _MainTexが存在しないマテリアルは違うやつに入れないといけない
                 renderer.sharedMaterials[materialInfo.MaterialSlotIndices[0]].mainTexture = previewTexture;
             }
-            ResetDrawAreaOffsetAndZoom();
+            ResetScrollOffsetAndZoomScale();
         }
 
         /// <summary>
@@ -260,7 +260,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         /// <summary>
         /// ScrollOffsetとZoomScaleをリセットする
         /// </summary>
-        public void ResetDrawAreaOffsetAndZoom()
+        public void ResetScrollOffsetAndZoomScale()
         {
             ScrollOffset = Vector4.zero;
             ZoomScale = 1;

@@ -314,7 +314,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
                 {
                     materialInfoIndex = 0;
                     canvasView.Initialize(matInfos[materialInfoIndex]);
-                    canvasView.InitializeDrawingArea(matInfos[materialInfoIndex], renderer);
+                    canvasView.InitializeDrawArea(matInfos[materialInfoIndex], renderer);
                     texture = matInfos[materialInfoIndex].Texture;
                 }
             }
@@ -329,7 +329,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             if (textures != null)
             {
                 RendererUtility.ResetMaterialTextures(renderer, textures);
-                canvasView.InitializeDrawingArea(matInfos[materialInfoIndex], renderer);
+                canvasView.InitializeDrawArea(matInfos[materialInfoIndex], renderer);
             }
         }
 
@@ -348,7 +348,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
 
             LoadRendererData(renderer);
             materialInfoIndex = 0;
-            canvasView.InitializeDrawingArea(matInfos[materialInfoIndex], renderer);
+            canvasView.InitializeDrawArea(matInfos[materialInfoIndex], renderer);
 
             previousMesh = null;
             previousMaterials = null;
@@ -365,7 +365,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
 
             LoadRendererData(renderer);
             materialInfoIndex = 0;
-            canvasView.InitializeDrawingArea(matInfos[materialInfoIndex], renderer);
+            canvasView.InitializeDrawArea(matInfos[materialInfoIndex], renderer);
         }
 
         public void DeleteMesh(CanvasView canvasView)
@@ -379,7 +379,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             {
                 materialInfoIndex = 0;
             }
-            canvasView.InitializeDrawingArea(matInfos[materialInfoIndex], renderer);
+            canvasView.InitializeDrawArea(matInfos[materialInfoIndex], renderer);
         }
 
         public void SelectFolder()
