@@ -349,7 +349,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         private Vector2 ConvertTexturePosToUVPos(Vector2Int textureSize, Vector2 texturePos) => texturePos / textureSize;
 
-        public void InverseSiroKuro()
+        public void InverseFillArea()
         {
             var height = textureSize.y;
             var width = textureSize.x;

@@ -183,7 +183,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     {
                         // TODO: Undo機能を一時的に閉じる
                         // canvasView.undo.RegisterUndoTexture(previewTexture, buffer);
-                        canvasView.InverseSiroKuro();
+                        canvasView.InverseFillArea();
                     }
 
                     if (GUILayout.Button("Clear All Drawing"))
