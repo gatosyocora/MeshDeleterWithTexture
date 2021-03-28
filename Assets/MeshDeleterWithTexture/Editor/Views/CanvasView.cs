@@ -265,19 +265,13 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         /// ペン
         /// </summary>
         /// <param name="pos"></param>
-        private void DrawOnTexture(Vector2 pos)
-        {
-            canvasModel.Draw(pos, texture);
-        }
+        private void DrawOnTexture(Vector2 pos) => canvasModel.Draw(pos, textureSize);
 
         /// <summary>
         /// 消しゴム
         /// </summary>
         /// <param name="pos"></param>
-        private void ClearOnTexture(Vector2 pos)
-        {
-            canvasModel.Clear(pos, texture);
-        }
+        private void ClearOnTexture(Vector2 pos) => canvasModel.Clear(pos, textureSize);
 
         public void SetPenColor(Color penColor)
         {
