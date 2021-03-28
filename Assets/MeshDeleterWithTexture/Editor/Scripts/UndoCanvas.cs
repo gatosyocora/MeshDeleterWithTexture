@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Gatosyocora.MeshDeleterWithTexture
 {
-    public class UndoCanvas : Editor
+    public class UndoCanvas
     {
         private RenderTexture[] undoTextures;
         private int[][] undoBuffers;
@@ -46,7 +46,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
             undoIndex--;
             Graphics.CopyTexture(undoTexture, previewTexture);
             buffer.SetData(undoBuffer);
-            Repaint();
         }
 
         public bool canUndo() => undoIndex == -1;
