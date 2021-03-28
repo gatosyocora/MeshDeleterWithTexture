@@ -192,6 +192,10 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             ResetDrawAreaOffsetAndZoom();
         }
 
+        /// <summary>
+        /// DrawTypeによって設定する
+        /// </summary>
+        /// <param name="drawType"></param>
         public void DrawTypeSetting(DrawType drawType)
         {
             this.drawType = drawType;
@@ -202,6 +206,9 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             }
         }
 
+        /// <summary>
+        /// 描画エリアをリセットする
+        /// </summary>
         public void ResetDrawArea()
         {
             previewTexture = TextureUtility.CopyTexture2DToRenderTexture(materialInfo.Texture, textureSize, PlayerSettings.colorSpace == ColorSpace.Linear);
@@ -225,12 +232,20 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         /// <param name="pos"></param>
         private void ClearOnTexture(Vector2 pos) => canvasModel.Clear(pos, textureSize);
 
+        /// <summary>
+        /// ペンの色を変更する
+        /// </summary>
+        /// <param name="penColor"></param>
         public void SetPenColor(Color penColor)
         {
             this.penColor = penColor;
             canvasModel.SetPen(penSize, penColor);
         }
 
+        /// <summary>
+        /// ペンのサイズを変更する
+        /// </summary>
+        /// <param name="penSize"></param>
         public void SetPenSize(int penSize)
         {
             this.penSize = penSize;
@@ -238,6 +253,9 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             canvasModel.SetPen(penSize, penColor);
         }
 
+        /// <summary>
+        /// ScrollOffsetとZoomScaleをリセットする
+        /// </summary>
         public void ResetDrawAreaOffsetAndZoom()
         {
             ScrollOffset = Vector4.zero;
@@ -298,6 +316,11 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         }
 
         public bool ApplyDeleteMaskTexturetToBuffer(string maskTexturePath)
+        /// <summary>
+        /// マスク画像をCanvasに適用する
+        /// </summary>
+        /// <param name="maskTexturePath">マスク画像のパス</param>
+        /// <returns></returns>
         {
             var fileStream = new FileStream(maskTexturePath, FileMode.Open, FileAccess.Read);
             var bin = new BinaryReader(fileStream);
@@ -349,6 +372,9 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         private Vector2 ConvertTexturePosToUVPos(Vector2Int textureSize, Vector2 texturePos) => texturePos / textureSize;
 
+        /// <summary>
+        /// 塗られている範囲を反転させる
+        /// </summary>
         public void InverseFillArea()
         {
             var height = textureSize.y;
@@ -376,6 +402,10 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             Graphics.Blit(materialInfo.Texture, previewTexture, negaposiMat);
         }
 
+        /// <summary>
+        /// 削除する場所のデータを取得
+        /// </summary>
+        /// <returns>削除する場所</returns>
         public int[] GetDeleteData()
         {
             var deletePos = new int[textureSize.x * textureSize.y];
