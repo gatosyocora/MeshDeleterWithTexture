@@ -70,37 +70,25 @@ namespace Gatosyocora.MeshDeleterWithTexture
             using (var check = new EditorGUI.ChangeCheckScope())
             {
                 model.renderer = EditorGUILayout.ObjectField("Renderer", model.renderer, typeof(Renderer), true) as Renderer;
-
-                if (check.changed)
-                {
-                    model.ChangeRenderer(canvasView);
-                }
+                if (check.changed) model.ChangeRenderer(canvasView);
             }
 
             using (new EditorGUILayout.HorizontalScope())
             {
                 using (new EditorGUILayout.VerticalScope())
                 {
-                    if (model.HasTexture())
-                    {
-                        canvasView.Render();
-                    }
-                    else
-                    {
-                        var size = EditorGUIUtility.currentViewWidth * 0.6f;
-                        var rect = GUILayoutUtility.GetRect(size, size);
-                        GUI.Box(rect, "");
-                    }
+                    if (model.HasTexture()) canvasView.Render();
+                    else GUI.Box(
+                            GUILayoutUtility.GetRect(
+                                EditorGUIUtility.currentViewWidth * 0.6f,
+                                EditorGUIUtility.currentViewWidth * 0.6f),
+                            "");
 
                     using (new EditorGUILayout.HorizontalScope())
                     using (var check = new EditorGUI.ChangeCheckScope())
                     {
                         var zoomScale = EditorGUILayout.Slider("Scale", canvasView.ZoomScale, 0.1f, 1.0f);
-
-                        if (check.changed)
-                        {
-                            canvasView.ZoomScale = zoomScale;
-                        }
+                        if (check.changed) canvasView.ZoomScale = zoomScale;
 
                         if (GUILayout.Button("Reset"))
                         {
@@ -145,11 +133,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 using (var check = new EditorGUI.ChangeCheckScope())
                 {
                     var path = GatoGUILayout.DragAndDropableArea("Drag & Drop DeleteMaskTexture", deleteMaskTextureExtensions);
-
-                    if (check.changed)
-                    {
-                        canvasView.ApplyDeleteMaskTexturetToBuffer(path);
-                    }
+                    if (check.changed) canvasView.ApplyDeleteMaskTexturetToBuffer(path);
                 }
 
                 GUILayout.Space(10f);
@@ -159,10 +143,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     using (var check = new EditorGUI.ChangeCheckScope())
                     {
                         var uvMapLineColor = EditorGUILayout.ColorField("UVMap LineColor", canvasView.uvMap.uvMapLineColor);
-                        if (check.changed)
-                        {
-                            canvasView.uvMap.SetUVMapLineColor(uvMapLineColor);
-                        }
+                        if (check.changed) canvasView.uvMap.SetUVMapLineColor(uvMapLineColor);
                     }
 
                     if (GUILayout.Button("Export UVMap"))
@@ -178,10 +159,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     if (model.HasTextures())
                         model.materialInfoIndex = EditorGUILayout.Popup("Texture (Material)", model.materialInfoIndex, model.textureNames);
 
-                    if (check.changed)
-                    {
-                        model.ChangeTexture(canvasView);
-                    }
+                    if (check.changed) model.ChangeTexture(canvasView);
                 }
 
                 EditorGUILayout.Space();
@@ -189,17 +167,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 EditorGUILayout.LabelField("Tools", EditorStyles.boldLabel);
 
                 EditorGUILayout.LabelField("DrawType");
+                using (var check = new EditorGUI.ChangeCheckScope())
                 using (new EditorGUILayout.HorizontalScope())
                 {
-                    using (var check = new EditorGUI.ChangeCheckScope())
-                    {
-                        var drawType = (DrawType)GUILayout.Toolbar((int)canvasView.drawType, Enum.GetNames(typeof(DrawType)));
-
-                        if (check.changed)
-                        {
-                            canvasView.DrawTypeSetting(drawType);
-                        }
-                    }
+                    var drawType = (DrawType)GUILayout.Toolbar((int)canvasView.drawType, Enum.GetNames(typeof(DrawType)));
+                    if (check.changed) canvasView.DrawTypeSetting(drawType);
                 }
 
                 EditorGUILayout.Space();
