@@ -370,7 +370,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
 
         public void DeleteMesh(CanvasView canvasView)
         {
-            var deletePos = canvasView.GetDeleteData(texture.width, texture.height);
+            var deletePos = canvasView.GetDeleteData();
             var deletedSubMesh = DeleteMesh(renderer, deletePos, texture, matInfos[materialInfoIndex]);
 
             LoadRendererData(renderer);

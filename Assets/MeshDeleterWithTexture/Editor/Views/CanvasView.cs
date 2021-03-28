@@ -376,9 +376,9 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             Graphics.Blit(materialInfo.Texture, previewTexture, negaposiMat);
         }
 
-        public int[] GetDeleteData(int width, int height)
+        public int[] GetDeleteData()
         {
-            var deletePos = new int[width * height];
+            var deletePos = new int[textureSize.x * textureSize.y];
             canvasModel.buffer.GetData(deletePos);
             return deletePos;
         }
