@@ -1,7 +1,6 @@
 ﻿using Gatosyocora.MeshDeleterWithTexture.Utilities;
 using Gatosyocora.MeshDeleterWithTexture.Views;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,7 +16,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         public int materialInfoIndex = 0;
 
         public Renderer renderer;
-        private Texture2D originTexture;
         public Texture2D texture;
         private Texture2D[] textures;
         public string[] textureNames;

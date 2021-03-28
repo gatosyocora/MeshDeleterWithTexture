@@ -1,13 +1,8 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System;
-using System.Runtime.InteropServices;
 using Gatosyocora.MeshDeleterWithTexture.Utilities;
 using Gatosyocora.MeshDeleterWithTexture.Views;
 using Gatosyocora.MeshDeleterWithTexture.Models;
