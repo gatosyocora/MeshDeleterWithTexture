@@ -339,20 +339,12 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             var texX = (int)((windowPos.x - rect.position.x) * raito);
             var texY = textureSize.y - (int)((windowPos.y - rect.position.y) * raito);
 
-            return ScaleOffset(textureSize, new Vector2(texX, texY), zoomScale, textureOffset);
-        }
-
-        private Vector2 ScaleOffset(Vector2Int textureSize, Vector2 pos, float zoomScale, Vector4 textureOffset)
-        {
-            var x = (textureSize.x / 2 * (1 - zoomScale) + textureOffset.x * textureSize.x / 2) + pos.x * zoomScale;
-            var y = (textureSize.y / 2 * (1 - zoomScale) + textureOffset.y * textureSize.y / 2) + pos.y * zoomScale;
+            var x = (texX / 2 * (1 - zoomScale) + textureOffset.x * texX / 2) + texX * zoomScale;
+            var y = (texY / 2 * (1 - zoomScale) + textureOffset.y * texY / 2) + texY * zoomScale;
             return new Vector2(x, y);
         }
 
-        private Vector2 ConvertTexturePosToUVPos(Vector2Int textureSize, Vector2 texturePos)
-        {
-            return new Vector2(texturePos.x / (float)textureSize.x, texturePos.y / (float)textureSize.y);
-        }
+        private Vector2 ConvertTexturePosToUVPos(Vector2Int textureSize, Vector2 texturePos) => texturePos / textureSize;
 
         public void InverseSiroKuro()
         {
