@@ -48,6 +48,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         public UndoCanvas undo;
         public UVMapCanvas uvMap;
+        public DeleteMaskCanvas deleteMask;
 
         public void OnEnable()
         {
@@ -178,6 +179,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 DrawTypeSetting(drawType);
                 ResetDrawArea();
                 canvasModel.SetupComputeShader(ref editTexture, ref previewTexture);
+                deleteMask = new DeleteMaskCanvas(ref canvasModel.buffer, materialInfo.Texture, ref previewTexture);
 
                 var mesh = RendererUtility.GetMesh(renderer);
                 if (mesh != null)
@@ -213,6 +215,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         {
             previewTexture = TextureUtility.CopyTexture2DToRenderTexture(materialInfo.Texture, textureSize, PlayerSettings.colorSpace == ColorSpace.Linear);
             canvasModel.SetupComputeShader(ref editTexture, ref previewTexture);
+            deleteMask = new DeleteMaskCanvas(ref canvasModel.buffer, materialInfo.Texture, ref previewTexture);
 
             editMat.SetVector("_StartPos", new Vector4(0, 0, 0, 0));
             editMat.SetVector("_EndPos", new Vector4(textureSize.x - 1, textureSize.y - 1, 0, 0));
@@ -260,99 +263,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         {
             ScrollOffset = Vector4.zero;
             ZoomScale = 1;
-        }
-
-        /// <summary>
-        /// マスク画像を読み込む
-        /// </summary>
-        /// <param name="texture"></param>
-        /// <param name="deletePos"></param>
-        /// <returns></returns>
-        public bool ImportDeleteMaskTexture()
-        {
-            // 画像ファイルを取得(png, jpg)
-            var path = EditorUtility.OpenFilePanelWithFilters("Select delete mask texture", "Assets", new string[] { "Image files", "png,jpg,jpeg" });
-
-            if (string.IsNullOrEmpty(path)) return false;
-
-            return ApplyDeleteMaskTextureToBuffer(path);
-        }
-
-        /// <summary>
-        /// マスク画像を書き出す
-        /// </summary>
-        /// <param name="deletePos"></param>
-        public void ExportDeleteMaskTexture()
-        {
-            var height = textureSize.y;
-            var width = textureSize.x;
-            var maskTexture = new Texture2D(width, height);
-
-            var deletePos = new int[width * height];
-            canvasModel.buffer.GetData(deletePos);
-
-            for (int j = 0; j < height; j++)
-            {
-                for (int i = 0; i < width; i++)
-                {
-                    var c = (deletePos[j * width + i] == 1) ? UnityEngine.Color.black : UnityEngine.Color.white;
-                    maskTexture.SetPixel(i, j, c);
-                }
-            }
-
-            var png = maskTexture.EncodeToPNG();
-
-            var path = EditorUtility.SaveFilePanel(
-                        "Save delete mask texture as PNG",
-                        "Assets",
-                        materialInfo.Texture.name + ".png",
-                        "png");
-
-            if (path.Length > 0)
-                File.WriteAllBytes(path, png);
-
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
-        }
-
-        /// <summary>
-        /// マスク画像をCanvasに適用する
-        /// </summary>
-        /// <param name="maskTexturePath">マスク画像のパス</param>
-        /// <returns></returns>
-        public bool ApplyDeleteMaskTextureToBuffer(string maskTexturePath)
-        {
-            var fileStream = new FileStream(maskTexturePath, FileMode.Open, FileAccess.Read);
-            var bin = new BinaryReader(fileStream);
-            var binaryData = bin.ReadBytes((int)bin.BaseStream.Length);
-            bin.Close();
-
-            var maskTexture = new Texture2D(0, 0);
-            maskTexture.LoadImage(binaryData);
-
-            if (maskTexture == null || textureSize.x != maskTexture.width || textureSize.y != maskTexture.height) return false;
-
-            var deletePos = new int[maskTexture.width * maskTexture.height];
-            canvasModel.buffer.GetData(deletePos);
-
-            for (int j = 0; j < maskTexture.height; j++)
-            {
-                for (int i = 0; i < maskTexture.width; i++)
-                {
-                    var col = maskTexture.GetPixel(i, j);
-                    var isDelete = (col == UnityEngine.Color.black) ? 1 : 0;
-                    deletePos[j * maskTexture.width + i] = isDelete;
-                }
-            }
-
-            canvasModel.buffer.SetData(deletePos);
-
-            Material negaposiMat = new Material(Shader.Find("Gato/NegaPosi"));
-            negaposiMat.SetTexture("_MaskTex", maskTexture);
-            negaposiMat.SetFloat("_Inverse", 0);
-            Graphics.Blit(materialInfo.Texture, previewTexture, negaposiMat);
-
-            return true;
         }
 
         private Vector2 ConvertWindowPosToTexturePos(Vector2Int textureSize, Vector2 windowPos, Rect rect, float zoomScale, Vector4 scrollOffset)

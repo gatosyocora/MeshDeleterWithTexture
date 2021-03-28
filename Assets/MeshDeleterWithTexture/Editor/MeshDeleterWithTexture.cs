@@ -112,11 +112,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 {
                     if (GUILayout.Button("Import DeleteMask"))
                     {
-                        canvasView.ImportDeleteMaskTexture();
+                        canvasView.deleteMask.ImportDeleteMaskTexture();
                     }
                     if (GUILayout.Button("Export DeleteMask"))
                     {
-                        canvasView.ExportDeleteMaskTexture();
+                        canvasView.deleteMask.ExportDeleteMaskTexture();
                         model.SetPreviewTextureToMaterial(ref canvasView.previewTexture);
 
                         var mesh = RendererUtility.GetMesh(model.renderer);
@@ -128,7 +128,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 using (var check = new EditorGUI.ChangeCheckScope())
                 {
                     var path = GatoGUILayout.DragAndDropableArea("Drag & Drop DeleteMaskTexture", deleteMaskTextureExtensions);
-                    if (check.changed) canvasView.ApplyDeleteMaskTextureToBuffer(path);
+                    if (check.changed) canvasView.deleteMask.ApplyDeleteMaskTextureToBuffer(path);
                 }
 
                 GUILayout.Space(10f);
