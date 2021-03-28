@@ -21,24 +21,24 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             this.uvMapCanvas = uvMapCanvas;
         }
 
-        public void Draw(Vector2 pos, Texture2D texture)
+        public void Draw(Vector2 pos, Vector2Int textureSize)
         {
             var posArray = new int[2 * sizeof(int)];
             posArray[0 * sizeof(int)] = (int)pos.x;
             posArray[1 * sizeof(int)] = (int)pos.y;
             computeShader.SetInts("Pos", posArray);
 
-            computeShader.Dispatch(penKernelId, texture.width / 32, texture.height / 32, 1);
+            computeShader.Dispatch(penKernelId, textureSize.x / 32, textureSize.y / 32, 1);
         }
 
-        public void Clear(Vector2 pos, Texture2D texture)
+        public void Clear(Vector2 pos, Vector2Int textureSize)
         {
             var posArray = new int[2 * sizeof(int)];
             posArray[0 * sizeof(int)] = (int)pos.x;
             posArray[1 * sizeof(int)] = (int)pos.y;
             computeShader.SetInts("Pos", posArray);
 
-            computeShader.Dispatch(eraserKernelId, texture.width / 32, texture.height / 32, 1);
+            computeShader.Dispatch(eraserKernelId, textureSize.x / 32, textureSize.y / 32, 1);
         }
 
         public void InitComputeShader()
