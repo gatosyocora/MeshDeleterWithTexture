@@ -53,6 +53,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             textureOffset = Vector4.zero;
             zoomScale = 1;
 
+            editMat.SetVector("_Offset", textureOffset);
+            editMat.SetFloat("_TextureScale", zoomScale);
             editMat.SetFloat("_ApplyGammaCorrection", Convert.ToInt32(PlayerSettings.colorSpace == ColorSpace.Linear));
             editMat.SetInt("_PointNum", 0);
 
