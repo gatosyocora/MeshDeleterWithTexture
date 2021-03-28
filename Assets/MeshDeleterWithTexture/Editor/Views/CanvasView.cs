@@ -185,7 +185,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             this.drawType = drawType;
             if (drawType == DrawType.PEN)
             {
-                SetupDrawing(penSize, penColor, texture);
+                SetPenColor(penColor);
+                SetPenSize(penSize);
             }
         }
 
@@ -255,12 +256,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             return editTexture;
         }
 
-        private void SetupDrawing(int penSize, Color penColor, Texture2D texture)
-        {
-            canvasModel.SetPen(penSize, penColor);
-            editMat.SetFloat("_PenSize", penSize / (float)texture.width);
-        }
-
         /// <summary>
         /// ペン
         /// </summary>
@@ -276,13 +271,14 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         public void SetPenColor(Color penColor)
         {
             this.penColor = penColor;
-            SetupDrawing(penSize, penColor, texture);
+            canvasModel.SetPen(penSize, penColor);
         }
 
         public void SetPenSize(int penSize)
         {
             this.penSize = penSize;
-            SetupDrawing(penSize, penColor, texture);
+            editMat.SetFloat("_PenSize", penSize / (float)textureSize.x);
+            canvasModel.SetPen(penSize, penColor);
         }
 
         public void ApplyTextureZoomScale(float scale)
