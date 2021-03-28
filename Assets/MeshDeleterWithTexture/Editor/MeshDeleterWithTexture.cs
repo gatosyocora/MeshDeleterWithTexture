@@ -128,7 +128,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 using (var check = new EditorGUI.ChangeCheckScope())
                 {
                     var path = GatoGUILayout.DragAndDropableArea("Drag & Drop DeleteMaskTexture", deleteMaskTextureExtensions);
-                    if (check.changed) canvasView.ApplyDeleteMaskTexturetToBuffer(path);
+                    if (check.changed) canvasView.ApplyDeleteMaskTextureToBuffer(path);
                 }
 
                 GUILayout.Space(10f);

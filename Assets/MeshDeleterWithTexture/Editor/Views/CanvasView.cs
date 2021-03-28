@@ -275,7 +275,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
             if (string.IsNullOrEmpty(path)) return false;
 
-            return ApplyDeleteMaskTexturetToBuffer(path);
+            return ApplyDeleteMaskTextureToBuffer(path);
         }
 
         /// <summary>
@@ -315,12 +315,12 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             AssetDatabase.Refresh();
         }
 
-        public bool ApplyDeleteMaskTexturetToBuffer(string maskTexturePath)
         /// <summary>
         /// マスク画像をCanvasに適用する
         /// </summary>
         /// <param name="maskTexturePath">マスク画像のパス</param>
         /// <returns></returns>
+        public bool ApplyDeleteMaskTextureToBuffer(string maskTexturePath)
         {
             var fileStream = new FileStream(maskTexturePath, FileMode.Open, FileAccess.Read);
             var bin = new BinaryReader(fileStream);
