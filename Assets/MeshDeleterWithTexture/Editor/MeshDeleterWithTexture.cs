@@ -151,7 +151,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                         if (check.changed)
                         {
-                            canvasView.ApplyTextureZoomScale(zoomScale);
+                            canvasView.ZoomScale = zoomScale;
                         }
 
                         if (GUILayout.Button("Reset"))

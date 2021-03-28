@@ -38,7 +38,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         public float ZoomScale 
         {
             get => _zoomScale;
-            private set {
+            set {
                 editMat.SetFloat("_TextureScale", value);
                 _zoomScale = value;
             }
