@@ -11,9 +11,13 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
     public class CanvasView : Editor, IDisposable
     {
         private static Material editMat;
+        public Texture2D editTexture;
         public RenderTexture previewTexture;
-        private Texture2D texture;
+
         private bool isDrawing = false;
+        private Vector2Int textureSize;
+
+        private MaterialInfo materialInfo;
 
         public DrawType drawType { get; private set; }
 
@@ -42,9 +46,10 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             drawType = DrawType.PEN;
         }
 
-        public void Initialize(Texture2D texture)
+        public void Initialize(MaterialInfo materialInfo)
         {
-            this.texture = texture;
+            this.materialInfo = materialInfo;
+            textureSize = new Vector2Int(materialInfo.Texture.width, materialInfo.Texture.height);
             textureOffset = Vector4.zero;
             zoomScale = 1;
 
@@ -56,10 +61,10 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         public void Render()
         {
-            if (texture == null) return;
+            if (textureSize == null) return;
 
             var width = EditorGUIUtility.currentViewWidth * 0.6f;
-            var height = width * texture.height / texture.width;
+            var height = width * textureSize.y / textureSize.x;
             EventType mouseEventType = 0;
             Rect rect = new Rect(0, 0, 0, 0);
             var delta = GatoGUILayout.MiniMonitor(previewTexture, width, height, ref rect, ref mouseEventType, true);
@@ -115,11 +120,11 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 }
 
 
-                var pos = ConvertWindowPosToTexturePos(texture, Event.current.mousePosition, rect, zoomScale, textureOffset);
+                var pos = ConvertWindowPosToTexturePos(textureSize, Event.current.mousePosition, rect, zoomScale, textureOffset);
 
                 if (drawType == DrawType.PEN || drawType == DrawType.ERASER)
                 {
-                    var uvPos = ConvertTexturePosToUVPos(texture, pos);
+                    var uvPos = ConvertTexturePosToUVPos(textureSize, pos);
                     editMat.SetVector("_CurrentPos", new Vector4(uvPos.x, uvPos.y, 0, 0));
 
                     if (Event.current.type == EventType.MouseDown &&
@@ -156,16 +161,16 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         {
             if (materialInfo.Texture != null)
             {
-                texture = LoadSettingToTexture(materialInfo.Texture);
+                editTexture = GenerateTextureToEditting(materialInfo.Texture);
 
                 DrawTypeSetting(drawType);
                 ResetDrawArea();
-                canvasModel.SetupComputeShader(ref texture, ref previewTexture);
+                canvasModel.SetupComputeShader(ref editTexture, ref previewTexture);
 
                 var mesh = RendererUtility.GetMesh(renderer);
                 if (mesh != null)
                 {
-                    var uvMapTex = uvMap.GenerateUVMap(mesh, materialInfo, texture);
+                    var uvMapTex = uvMap.GenerateUVMap(mesh, materialInfo, materialInfo.Texture);
                     uvMap.SetUVMapTexture(uvMapTex);
                 }
 
@@ -186,23 +191,23 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         public void ResetDrawArea()
         {
-            previewTexture = CopyTexture2DToRenderTexture(texture, PlayerSettings.colorSpace == ColorSpace.Linear);
-            canvasModel.SetupComputeShader(ref texture, ref previewTexture);
+            previewTexture = CopyTexture2DToRenderTexture(materialInfo.Texture, textureSize, PlayerSettings.colorSpace == ColorSpace.Linear);
+            canvasModel.SetupComputeShader(ref editTexture, ref previewTexture);
 
             editMat.SetVector("_StartPos", new Vector4(0, 0, 0, 0));
-            editMat.SetVector("_EndPos", new Vector4(texture.width - 1, texture.height - 1, 0, 0));
+            editMat.SetVector("_EndPos", new Vector4(textureSize.x - 1, textureSize.y - 1, 0, 0));
 
             editMat.SetTexture("_SelectTex", null);
         }
 
-        private RenderTexture CopyTexture2DToRenderTexture(Texture2D texture, bool isLinearColorSpace = false)
+        private RenderTexture CopyTexture2DToRenderTexture(Texture2D texture, Vector2Int textureSize, bool isLinearColorSpace = false)
         {
             RenderTexture renderTexture;
 
             if (isLinearColorSpace)
-                renderTexture = new RenderTexture(texture.width, texture.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
+                renderTexture = new RenderTexture(textureSize.x, textureSize.y, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
             else
-                renderTexture = new RenderTexture(texture.width, texture.height, 0, RenderTextureFormat.ARGB32);
+                renderTexture = new RenderTexture(textureSize.x, textureSize.y, 0, RenderTextureFormat.ARGB32);
 
             renderTexture.enableRandomWrite = true;
             renderTexture.anisoLevel = texture.anisoLevel;
@@ -224,7 +229,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         /// </summary>
         /// <param name="texture"></param>
         /// <returns></returns>
-        private Texture2D LoadSettingToTexture(Texture2D originTexture)
+        private Texture2D GenerateTextureToEditting(Texture2D originTexture)
         {
 
             // 書き込むために設定の変更が必要
@@ -322,8 +327,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         /// <param name="deletePos"></param>
         public void ExportDeleteMaskTexture()
         {
-            var height = texture.height;
-            var width = texture.width;
+            var height = textureSize.y;
+            var width = textureSize.x;
             var maskTexture = new Texture2D(width, height);
 
             var deletePos = new int[width * height];
@@ -343,7 +348,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             var path = EditorUtility.SaveFilePanel(
                         "Save delete mask texture as PNG",
                         "Assets",
-                        texture.name + ".png",
+                        materialInfo.Texture.name + ".png",
                         "png");
 
             if (path.Length > 0)
@@ -363,7 +368,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             var maskTexture = new Texture2D(0, 0);
             maskTexture.LoadImage(binaryData);
 
-            if (maskTexture == null || texture.width != maskTexture.width || texture.height != maskTexture.height) return false;
+            if (maskTexture == null || textureSize.x != maskTexture.width || textureSize.y != maskTexture.height) return false;
 
             var deletePos = new int[maskTexture.width * maskTexture.height];
             canvasModel.buffer.GetData(deletePos);
@@ -383,40 +388,40 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             Material negaposiMat = new Material(Shader.Find("Gato/NegaPosi"));
             negaposiMat.SetTexture("_MaskTex", maskTexture);
             negaposiMat.SetFloat("_Inverse", 0);
-            Graphics.Blit(texture, previewTexture, negaposiMat);
+            Graphics.Blit(materialInfo.Texture, previewTexture, negaposiMat);
 
             return true;
         }
 
-        private Vector2 ConvertWindowPosToTexturePos(Texture2D texture, Vector2 windowPos, Rect rect, float zoomScale, Vector4 textureOffset)
+        private Vector2 ConvertWindowPosToTexturePos(Vector2Int textureSize, Vector2 windowPos, Rect rect, float zoomScale, Vector4 textureOffset)
         {
-            float raito = texture.width / rect.width;
+            float raito = textureSize.x / rect.width;
 
             var texX = (int)((windowPos.x - rect.position.x) * raito);
-            var texY = texture.height - (int)((windowPos.y - rect.position.y) * raito);
+            var texY = textureSize.y - (int)((windowPos.y - rect.position.y) * raito);
 
-            return ScaleOffset(texture, new Vector2(texX, texY), zoomScale, textureOffset);
+            return ScaleOffset(textureSize, new Vector2(texX, texY), zoomScale, textureOffset);
         }
 
-        private Vector2 ScaleOffset(Texture2D texture, Vector2 pos, float zoomScale, Vector4 textureOffset)
+        private Vector2 ScaleOffset(Vector2Int textureSize, Vector2 pos, float zoomScale, Vector4 textureOffset)
         {
-            var x = (texture.width / 2 * (1 - zoomScale) + textureOffset.x * texture.width / 2) + pos.x * zoomScale;
-            var y = (texture.height / 2 * (1 - zoomScale) + textureOffset.y * texture.height / 2) + pos.y * zoomScale;
+            var x = (textureSize.x / 2 * (1 - zoomScale) + textureOffset.x * textureSize.x / 2) + pos.x * zoomScale;
+            var y = (textureSize.y / 2 * (1 - zoomScale) + textureOffset.y * textureSize.y / 2) + pos.y * zoomScale;
             return new Vector2(x, y);
         }
 
-        private Vector2 ConvertTexturePosToUVPos(Texture2D texture, Vector2 texturePos)
+        private Vector2 ConvertTexturePosToUVPos(Vector2Int textureSize, Vector2 texturePos)
         {
-            return new Vector2(texturePos.x / (float)texture.width, texturePos.y / (float)texture.height);
+            return new Vector2(texturePos.x / (float)textureSize.x, texturePos.y / (float)textureSize.y);
         }
 
         public void InverseSiroKuro()
         {
-            var height = texture.height;
-            var width = texture.width;
+            var height = textureSize.y;
+            var width = textureSize.x;
             var maskTexture = new Texture2D(width, height);
 
-            var deletePos = new int[texture.width * texture.height];
+            var deletePos = new int[width * height];
             canvasModel.buffer.GetData(deletePos);
             deletePos = deletePos.Select(x => Mathf.Abs(x - 1)).ToArray();
             canvasModel.buffer.SetData(deletePos);
@@ -434,7 +439,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             Material negaposiMat = new Material(Shader.Find("Gato/NegaPosi"));
             negaposiMat.SetTexture("_MaskTex", maskTexture);
             negaposiMat.SetFloat("_Inverse", 0);
-            Graphics.Blit(texture, previewTexture, negaposiMat);
+            Graphics.Blit(materialInfo.Texture, previewTexture, negaposiMat);
         }
 
         public int[] GetDeleteData(int width, int height)

@@ -117,7 +117,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         if (textures != null)
                         {
                             materialInfoIndex = 0;
-                            canvasView.Initialize(matInfos[materialInfoIndex].Texture);
+                            canvasView.Initialize(matInfos[materialInfoIndex]);
                             canvasView.InitializeDrawingArea(matInfos[materialInfoIndex], renderer);
                             texture = matInfos[materialInfoIndex].Texture;
                         }
