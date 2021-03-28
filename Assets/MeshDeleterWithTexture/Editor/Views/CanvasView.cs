@@ -24,8 +24,25 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         public Color penColor { get; private set; } = Color.black;
         public int penSize { get; private set; } = 20;
 
-        private Vector4 scrollOffset;
-        public float zoomScale { get; private set; }
+        private Vector4 _scrollOffset;
+        public Vector4 ScrollOffset
+        {
+            get => _scrollOffset;
+            private set
+            {
+                editMat.SetVector("_Offset", value);
+                _scrollOffset = value;
+            }
+        }
+        private float _zoomScale;
+        public float ZoomScale 
+        {
+            get => _zoomScale;
+            private set {
+                editMat.SetFloat("_TextureScale", value);
+                _zoomScale = value;
+            }
+        }
 
         private CanvasModel canvasModel;
 
@@ -50,11 +67,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         {
             this.materialInfo = materialInfo;
             textureSize = new Vector2Int(materialInfo.Texture.width, materialInfo.Texture.height);
-            scrollOffset = Vector4.zero;
-            zoomScale = 1;
+            ResetDrawAreaOffsetAndZoom();
 
-            editMat.SetVector("_Offset", scrollOffset);
-            editMat.SetFloat("_TextureScale", zoomScale);
             editMat.SetFloat("_ApplyGammaCorrection", Convert.ToInt32(PlayerSettings.colorSpace == ColorSpace.Linear));
             editMat.SetInt("_PointNum", 0);
 
@@ -76,23 +90,19 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 // テクスチャの拡大縮小機能
                 if (mouseEventType == EventType.ScrollWheel)
                 {
-                    zoomScale += Mathf.Sign(delta.y) * 0.1f;
+                    ZoomScale += Mathf.Sign(delta.y) * 0.1f;
 
-                    if (zoomScale > 1) zoomScale = 1;
-                    else if (zoomScale < 0.1f) zoomScale = 0.1f;
+                    if (ZoomScale > 1) ZoomScale = 1;
+                    else if (ZoomScale < 0.1f) ZoomScale = 0.1f;
 
                     // 縮小ではOffsetも中心に戻していく
                     if (Mathf.Sign(delta.y) > 0)
                     {
-                        if (zoomScale < 1)
-                            scrollOffset *= zoomScale;
+                        if (ZoomScale < 1)
+                            ScrollOffset *= ZoomScale;
                         else
-                            scrollOffset = Vector4.zero;
-
-                        editMat.SetVector("_Offset", scrollOffset);
+                            ScrollOffset = Vector4.zero;
                     }
-
-                    editMat.SetFloat("_TextureScale", zoomScale);
                 }
                 // テクスチャの表示箇所を移動する機能
                 else if (Event.current.button == 1 &&
@@ -100,29 +110,29 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 {
                     if (delta.x != 0)
                     {
-                        scrollOffset.x -= delta.x / rect.width;
+                        _scrollOffset.x -= delta.x / rect.width;
 
-                        if (scrollOffset.x > 1 - zoomScale)
-                            scrollOffset.x = 1 - zoomScale;
-                        else if (scrollOffset.x < -(1 - zoomScale))
-                            scrollOffset.x = -(1 - zoomScale);
+                        if (_scrollOffset.x > 1 - ZoomScale)
+                            _scrollOffset.x = 1 - ZoomScale;
+                        else if (_scrollOffset.x < -(1 - ZoomScale))
+                            _scrollOffset.x = -(1 - ZoomScale);
                     }
 
                     if (delta.y != 0)
                     {
-                        scrollOffset.y += delta.y / rect.height;
+                        _scrollOffset.y += delta.y / rect.height;
 
-                        if (scrollOffset.y > 1 - zoomScale)
-                            scrollOffset.y = 1 - zoomScale;
-                        else if (scrollOffset.y < -(1 - zoomScale))
-                            scrollOffset.y = -(1 - zoomScale);
+                        if (_scrollOffset.y > 1 - ZoomScale)
+                            _scrollOffset.y = 1 - ZoomScale;
+                        else if (_scrollOffset.y < -(1 - ZoomScale))
+                            _scrollOffset.y = -(1 - ZoomScale);
                     }
 
-                    editMat.SetVector("_Offset", scrollOffset);
+                    editMat.SetVector("_Offset", _scrollOffset);
                 }
 
 
-                var pos = ConvertWindowPosToTexturePos(textureSize, Event.current.mousePosition, rect, zoomScale, scrollOffset);
+                var pos = ConvertWindowPosToTexturePos(textureSize, Event.current.mousePosition, rect, ZoomScale, ScrollOffset);
 
                 if (drawType == DrawType.PEN || drawType == DrawType.ERASER)
                 {
@@ -283,18 +293,10 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             canvasModel.SetPen(penSize, penColor);
         }
 
-        public void ApplyTextureZoomScale(float scale)
-        {
-            zoomScale = scale;
-            editMat.SetFloat("_TextureScale", scale);
-        }
-
         public void ResetDrawAreaOffsetAndZoom()
         {
-            scrollOffset = Vector4.zero;
-            editMat.SetVector("_Offset", scrollOffset);
-            zoomScale = 1;
-            ApplyTextureZoomScale(zoomScale);
+            ScrollOffset = Vector4.zero;
+            ZoomScale = 1;
         }
 
         /// <summary>

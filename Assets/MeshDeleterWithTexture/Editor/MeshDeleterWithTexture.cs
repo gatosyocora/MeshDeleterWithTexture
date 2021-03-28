@@ -147,7 +147,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     using (new EditorGUILayout.HorizontalScope())
                     using (var check = new EditorGUI.ChangeCheckScope())
                     {
-                        var zoomScale = EditorGUILayout.Slider("Scale", canvasView.zoomScale, 0.1f, 1.0f);
+                        var zoomScale = EditorGUILayout.Slider("Scale", canvasView.ZoomScale, 0.1f, 1.0f);
 
                         if (check.changed)
                         {
