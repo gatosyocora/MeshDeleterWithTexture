@@ -176,7 +176,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             {
                 editTexture = TextureUtility.GenerateTextureToEditting(materialInfo.Texture);
 
-                DrawTypeSetting(drawType);
                 ResetDrawArea();
                 canvasModel.SetupComputeShader(ref editTexture, ref previewTexture);
                 deleteMask = new DeleteMaskCanvas(ref canvasModel.buffer, materialInfo.Texture, ref previewTexture);
@@ -213,6 +212,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         /// </summary>
         public void ResetDrawArea()
         {
+            DrawTypeSetting(drawType);
+
             previewTexture = TextureUtility.CopyTexture2DToRenderTexture(materialInfo.Texture, textureSize, PlayerSettings.colorSpace == ColorSpace.Linear);
             canvasModel.SetupComputeShader(ref editTexture, ref previewTexture);
             deleteMask = new DeleteMaskCanvas(ref canvasModel.buffer, materialInfo.Texture, ref previewTexture);
