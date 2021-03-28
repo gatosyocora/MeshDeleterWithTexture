@@ -332,15 +332,18 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             return true;
         }
 
-        private Vector2 ConvertWindowPosToTexturePos(Vector2Int textureSize, Vector2 windowPos, Rect rect, float zoomScale, Vector4 textureOffset)
+        private Vector2 ConvertWindowPosToTexturePos(Vector2Int textureSize, Vector2 windowPos, Rect rect, float zoomScale, Vector4 scrollOffset)
         {
             float raito = textureSize.x / rect.width;
 
+            // Textureの場所に変換
             var texX = (int)((windowPos.x - rect.position.x) * raito);
             var texY = textureSize.y - (int)((windowPos.y - rect.position.y) * raito);
 
-            var x = (texX / 2 * (1 - zoomScale) + textureOffset.x * texX / 2) + texX * zoomScale;
-            var y = (texY / 2 * (1 - zoomScale) + textureOffset.y * texY / 2) + texY * zoomScale;
+            // ScaleとOffsetによって変化しているので戻す
+            var x = texX / 2 * (1 + zoomScale + scrollOffset.x);
+            var y = texY / 2 * (1 + zoomScale + scrollOffset.y);
+
             return new Vector2(x, y);
         }
 
