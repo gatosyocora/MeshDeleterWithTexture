@@ -21,8 +21,30 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         public DrawType drawType { get; private set; }
 
-        public Color penColor { get; private set; } = Color.black;
-        public int penSize { get; private set; } = 20;
+        private Color _penColor;
+        public Color PenColor 
+        {
+            get => _penColor;
+            set 
+            {
+                canvasModel.SetPen(_penSize, value);
+            }
+        }
+
+        private int _penSize;
+        public int PenSize
+        {
+            get => _penSize;
+            set
+            {
+                float adjustedPenSize;
+                if (textureSize != null) adjustedPenSize = value / (float)textureSize.x;
+                else adjustedPenSize = value;
+
+                editMat.SetFloat("_PenSize", adjustedPenSize);
+                canvasModel.SetPen(value, _penColor);
+            }
+        }
 
         private Vector4 _scrollOffset;
         public Vector4 ScrollOffset
@@ -59,6 +81,9 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             undo = new UndoCanvas();
             uvMap = new UVMapCanvas(ref editMat);
             canvasModel = new CanvasModel(undo, uvMap);
+
+            PenColor = Color.black;
+            PenSize = 20;
 
             drawType = DrawType.PEN;
         }
@@ -197,8 +222,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             this.drawType = drawType;
             if (drawType == DrawType.PEN)
             {
-                SetPenColor(penColor);
-                SetPenSize(penSize);
+                PenColor = _penColor;
+                PenSize = _penSize;
             }
         }
 
@@ -279,19 +304,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         /// </summary>
         /// <param name="pos"></param>
         private void ClearOnTexture(Vector2 pos) => canvasModel.Clear(pos, textureSize);
-
-        public void SetPenColor(Color penColor)
-        {
-            this.penColor = penColor;
-            canvasModel.SetPen(penSize, penColor);
-        }
-
-        public void SetPenSize(int penSize)
-        {
-            this.penSize = penSize;
-            editMat.SetFloat("_PenSize", penSize / (float)textureSize.x);
-            canvasModel.SetPen(penSize, penColor);
-        }
 
         public void ResetDrawAreaOffsetAndZoom()
         {
