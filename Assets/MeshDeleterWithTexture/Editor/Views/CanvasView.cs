@@ -79,7 +79,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         {
             undo = new UndoCanvas();
             uvMap = new UVMapCanvas(ref editMat);
-            canvasModel = new CanvasModel(undo, uvMap);
+            canvasModel = new CanvasModel();
 
             DrawType = DrawType.PEN;
             PenColor = Color.black;
@@ -224,7 +224,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         public void ClearAllDrawing()
         {
             previewTexture = TextureUtility.CopyTexture2DToRenderTexture(materialInfo.Texture, textureSize, PlayerSettings.colorSpace == ColorSpace.Linear);
-            canvasModel.SetupComputeShader(ref editTexture, ref previewTexture);
+            canvasModel.Initialize(ref editTexture, ref previewTexture);
             deleteMask = new DeleteMaskCanvas(ref canvasModel.buffer, materialInfo.Texture, ref previewTexture);
         }
 

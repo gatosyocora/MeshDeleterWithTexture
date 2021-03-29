@@ -9,54 +9,24 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         public ComputeBuffer buffer;
         private int penKernelId, eraserKernelId;
 
-        private UndoCanvas undoCanvas;
-        private UVMapCanvas uvMapCanvas;
-
-        public CanvasModel(UndoCanvas undoCanvas, UVMapCanvas uvMapCanvas)
-        {
-            InitComputeShader();
-            this.undoCanvas = undoCanvas;
-            this.uvMapCanvas = uvMapCanvas;
-        }
-
-        public void Draw(Vector2 pos, Vector2Int textureSize)
-        {
-            var posArray = new int[2 * sizeof(int)];
-            posArray[0 * sizeof(int)] = (int)pos.x;
-            posArray[1 * sizeof(int)] = (int)pos.y;
-            computeShader.SetInts("Pos", posArray);
-
-            computeShader.Dispatch(penKernelId, textureSize.x / 32, textureSize.y / 32, 1);
-        }
-
-        public void Clear(Vector2 pos, Vector2Int textureSize)
-        {
-            var posArray = new int[2 * sizeof(int)];
-            posArray[0 * sizeof(int)] = (int)pos.x;
-            posArray[1 * sizeof(int)] = (int)pos.y;
-            computeShader.SetInts("Pos", posArray);
-
-            computeShader.Dispatch(eraserKernelId, textureSize.x / 32, textureSize.y / 32, 1);
-        }
-
-        public void InitComputeShader()
+        public CanvasModel()
         {
             computeShader = UnityEngine.Object.Instantiate(Resources.Load<ComputeShader>("colorchecker2"));
             penKernelId = computeShader.FindKernel("CSPen");
             eraserKernelId = computeShader.FindKernel("CSEraser");
         }
 
-        private void InitComputeBuffer(Texture2D texture)
+        /// <summary>
+        /// 初期化する
+        /// </summary>
+        /// <param name="texture"></param>
+        /// <param name="previewTexture"></param>
+        public void Initialize(ref Texture2D texture, ref RenderTexture previewTexture)
         {
             if (buffer != null) buffer.Release();
             buffer = new ComputeBuffer(texture.width * texture.height, sizeof(int));
             computeShader.SetBuffer(penKernelId, "Result", buffer);
             computeShader.SetBuffer(eraserKernelId, "Result", buffer);
-        }
-
-        public void SetupComputeShader(ref Texture2D texture, ref RenderTexture previewTexture)
-        {
-            InitComputeBuffer(texture);
 
             computeShader.SetTexture(penKernelId, "Tex", texture);
             computeShader.SetTexture(eraserKernelId, "Tex", texture);
@@ -67,6 +37,41 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             computeShader.SetTexture(eraserKernelId, "PreviewTex", previewTexture);
         }
 
+        /// <summary>
+        /// 任意の位置を削除箇所としてマーキングする
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="textureSize"></param>
+        public void Draw(Vector2 pos, Vector2Int textureSize)
+        {
+            var posArray = new int[2 * sizeof(int)];
+            posArray[0 * sizeof(int)] = (int)pos.x;
+            posArray[1 * sizeof(int)] = (int)pos.y;
+            computeShader.SetInts("Pos", posArray);
+
+            computeShader.Dispatch(penKernelId, textureSize.x / 32, textureSize.y / 32, 1);
+        }
+
+        /// <summary>
+        /// 任意の位置の削除箇所としてのマーキングを取り消す
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="textureSize"></param>
+        public void Clear(Vector2 pos, Vector2Int textureSize)
+        {
+            var posArray = new int[2 * sizeof(int)];
+            posArray[0 * sizeof(int)] = (int)pos.x;
+            posArray[1 * sizeof(int)] = (int)pos.y;
+            computeShader.SetInts("Pos", posArray);
+
+            computeShader.Dispatch(eraserKernelId, textureSize.x / 32, textureSize.y / 32, 1);
+        }
+
+        /// <summary>
+        /// ペンの設定を変更する
+        /// </summary>
+        /// <param name="penSize"></param>
+        /// <param name="penColor"></param>
         public void SetPen(int penSize, Color penColor)
         {
             computeShader.SetInt("PenSize", penSize);
