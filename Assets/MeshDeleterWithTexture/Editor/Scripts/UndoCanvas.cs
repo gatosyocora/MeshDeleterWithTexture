@@ -48,6 +48,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
             buffer.SetData(undoBuffer);
         }
 
-        public bool canUndo() => undoIndex == -1;
+        public bool canUndo() => undoIndex > -1;
     }
 }
