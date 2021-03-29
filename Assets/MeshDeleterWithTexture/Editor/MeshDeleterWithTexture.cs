@@ -268,27 +268,27 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                 if (GUILayout.Button("Black"))
                 {
-                    canvasView.SetPenColor(Color.black);
+                    canvasView.PenColor = Color.black;
                 }
                 if (GUILayout.Button("R"))
                 {
-                    canvasView.SetPenColor(Color.red);
+                    canvasView.PenColor = Color.red;
                 }
                 if (GUILayout.Button("G"))
                 {
-                    canvasView.SetPenColor(Color.green);
+                    canvasView.PenColor = Color.green;
                 }
                 if (GUILayout.Button("B"))
                 {
-                    canvasView.SetPenColor(Color.blue);
+                    canvasView.PenColor = Color.blue;
                 }
 
                 using (var check = new EditorGUI.ChangeCheckScope())
                 {
-                    var penColor = EditorGUILayout.ColorField(canvasView.penColor);
+                    var penColor = EditorGUILayout.ColorField(canvasView.PenColor);
                     if (check.changed)
                     {
-                        canvasView.SetPenColor(penColor);
+                        canvasView.PenColor = penColor;
                     }
                 }
             }
@@ -299,13 +299,13 @@ namespace Gatosyocora.MeshDeleterWithTexture
             {
                 var penSize = EditorGUILayout.IntSlider(
                                 "Pen/Eraser size",
-                                canvasView.penSize,
+                                canvasView.PenSize,
                                 1,
                                 !model.HasTexture() ? 100 : model.texture.width / 20);
 
                 if (check.changed)
                 {
-                    canvasView.SetPenSize(penSize);
+                    canvasView.PenSize = penSize;
                 }
             }
         }
