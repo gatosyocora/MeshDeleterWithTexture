@@ -203,8 +203,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 editTexture = TextureUtility.GenerateTextureToEditting(materialInfo.Texture);
 
                 ClearAllDrawing();
-                canvasModel.SetupComputeShader(ref editTexture, ref previewTexture);
-                deleteMask = new DeleteMaskCanvas(ref canvasModel.buffer, materialInfo.Texture, ref previewTexture);
 
                 var mesh = RendererUtility.GetMesh(renderer);
                 if (mesh != null)
