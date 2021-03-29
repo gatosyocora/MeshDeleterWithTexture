@@ -19,7 +19,20 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         private MaterialInfo materialInfo;
 
-        public DrawType drawType { get; private set; }
+        private DrawType _drawType;
+        public DrawType DrawType
+        {
+            get => _drawType;
+            set 
+            {
+                _drawType = value;
+                if (DrawType == DrawType.PEN)
+                {
+                    SetPenColor(penColor);
+                    SetPenSize(penSize);
+                }
+            }
+        }
 
         public Color penColor { get; private set; } = Color.black;
         public int penSize { get; private set; } = 20;
@@ -61,7 +74,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             uvMap = new UVMapCanvas(ref editMat);
             canvasModel = new CanvasModel(undo, uvMap);
 
-            drawType = DrawType.PEN;
+            DrawType = DrawType.PEN;
         }
 
         public void Initialize(MaterialInfo materialInfo)
@@ -138,7 +151,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
                 var pos = ConvertWindowPosToTexturePos(textureSize, Event.current.mousePosition, rect, ZoomScale, ScrollOffset);
 
-                if (drawType == DrawType.PEN || drawType == DrawType.ERASER)
+                if (DrawType == DrawType.PEN || DrawType == DrawType.ERASER)
                 {
                     var uvPos = ConvertTexturePosToUVPos(textureSize, pos);
                     editMat.SetVector("_CurrentPos", new Vector4(uvPos.x, uvPos.y, 0, 0));
@@ -159,7 +172,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
                     if (isDrawing)
                     {
-                        if (drawType == DrawType.PEN)
+                        if (DrawType == DrawType.PEN)
                             DrawOnTexture(pos);
                         else
                             ClearOnTexture(pos);
@@ -179,8 +192,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             {
                 editTexture = TextureUtility.GenerateTextureToEditting(materialInfo.Texture);
 
-                DrawTypeSetting(drawType);
-
                 ClearAllDrawing();
                 canvasModel.SetupComputeShader(ref editTexture, ref previewTexture);
                 deleteMask = new DeleteMaskCanvas(ref canvasModel.buffer, materialInfo.Texture, ref previewTexture);
@@ -196,20 +207,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 renderer.sharedMaterials[materialInfo.MaterialSlotIndices[0]].mainTexture = previewTexture;
             }
             ResetScrollOffsetAndZoomScale();
-        }
-
-        /// <summary>
-        /// DrawTypeによって設定する
-        /// </summary>
-        /// <param name="drawType"></param>
-        public void DrawTypeSetting(DrawType drawType)
-        {
-            this.drawType = drawType;
-            if (drawType == DrawType.PEN)
-            {
-                SetPenColor(penColor);
-                SetPenSize(penSize);
-            }
         }
 
         /// <summary>

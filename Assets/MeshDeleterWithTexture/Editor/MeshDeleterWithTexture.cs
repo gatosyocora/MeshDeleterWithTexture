@@ -165,8 +165,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 using (var check = new EditorGUI.ChangeCheckScope())
                 using (new EditorGUILayout.HorizontalScope())
                 {
-                    var drawType = (DrawType)GUILayout.Toolbar((int)canvasView.drawType, Enum.GetNames(typeof(DrawType)));
-                    if (check.changed) canvasView.DrawTypeSetting(drawType);
+                    var drawType = (DrawType)GUILayout.Toolbar((int)canvasView.DrawType, Enum.GetNames(typeof(DrawType)));
+                    if (check.changed) canvasView.DrawType = drawType;
                 }
 
                 EditorGUILayout.Space();
