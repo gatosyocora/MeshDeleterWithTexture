@@ -85,11 +85,10 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             PenColor = Color.black;
         }
 
-        public void Initialize(MaterialInfo materialInfo)
+        public void Initialize(MaterialInfo materialInfo, Renderer renderer)
         {
             this.materialInfo = materialInfo;
             textureSize = new Vector2Int(materialInfo.Texture.width, materialInfo.Texture.height);
-            ResetScrollOffsetAndZoomScale();
 
             editMat.SetFloat("_ApplyGammaCorrection", Convert.ToInt32(PlayerSettings.colorSpace == ColorSpace.Linear));
             editMat.SetInt("_PointNum", 0);
@@ -100,6 +99,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             editMat.SetTexture("_SelectTex", null);
 
             PenSize = 20;
+
+            InitializeDrawArea(materialInfo, renderer);
         }
 
         public void Render()
