@@ -232,13 +232,13 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         /// ペン
         /// </summary>
         /// <param name="pos"></param>
-        private void DrawOnTexture(Vector2 pos) => canvasModel.Draw(pos, textureSize);
+        private void DrawOnTexture(Vector2 pos) => canvasModel.Mark(pos);
 
         /// <summary>
         /// 消しゴム
         /// </summary>
         /// <param name="pos"></param>
-        private void ClearOnTexture(Vector2 pos) => canvasModel.Clear(pos, textureSize);
+        private void ClearOnTexture(Vector2 pos) => canvasModel.UnMark(pos);
 
         /// <summary>
         /// ScrollOffsetとZoomScaleをリセットする

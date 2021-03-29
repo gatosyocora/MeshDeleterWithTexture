@@ -9,6 +9,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         public ComputeBuffer buffer;
         private int penKernelId, eraserKernelId;
 
+        private Vector2Int textureSize;
+
         public CanvasModel()
         {
             computeShader = UnityEngine.Object.Instantiate(Resources.Load<ComputeShader>("colorchecker2"));
@@ -35,6 +37,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
 
             computeShader.SetTexture(penKernelId, "PreviewTex", previewTexture);
             computeShader.SetTexture(eraserKernelId, "PreviewTex", previewTexture);
+
+            textureSize = new Vector2Int(texture.width, texture.height);
         }
 
         /// <summary>
@@ -42,7 +46,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         /// </summary>
         /// <param name="pos"></param>
         /// <param name="textureSize"></param>
-        public void Draw(Vector2 pos, Vector2Int textureSize)
+        public void Mark(Vector2 pos)
         {
             var posArray = new int[2 * sizeof(int)];
             posArray[0 * sizeof(int)] = (int)pos.x;
@@ -57,7 +61,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         /// </summary>
         /// <param name="pos"></param>
         /// <param name="textureSize"></param>
-        public void Clear(Vector2 pos, Vector2Int textureSize)
+        public void UnMark(Vector2 pos)
         {
             var posArray = new int[2 * sizeof(int)];
             posArray[0 * sizeof(int)] = (int)pos.x;
