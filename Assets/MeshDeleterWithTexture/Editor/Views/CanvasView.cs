@@ -72,8 +72,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
             editMat.SetFloat("_ApplyGammaCorrection", Convert.ToInt32(PlayerSettings.colorSpace == ColorSpace.Linear));
             editMat.SetInt("_PointNum", 0);
-
-            canvasModel.InitComputeShader();
         }
 
         public void Render()
