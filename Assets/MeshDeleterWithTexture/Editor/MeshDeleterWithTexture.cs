@@ -65,7 +65,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             using (var check = new EditorGUI.ChangeCheckScope())
             {
                 model.renderer = EditorGUILayout.ObjectField("Renderer", model.renderer, typeof(Renderer), true) as Renderer;
-                if (check.changed) model.ChangeRenderer(canvasView);
+                if (check.changed) model.OnChangeRenderer(canvasView);
             }
 
             using (new EditorGUILayout.HorizontalScope())
@@ -154,7 +154,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     if (model.HasTextures())
                         model.materialInfoIndex = EditorGUILayout.Popup("Texture (Material)", model.materialInfoIndex, model.textureNames);
 
-                    if (check.changed) model.ChangeTexture(canvasView);
+                    if (check.changed) model.OnChangeMaterial(canvasView);
                 }
 
                 EditorGUILayout.Space();

@@ -288,7 +288,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             return matInfos.ToArray();
         }
 
-        public void ChangeRenderer(CanvasView canvasView)
+        public void OnChangeRenderer(CanvasView canvasView)
         {
             if (textures != null)
                 RendererUtility.ResetMaterialTextures(renderer, textures);
@@ -323,7 +323,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             }
         }
 
-        public void ChangeTexture(CanvasView canvasView)
+        public void OnChangeMaterial(CanvasView canvasView)
         {
             if (textures != null)
             {
