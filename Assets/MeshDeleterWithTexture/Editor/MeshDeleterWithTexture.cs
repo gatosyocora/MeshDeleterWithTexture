@@ -191,7 +191,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         // TODO: Undo機能を一時的に閉じる
                         // canvasView.undo.RegisterUndoTexture(previewTexture, buffer);
 
-                        canvasView.ResetDrawArea();
+                        canvasView.ClearAllDrawing();
 
                         model.SetPreviewTextureToMaterial(ref canvasView.previewTexture);
                     }

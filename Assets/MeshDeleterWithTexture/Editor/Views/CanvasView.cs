@@ -72,6 +72,11 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
             editMat.SetFloat("_ApplyGammaCorrection", Convert.ToInt32(PlayerSettings.colorSpace == ColorSpace.Linear));
             editMat.SetInt("_PointNum", 0);
+
+            editMat.SetVector("_StartPos", new Vector4(0, 0, 0, 0));
+            editMat.SetVector("_EndPos", new Vector4(textureSize.x - 1, textureSize.y - 1, 0, 0));
+
+            editMat.SetTexture("_SelectTex", null);
         }
 
         public void Render()
@@ -174,7 +179,9 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             {
                 editTexture = TextureUtility.GenerateTextureToEditting(materialInfo.Texture);
 
-                ResetDrawArea();
+                DrawTypeSetting(drawType);
+
+                ClearAllDrawing();
                 canvasModel.SetupComputeShader(ref editTexture, ref previewTexture);
                 deleteMask = new DeleteMaskCanvas(ref canvasModel.buffer, materialInfo.Texture, ref previewTexture);
 
@@ -208,18 +215,11 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         /// <summary>
         /// 描画エリアをリセットする
         /// </summary>
-        public void ResetDrawArea()
+        public void ClearAllDrawing()
         {
-            DrawTypeSetting(drawType);
-
             previewTexture = TextureUtility.CopyTexture2DToRenderTexture(materialInfo.Texture, textureSize, PlayerSettings.colorSpace == ColorSpace.Linear);
             canvasModel.SetupComputeShader(ref editTexture, ref previewTexture);
             deleteMask = new DeleteMaskCanvas(ref canvasModel.buffer, materialInfo.Texture, ref previewTexture);
-
-            editMat.SetVector("_StartPos", new Vector4(0, 0, 0, 0));
-            editMat.SetVector("_EndPos", new Vector4(textureSize.x - 1, textureSize.y - 1, 0, 0));
-
-            editMat.SetTexture("_SelectTex", null);
         }
 
         /// <summary>
