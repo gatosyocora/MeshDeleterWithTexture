@@ -120,7 +120,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         model.SetPreviewTextureToMaterial(ref canvasView.previewTexture);
 
                         var mesh = RendererUtility.GetMesh(model.renderer);
-                        var uvMapTex = canvasView.uvMap.GenerateUVMap(mesh, model.currentMaterialInfo, model.texture);
+                        var uvMapTex = canvasView.uvMap.GenerateUVMap(mesh, model.currentMaterialInfo, model.Texture);
                         canvasView.uvMap.SetUVMapTexture(uvMapTex);
                     }
                 }
@@ -301,7 +301,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                                 "Pen/Eraser size",
                                 canvasView.PenSize,
                                 1,
-                                !model.HasTexture() ? 100 : model.texture.width / 20);
+                                !model.HasTexture() ? 100 : model.Texture.width / 20);
 
                 if (check.changed)
                 {

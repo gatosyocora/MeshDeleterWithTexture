@@ -18,6 +18,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         public Renderer renderer;
         private Texture2D[] textures;
         public string[] textureNames;
+        public Texture2D Texture => matInfos[materialInfoIndex].Texture;
 
         public int triangleCount = 0;
         public string saveFolder = "Assets/";
