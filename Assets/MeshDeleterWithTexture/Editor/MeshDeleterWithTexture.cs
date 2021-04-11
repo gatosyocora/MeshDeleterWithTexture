@@ -151,7 +151,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                 using (var check = new EditorGUI.ChangeCheckScope())
                 {
-                    if (model.HasTextures())
+                    if (model.HasMaterials())
                         model.materialInfoIndex = EditorGUILayout.Popup("Texture (Material)", model.materialInfoIndex, model.textureNames);
 
                     if (check.changed) model.OnChangeMaterial(canvasView);
