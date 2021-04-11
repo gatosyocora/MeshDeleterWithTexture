@@ -84,11 +84,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
             DrawType = DrawType.PEN;
             PenColor = Color.black;
-
-            previewMaterial = new Material(Shader.Find("Unlit/Texture"))
-            {
-                name = "Preview",
-            };
         }
 
         public void Initialize(MaterialInfo materialInfo, Renderer renderer)
@@ -219,8 +214,12 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 }
 
                 // TODO: _MainTexが存在しないマテリアルは違うやつに入れないといけない
-                previewMaterial.mainTexture = previewTexture;
                 var materials = renderer.sharedMaterials;
+                previewMaterial = new Material(materials[materialInfo.MaterialSlotIndices[0]])
+                {
+                    name = "_preview",
+                    mainTexture = previewTexture,
+                };
                 materials[materialInfo.MaterialSlotIndices[0]] = previewMaterial;
                 renderer.sharedMaterials = materials;
             }
