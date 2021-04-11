@@ -16,7 +16,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         public int materialInfoIndex = 0;
 
         public Renderer renderer;
-        public Texture2D texture;
         private Texture2D[] textures;
         public string[] textureNames;
 
@@ -31,7 +30,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
 
         public MeshDeleterWithTextureModel()
         {
-            texture = null;
             renderer = null;
             textures = null;
 
@@ -314,12 +312,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
                 {
                     materialInfoIndex = 0;
                     canvasView.Initialize(matInfos[materialInfoIndex], renderer);
-                    texture = matInfos[materialInfoIndex].Texture;
                 }
-            }
-            else
-            {
-                texture = null;
             }
         }
 
@@ -342,7 +335,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             RendererUtility.ResetMaterialTextures(renderer, textures);
             RendererUtility.RevertMeshToPrefab(renderer);
             var mesh = RendererUtility.GetMesh(renderer);
-            var uvMapTex = canvasView.uvMap.GenerateUVMap(mesh, matInfos[materialInfoIndex], texture);
+            var uvMapTex = canvasView.uvMap.GenerateUVMap(mesh, matInfos[materialInfoIndex], matInfos[materialInfoIndex].Texture);
             canvasView.uvMap.SetUVMapTexture(uvMapTex);
 
             LoadRendererData(renderer);
@@ -370,7 +363,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         public void DeleteMesh(CanvasView canvasView)
         {
             var deletePos = canvasView.GetDeleteData();
-            var deletedSubMesh = DeleteMesh(renderer, deletePos, texture, matInfos[materialInfoIndex]);
+            var deletedSubMesh = DeleteMesh(renderer, deletePos, matInfos[materialInfoIndex].Texture, matInfos[materialInfoIndex]);
 
             LoadRendererData(renderer);
 
@@ -389,7 +382,10 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             if (saveFolder == "") saveFolder = "Assets/";
         }
 
-        public bool HasTexture() => texture != null;
+        public bool HasTexture() => matInfos != null &&
+                                    materialInfoIndex > 0 && 
+                                    matInfos[materialInfoIndex] != null && 
+                                    matInfos[materialInfoIndex].Texture != null;
         public bool HasPreviousMesh() => previousMesh != null;
         public bool HasTextures() => textures != null;
 
