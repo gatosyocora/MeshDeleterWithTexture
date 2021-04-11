@@ -204,7 +204,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             {
                 editTexture = TextureUtility.GenerateTextureToEditting(materialInfo.Texture);
 
-                ClearAllDrawing();
+                ClearAllDrawing(materialInfo);
 
                 var mesh = RendererUtility.GetMesh(renderer);
                 if (mesh != null)
@@ -229,11 +229,16 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         /// <summary>
         /// 描画エリアをリセットする
         /// </summary>
-        public void ClearAllDrawing()
+        public void ClearAllDrawing(MaterialInfo materialInfo)
         {
             previewTexture = TextureUtility.CopyTexture2DToRenderTexture(materialInfo.Texture, textureSize, PlayerSettings.colorSpace == ColorSpace.Linear);
             canvasModel.Initialize(ref editTexture, ref previewTexture);
             deleteMask = new DeleteMaskCanvas(ref canvasModel.buffer, materialInfo.Texture, ref previewTexture);
+        }
+
+        public void ClearAllDrawing()
+        {
+            ClearAllDrawing(materialInfo);
         }
 
         /// <summary>
