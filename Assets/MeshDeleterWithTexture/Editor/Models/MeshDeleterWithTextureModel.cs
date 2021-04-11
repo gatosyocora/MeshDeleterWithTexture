@@ -383,7 +383,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         }
 
         public bool HasTexture() => matInfos != null &&
-                                    materialInfoIndex > 0 && 
+                                    materialInfoIndex >= 0 && 
                                     matInfos[materialInfoIndex] != null && 
                                     matInfos[materialInfoIndex].Texture != null;
         public bool HasPreviousMesh() => previousMesh != null;
