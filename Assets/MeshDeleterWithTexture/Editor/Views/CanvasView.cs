@@ -96,9 +96,9 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
             editMat.SetTexture("_SelectTex", null);
 
-            PenSize = 20;
-
             InitializeDrawArea(materialInfo, renderer);
+
+            PenSize = 20;
         }
 
         public void Render()
