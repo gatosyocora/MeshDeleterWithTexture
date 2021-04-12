@@ -39,8 +39,9 @@ namespace Gatosyocora.MeshDeleterWithTexture
         /// <param name="subMeshIndex"></param>
         /// <param name="texture"></param>
         /// <returns></returns>
-        public Texture2D GenerateUVMap(Mesh mesh, MaterialInfo matInfo, Texture2D texture)
+        public Texture2D GenerateUVMap(Mesh mesh, MaterialInfo matInfo)
         {
+            var texture = matInfo.Texture;
             var triangles = new List<int>();
             foreach (var slotIndex in matInfo.MaterialSlotIndices)
                 triangles.AddRange(mesh.GetTriangles(slotIndex));

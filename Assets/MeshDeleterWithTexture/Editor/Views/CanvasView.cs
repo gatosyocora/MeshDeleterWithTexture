@@ -209,7 +209,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 var mesh = RendererUtility.GetMesh(renderer);
                 if (mesh != null)
                 {
-                    var uvMapTex = uvMap.GenerateUVMap(mesh, materialInfo, materialInfo.Texture);
+                    var uvMapTex = uvMap.GenerateUVMap(mesh, materialInfo);
                     uvMap.SetUVMapTexture(uvMapTex);
                 }
 

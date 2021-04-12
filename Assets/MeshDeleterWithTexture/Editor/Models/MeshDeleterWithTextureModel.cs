@@ -348,7 +348,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             ResetMaterialsToDefault(renderer, materials);
             RendererUtility.RevertMeshToPrefab(renderer);
             var mesh = RendererUtility.GetMesh(renderer);
-            var uvMapTex = canvasView.uvMap.GenerateUVMap(mesh, matInfos[materialInfoIndex], matInfos[materialInfoIndex].Texture);
+            var uvMapTex = canvasView.uvMap.GenerateUVMap(mesh, matInfos[materialInfoIndex]);
             canvasView.uvMap.SetUVMapTexture(uvMapTex);
 
             LoadRendererData(renderer);

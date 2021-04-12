@@ -120,7 +120,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         model.SetPreviewTextureToMaterial(ref canvasView.previewTexture);
 
                         var mesh = RendererUtility.GetMesh(model.renderer);
-                        var uvMapTex = canvasView.uvMap.GenerateUVMap(mesh, model.currentMaterialInfo, model.Texture);
+                        var uvMapTex = canvasView.uvMap.GenerateUVMap(mesh, model.currentMaterialInfo);
                         canvasView.uvMap.SetUVMapTexture(uvMapTex);
                     }
                 }
