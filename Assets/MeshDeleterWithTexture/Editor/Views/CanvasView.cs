@@ -88,14 +88,11 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         public void Initialize(MaterialInfo materialInfo, Renderer renderer)
         {
-            this.materialInfo = materialInfo;
-            textureSize = new Vector2Int(materialInfo.Texture.width, materialInfo.Texture.height);
-
             editMat.SetFloat("_ApplyGammaCorrection", Convert.ToInt32(PlayerSettings.colorSpace == ColorSpace.Linear));
             editMat.SetInt("_PointNum", 0);
 
             editMat.SetVector("_StartPos", new Vector4(0, 0, 0, 0));
-            editMat.SetVector("_EndPos", new Vector4(textureSize.x - 1, textureSize.y - 1, 0, 0));
+            editMat.SetVector("_EndPos", new Vector4(0, 0, 0, 0));
 
             editMat.SetTexture("_SelectTex", null);
 
@@ -200,9 +197,12 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         /// <param name="mesh"></param>
         public void InitializeDrawArea(MaterialInfo materialInfo, Renderer renderer)
         {
+            this.materialInfo = materialInfo;
+
             if (materialInfo.Texture != null)
             {
                 editTexture = TextureUtility.GenerateTextureToEditting(materialInfo.Texture);
+                textureSize = new Vector2Int(materialInfo.Texture.width, materialInfo.Texture.height);
 
                 ClearAllDrawing(materialInfo);
 
