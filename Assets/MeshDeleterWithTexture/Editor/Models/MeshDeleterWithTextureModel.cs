@@ -233,9 +233,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             previousMaterials = renderer.sharedMaterials;
             RendererUtility.SetMesh(renderer, deletedMesh);
 
-            // 削除したサブメッシュに対応したマテリアルにテクスチャを戻すためにここでおこなう
-            ResetMaterialsToDefault(renderer, defaultMaterials);
-
             if (deletedSubMesh)
             {
                 // サブメッシュ削除によってマテリアルの対応を変更する必要がある
