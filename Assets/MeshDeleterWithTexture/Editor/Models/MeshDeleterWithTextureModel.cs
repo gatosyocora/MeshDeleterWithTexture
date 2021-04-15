@@ -45,8 +45,10 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         /// <param name="deleteTexPos"></param>
         /// <param name="texture"></param>
         /// <param name="subMeshIndexInDeletedVertex"></param>
-        private bool DeleteMesh(Renderer renderer, bool[] deletePos, Texture2D texture, MaterialInfo matInfo)
+        private bool DeleteMesh(Renderer renderer, bool[] deletePos, MaterialInfo matInfo)
         {
+            var texture = matInfo.Texture;
+            var materialIndexList = matInfo.MaterialSlotIndices;
 
             var mesh = RendererUtility.GetMesh(renderer);
             var deletedMesh = UnityEngine.Object.Instantiate(mesh);
@@ -80,7 +82,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             List<int> nonDeleteVertexIndexs = new List<int>();
             for (var subMeshIndex = 0; subMeshIndex < mesh.subMeshCount; subMeshIndex++)
             {
-                if (matInfo.MaterialSlotIndices.BinarySearch(subMeshIndex) < 0)
+                if (materialIndexList.BinarySearch(subMeshIndex) < 0)
                     nonDeleteVertexIndexs.AddRange(mesh.GetIndices(subMeshIndex));
             }
             nonDeleteVertexIndexs = nonDeleteVertexIndexs.Distinct().ToList();
@@ -375,7 +377,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             ResetMaterialsToDefault(renderer, defaultMaterials);
 
             var deletePos = canvasView.GetDeleteData();
-            var deletedSubMesh = DeleteMesh(renderer, deletePos, matInfos[materialInfoIndex].Texture, matInfos[materialInfoIndex]);
+            var deletedSubMesh = DeleteMesh(renderer, deletePos, matInfos[materialInfoIndex]);
 
             LoadRendererData(renderer);
 
