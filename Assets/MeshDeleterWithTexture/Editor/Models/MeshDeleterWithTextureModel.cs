@@ -16,7 +16,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         public int materialInfoIndex = 0;
 
         public Renderer renderer;
-        private Material[] materials;
+        private Material[] defaultMaterials;
         public string[] textureNames;
         public Texture2D Texture => matInfos[materialInfoIndex].Texture;
 
@@ -32,7 +32,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         public MeshDeleterWithTextureModel()
         {
             renderer = null;
-            materials = null;
+            defaultMaterials = null;
 
             triangleCount = 0;
             saveFolder = "Assets/";
@@ -234,12 +234,12 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             RendererUtility.SetMesh(renderer, deletedMesh);
 
             // 削除したサブメッシュに対応したマテリアルにテクスチャを戻すためにここでおこなう
-            ResetMaterialsToDefault(renderer, materials);
+            ResetMaterialsToDefault(renderer, defaultMaterials);
 
             if (deletedSubMesh)
             {
                 // サブメッシュ削除によってマテリアルの対応を変更する必要がある
-                renderer.sharedMaterials = materials.Where(m => m != null).ToArray();
+                renderer.sharedMaterials = defaultMaterials.Where((material, index) => materials[index] != null).ToArray();
             }
 
             EditorUtility.ClearProgressBar();
@@ -258,7 +258,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             if (mesh == null) return;
             triangleCount = RendererUtility.GetMeshTriangleCount(mesh);
             saveFolder = RendererUtility.GetMeshPath(mesh);
-            materials = GetMaterials(renderer);
+            defaultMaterials = GetMaterials(renderer);
             matInfos = GetMaterialInfos(renderer);
             textureNames = matInfos.Select(x => x.Name).ToArray();
             meshName = StringUtility.AddKeywordToEnd(mesh.name, "_deleteMesh");
@@ -301,8 +301,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
 
         public void OnChangeRenderer(CanvasView canvasView)
         {
-            if (materials != null)
-                ResetMaterialsToDefault(renderer, materials);
+            if (defaultMaterials != null)
+                ResetMaterialsToDefault(renderer, defaultMaterials);
 
             if (renderer != null)
             {
@@ -321,7 +321,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
 
                 LoadRendererData(renderer);
 
-                if (materials != null)
+                if (defaultMaterials != null)
                 {
                     materialInfoIndex = 0;
                     canvasView.Initialize(matInfos[materialInfoIndex], renderer);
@@ -331,9 +331,9 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
 
         public void OnChangeMaterial(CanvasView canvasView)
         {
-            if (materials != null)
+            if (defaultMaterials != null)
             {
-                ResetMaterialsToDefault(renderer, materials);
+                ResetMaterialsToDefault(renderer, defaultMaterials);
                 canvasView.InitializeDrawArea(matInfos[materialInfoIndex], renderer);
             }
         }
@@ -345,7 +345,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
 
         public void RevertMeshToPrefab(CanvasView canvasView)
         {
-            ResetMaterialsToDefault(renderer, materials);
+            ResetMaterialsToDefault(renderer, defaultMaterials);
             RendererUtility.RevertMeshToPrefab(renderer);
             var mesh = RendererUtility.GetMesh(renderer);
             var uvMapTex = canvasView.uvMap.GenerateUVMap(mesh, matInfos[materialInfoIndex]);
@@ -361,7 +361,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
 
         public void RevertMeshToPreviously(CanvasView canvasView)
         {
-            ResetMaterialsToDefault(renderer, materials);
+            ResetMaterialsToDefault(renderer, defaultMaterials);
 
             RendererUtility.SetMesh(renderer, previousMesh);
             previousMesh = null;
@@ -400,13 +400,13 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
                                     matInfos[materialInfoIndex] != null && 
                                     matInfos[materialInfoIndex].Texture != null;
         public bool HasPreviousMesh() => previousMesh != null;
-        public bool HasMaterials() => materials != null;
+        public bool HasMaterials() => defaultMaterials != null;
 
         public void Dispose()
         {
-            if (renderer != null && materials != null)
+            if (renderer != null && defaultMaterials != null)
             {
-                ResetMaterialsToDefault(renderer, materials);
+                ResetMaterialsToDefault(renderer, defaultMaterials);
             }
         }
     }
