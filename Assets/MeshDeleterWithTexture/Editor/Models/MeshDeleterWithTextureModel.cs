@@ -236,7 +236,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             if (deletedSubMesh)
             {
                 // サブメッシュ削除によってマテリアルの対応を変更する必要がある
-                renderer.sharedMaterials = defaultMaterials.Where((material, index) => materials[index] != null).ToArray();
+                renderer.sharedMaterials = materials.Where(material => material != null).ToArray();
             }
 
             EditorUtility.ClearProgressBar();
@@ -372,6 +372,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
 
         public void DeleteMesh(CanvasView canvasView)
         {
+            ResetMaterialsToDefault(renderer, defaultMaterials);
+
             var deletePos = canvasView.GetDeleteData();
             var deletedSubMesh = DeleteMesh(renderer, deletePos, matInfos[materialInfoIndex].Texture, matInfos[materialInfoIndex]);
 
