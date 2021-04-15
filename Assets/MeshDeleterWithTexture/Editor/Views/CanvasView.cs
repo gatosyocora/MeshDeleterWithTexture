@@ -313,11 +313,11 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         /// 削除する場所のデータを取得
         /// </summary>
         /// <returns>削除する場所</returns>
-        public int[] GetDeleteData()
+        public bool[] GetDeleteData()
         {
             var deletePos = new int[textureSize.x * textureSize.y];
             canvasModel.buffer.GetData(deletePos);
-            return deletePos;
+            return deletePos.Select(v => v == 1).ToArray();
         }
 
         public void Dispose()

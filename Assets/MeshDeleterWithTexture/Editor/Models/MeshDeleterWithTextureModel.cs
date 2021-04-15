@@ -45,7 +45,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         /// <param name="deleteTexPos"></param>
         /// <param name="texture"></param>
         /// <param name="subMeshIndexInDeletedVertex"></param>
-        private bool DeleteMesh(Renderer renderer, int[] deletePos, Texture2D texture, MaterialInfo matInfo)
+        private bool DeleteMesh(Renderer renderer, bool[] deletePos, Texture2D texture, MaterialInfo matInfo)
         {
 
             var mesh = RendererUtility.GetMesh(renderer);
@@ -68,7 +68,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
 
                 int index = y * texture.width + x;
 
-                if (deletePos[index] == 1)
+                if (deletePos[index])
                 {
                     deleteIndexList.Add(i);
                 }
