@@ -264,51 +264,19 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             if (mesh == null) return;
             triangleCount = RendererUtility.GetMeshTriangleCount(mesh);
             saveFolder = RendererUtility.GetMeshPath(mesh);
-            defaultMaterials = GetMaterials(renderer);
-            matInfos = GetMaterialInfos(renderer);
+            defaultMaterials = RendererUtility.GetMaterials(renderer);
+            matInfos = RendererUtility.GetMaterialInfos(renderer);
             textureNames = matInfos.Select(x => x.Name).ToArray();
             meshName = StringUtility.AddKeywordToEnd(mesh.name, "_deleteMesh");
         }
 
-        private Material[] GetMaterials(Renderer renderer) => renderer.sharedMaterials.ToArray();
-
-        private void ResetMaterialsToDefault(Renderer renderer, Material[] materials)
-        {
-            if (renderer.sharedMaterials.Length != materials.Length)
-            {
-                throw new Exception("renderer.sharedMaterials.Length is not equal to materials.Length");
-            }
-
-            renderer.sharedMaterials = materials;
-        }
-
-        private MaterialInfo[] GetMaterialInfos(Renderer renderer)
-        {
-            var mats = renderer.sharedMaterials;
-            var matInfos = new List<MaterialInfo>();
-            var processedList = new List<string>();
-
-            for (int matIndex = 0; matIndex < mats.Length; matIndex++)
-            {
-                if (!processedList.Contains(mats[matIndex].name))
-                {
-                    matInfos.Add(new MaterialInfo(mats[matIndex], matIndex));
-                    processedList.Add(mats[matIndex].name);
-                }
-                else
-                {
-                    var infoIndex = processedList.IndexOf(mats[matIndex].name);
-                    matInfos[infoIndex].AddSlotIndex(matIndex);
-                }
-            }
-
-            return matInfos.ToArray();
-        }
+        private void ResetMaterialsToDefault(Renderer renderer) 
+            => RendererUtility.SetMaterials(renderer, defaultMaterials);
 
         public void OnChangeRenderer(CanvasView canvasView)
         {
             if (defaultMaterials != null)
-                ResetMaterialsToDefault(renderer, defaultMaterials);
+                ResetMaterialsToDefault(renderer);
 
             if (renderer != null)
             {
@@ -339,7 +307,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         {
             if (defaultMaterials != null)
             {
-                ResetMaterialsToDefault(renderer, defaultMaterials);
+                ResetMaterialsToDefault(renderer);
                 canvasView.InitializeDrawArea(matInfos[materialInfoIndex], renderer);
             }
         }
@@ -351,7 +319,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
 
         public void RevertMeshToPrefab(CanvasView canvasView)
         {
-            ResetMaterialsToDefault(renderer, defaultMaterials);
+            ResetMaterialsToDefault(renderer);
             RendererUtility.RevertMeshToPrefab(renderer);
             var mesh = RendererUtility.GetMesh(renderer);
             var uvMapTex = canvasView.uvMap.GenerateUVMap(mesh, matInfos[materialInfoIndex]);
@@ -367,7 +335,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
 
         public void RevertMeshToPreviously(CanvasView canvasView)
         {
-            ResetMaterialsToDefault(renderer, defaultMaterials);
+            ResetMaterialsToDefault(renderer);
 
             RendererUtility.SetMesh(renderer, previousMesh);
             previousMesh = null;
@@ -381,7 +349,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
 
         public void DeleteMesh(CanvasView canvasView)
         {
-            ResetMaterialsToDefault(renderer, defaultMaterials);
+            ResetMaterialsToDefault(renderer);
 
             var deletePos = canvasView.GetDeleteData();
             var deletedSubMesh = DeleteMesh(renderer, deletePos, matInfos[materialInfoIndex]);
@@ -414,7 +382,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         {
             if (renderer != null && defaultMaterials != null)
             {
-                ResetMaterialsToDefault(renderer, defaultMaterials);
+                ResetMaterialsToDefault(renderer);
             }
         }
     }

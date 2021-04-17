@@ -175,5 +175,40 @@ namespace Gatosyocora.MeshDeleterWithTexture.Utilities
             for (int i = 0; i < textures.Length; i++)
                 renderer.sharedMaterials[i].mainTexture = textures[i];
         }
+
+        public static Material[] GetMaterials(Renderer renderer) => renderer.sharedMaterials.ToArray();
+
+        public static MaterialInfo[] GetMaterialInfos(Renderer renderer)
+        {
+            var mats = renderer.sharedMaterials;
+            var matInfos = new List<MaterialInfo>();
+            var processedList = new List<string>();
+
+            for (int matIndex = 0; matIndex < mats.Length; matIndex++)
+            {
+                if (!processedList.Contains(mats[matIndex].name))
+                {
+                    matInfos.Add(new MaterialInfo(mats[matIndex], matIndex));
+                    processedList.Add(mats[matIndex].name);
+                }
+                else
+                {
+                    var infoIndex = processedList.IndexOf(mats[matIndex].name);
+                    matInfos[infoIndex].AddSlotIndex(matIndex);
+                }
+            }
+
+            return matInfos.ToArray();
+        }
+
+        public static void SetMaterials(Renderer renderer, Material[] materials)
+        {
+            if (renderer.sharedMaterials.Length != materials.Length)
+            {
+                throw new Exception("renderer.sharedMaterials.Length is not equal to materials.Length");
+            }
+
+            renderer.sharedMaterials = materials;
+        }
     }
 }
