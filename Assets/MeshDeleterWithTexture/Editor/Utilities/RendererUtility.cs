@@ -171,12 +171,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Utilities
             return textureNames;
         }
 
-        public static void ResetMaterialTextures(Renderer renderer, Texture2D[] textures)
-        {
-            for (int i = 0; i < textures.Length; i++)
-                renderer.sharedMaterials[i].mainTexture = textures[i];
-        }
-
         public static Material[] GetMaterials(Renderer renderer) => renderer.sharedMaterials.ToArray();
 
         public static MaterialInfo[] GetMaterialInfos(Renderer renderer)
