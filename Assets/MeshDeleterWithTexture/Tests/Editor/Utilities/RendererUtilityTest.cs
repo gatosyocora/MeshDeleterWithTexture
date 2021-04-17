@@ -7,7 +7,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace MeshDeleterWithTexture.Tests
+namespace MeshDeleterWithTexture.Tests.Utilities
 {
     public class RendererUtilityTest
     {
@@ -70,7 +70,7 @@ namespace MeshDeleterWithTexture.Tests
         }
 
         [Test]
-        public void GetMesh()
+        public void GetMeshIsNotNull()
         {
             Setup();
             foreach (var model in models)
@@ -80,7 +80,7 @@ namespace MeshDeleterWithTexture.Tests
             }
         }
         [Test]
-        public void GetMeshPath()
+        public void GetMeshPathIsCorrect()
         {
             Setup();
             foreach (var model in models)
@@ -91,7 +91,7 @@ namespace MeshDeleterWithTexture.Tests
             }
         }
         [Test]
-        public void GetMeshTriangleCount()
+        public void GetMeshTriangleCountIsCorrect()
         {
             Setup();
             foreach (var model in models)
@@ -102,7 +102,7 @@ namespace MeshDeleterWithTexture.Tests
             }
         }
         [Test]
-        public void GetMainTextures()
+        public void GetMainTexturesNameIsCorrect()
         {
             Setup();
             foreach (var model in models)
@@ -116,7 +116,7 @@ namespace MeshDeleterWithTexture.Tests
             }
         }
         [Test]
-        public void GetTextureNames()
+        public void GetTextureNamesIsCorrect()
         {
             Setup();
             foreach (var model in models)
@@ -131,7 +131,7 @@ namespace MeshDeleterWithTexture.Tests
             }
         }
         [Test]
-        public void SetMesh()
+        public void SetMeshIsCorrect()
         {
             var mesh = new Mesh
             {
