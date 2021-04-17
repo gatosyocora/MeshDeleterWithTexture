@@ -51,8 +51,32 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             var materialIndexList = matInfo.MaterialSlotIndices;
 
             var mesh = RendererUtility.GetMesh(renderer);
-            var deletedMesh = UnityEngine.Object.Instantiate(mesh);
             var materials = renderer.sharedMaterials.ToArray();
+            var textureSize = new Vector2Int(texture.width, texture.height);
+            var (deletedMesh, deletedSubMeshes) = RemoveTriangles(mesh, deletePos, textureSize, materialIndexList);
+
+            if (meshName == "") meshName = mesh.name + "_deleteMesh";
+            AssetDatabase.CreateAsset(deletedMesh, AssetDatabase.GenerateUniqueAssetPath(Path.Combine(saveFolder, $"{meshName}.asset")));
+            AssetDatabase.SaveAssets();
+
+            Undo.RecordObject(renderer, "Change mesh " + deletedMesh.name);
+            previousMesh = mesh;
+            previousMaterials = renderer.sharedMaterials;
+            RendererUtility.SetMesh(renderer, deletedMesh);
+
+            if (deletedSubMeshes.Any())
+            {
+                // サブメッシュ削除によってマテリアルの対応を変更する必要がある
+                renderer.sharedMaterials = materials.Where((material, index) => !deletedSubMeshes[index]).ToArray();
+            }
+
+            return deletedSubMeshes.Any();
+        }
+
+        private static (Mesh, bool[]) RemoveTriangles(Mesh mesh, bool[] deletePos, Vector2Int textureSize, List<int> materialIndexList, bool showProgressBar = true)
+        {
+            var deletedMesh = UnityEngine.Object.Instantiate(mesh);
+            var deletedSubMeshes = new bool[mesh.subMeshCount];
 
             deletedMesh.Clear();
             deletedMesh.MarkDynamic();
@@ -63,12 +87,12 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
 
             for (int i = 0; i < uvs.Count(); i++)
             {
-                var x = (int)(Mathf.Abs(uvs[i].x % 1.0f) * texture.width);
-                var y = (int)(Mathf.Abs(uvs[i].y % 1.0f) * texture.height);
+                var x = (int)(Mathf.Abs(uvs[i].x % 1.0f) * textureSize.x);
+                var y = (int)(Mathf.Abs(uvs[i].y % 1.0f) * textureSize.y);
 
-                if (x == texture.width || y == texture.height) continue;
+                if (x == textureSize.x || y == textureSize.y) continue;
 
-                int index = y * texture.width + x;
+                int index = y * textureSize.x + x;
 
                 if (deletePos[index])
                 {
@@ -101,7 +125,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             deleteIndexsOrdered.Sort();
 
             // 削除する頂点がないので終了する
-            if (deleteIndexsOrdered.Count == 0) return false;
+            if (deleteIndexsOrdered.Count == 0) return (mesh, deletedSubMeshes);
 
             // 頂点を削除
             var nonDeleteVertices = mesh.vertices.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
@@ -140,7 +164,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             float progressMaxCount = mesh.subMeshCount;
             float count = 0;
             int addSubMeshIndex = 0;
-            bool deletedSubMesh = false;
 
             for (int subMeshIndex = 0; subMeshIndex < mesh.subMeshCount; subMeshIndex++)
             {
@@ -173,11 +196,11 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
                     }
                 }
 
-                if (EditorUtility.DisplayCancelableProgressBar("Delete triangles",
+                if (showProgressBar && EditorUtility.DisplayCancelableProgressBar("Delete triangles",
                         Mathf.Floor(count / progressMaxCount * 100) + "%", count++ / progressMaxCount))
                 {
                     EditorUtility.ClearProgressBar();
-                    return false;
+                    return (null, Array.Empty<bool>());
                 }
 
                 // 不要なポリゴンを削除する
@@ -186,15 +209,16 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
                 // ポリゴン数0のサブメッシュは追加しない
                 if (!triangleList.Any())
                 {
-                    materials[subMeshIndex] = null;
-                    deletedSubMesh = true;
+                    deletedSubMeshes[subMeshIndex] = true;
                     continue;
                 }
 
                 deletedMesh.SetTriangles(triangleList, addSubMeshIndex++);
             }
 
-            if (deletedSubMesh)
+            EditorUtility.ClearProgressBar();
+
+            if (deletedSubMeshes.Any())
             {
                 // ポリゴン削除の結果, ポリゴン数0になったSubMeshは含めない
                 deletedMesh.subMeshCount = addSubMeshIndex;
@@ -226,24 +250,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
                     deltaNonDeleteTangentsList);
             }
 
-            if (meshName == "") meshName = mesh.name + "_deleteMesh";
-            AssetDatabase.CreateAsset(deletedMesh, AssetDatabase.GenerateUniqueAssetPath(Path.Combine(saveFolder, $"{meshName}.asset")));
-            AssetDatabase.SaveAssets();
-
-            Undo.RecordObject(renderer, "Change mesh " + deletedMesh.name);
-            previousMesh = mesh;
-            previousMaterials = renderer.sharedMaterials;
-            RendererUtility.SetMesh(renderer, deletedMesh);
-
-            if (deletedSubMesh)
-            {
-                // サブメッシュ削除によってマテリアルの対応を変更する必要がある
-                renderer.sharedMaterials = materials.Where(material => material != null).ToArray();
-            }
-
-            EditorUtility.ClearProgressBar();
-
-            return deletedSubMesh;
+            return (deletedMesh, deletedSubMeshes);
         }
 
         /// <summary>
