@@ -152,15 +152,5 @@ namespace MeshDeleterWithTexture.Tests.Utilities
                 Assert.AreEqual(model.renderer.sharedMesh, mesh);
             }
         }
-        [Test]
-        public void RevertMeshToPrefab()
-        {
-
-        }
-        [Test]
-        public void ResetMaterialTextures()
-        {
-
-        }
     }
 }
