@@ -169,7 +169,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                         Event.current.button == 0 &&
                         !isDrawing)
                     {
-                        undo.RegisterUndoTexture(previewTexture, canvasModel.buffer);
+                        RegisterUndoTexture();
                         isDrawing = true;
                     }
                     else if (Event.current.type == EventType.MouseUp &&
@@ -319,6 +319,10 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             canvasModel.buffer.GetData(deletePos);
             return deletePos.Select(v => v == 1).ToArray();
         }
+
+        public void RegisterUndoTexture() => undo.RegisterUndoTexture(previewTexture, canvasModel.buffer);
+
+        public void UndoPreviewTexture() => undo.UndoPreviewTexture(ref previewTexture, ref canvasModel.buffer);
 
         public void Dispose()
         {

@@ -98,8 +98,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             if (Event.current.type == EventType.KeyDown && 
                 Event.current.keyCode == KeyCode.Z)
             {
-                // TODO: Undo機能を一時的に閉じる
-                // canvasView.undo.UndoPreviewTexture(ref previewTexture, ref buffer);
+                canvasView.UndoPreviewTexture();
             }
         }
 
@@ -181,15 +180,13 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                     if (GUILayout.Button("Inverse FillArea"))
                     {
-                        // TODO: Undo機能を一時的に閉じる
-                        // canvasView.undo.RegisterUndoTexture(previewTexture, buffer);
+                        canvasView.RegisterUndoTexture();
                         canvasView.InverseFillArea();
                     }
 
                     if (GUILayout.Button("Clear All Drawing"))
                     {
-                        // TODO: Undo機能を一時的に閉じる
-                        // canvasView.undo.RegisterUndoTexture(previewTexture, buffer);
+                        canvasView.RegisterUndoTexture();
 
                         canvasView.ClearAllDrawing();
 
@@ -202,8 +199,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                         if (GUILayout.Button("Undo Drawing"))
                         {
-                            // TODO: Undo機能を一時的に閉じる
-                            // canvasView.undo.UndoPreviewTexture(ref previewTexture);
+                            canvasView.UndoPreviewTexture();
                         }
                     }
 
