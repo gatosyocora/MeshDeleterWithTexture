@@ -118,9 +118,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                         canvasView.deleteMask.ExportDeleteMaskTexture();
                         model.SetPreviewTextureToMaterial(ref canvasView.previewTexture);
 
-                        var mesh = RendererUtility.GetMesh(model.renderer);
-                        var uvMapTex = canvasView.uvMap.GenerateUVMap(mesh, model.currentMaterialInfo);
-                        canvasView.uvMap.SetUVMapTexture(uvMapTex);
+                        canvasView.uvMap.SetUVMapTexture(model.renderer, model.currentMaterialInfo);
                     }
                 }
 

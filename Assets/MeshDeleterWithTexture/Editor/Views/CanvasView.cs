@@ -206,12 +206,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
                 ClearAllDrawing(materialInfo);
 
-                var mesh = RendererUtility.GetMesh(renderer);
-                if (mesh != null)
-                {
-                    var uvMapTex = uvMap.GenerateUVMap(mesh, materialInfo);
-                    uvMap.SetUVMapTexture(uvMapTex);
-                }
+                uvMap.SetUVMapTexture(renderer, materialInfo);
 
                 // TODO: _MainTexが存在しないマテリアルは違うやつに入れないといけない
                 var materials = renderer.sharedMaterials;

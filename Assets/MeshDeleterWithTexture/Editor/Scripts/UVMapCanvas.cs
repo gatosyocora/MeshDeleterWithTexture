@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Gatosyocora.MeshDeleterWithTexture.Utilities;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,10 +21,15 @@ namespace Gatosyocora.MeshDeleterWithTexture
             this.editMat = editMat;
         }
 
-        public void SetUVMapTexture(Texture2D uvMapTexture)
+        public bool SetUVMapTexture(Renderer renderer, MaterialInfo materialInfo)
         {
-            this.uvMapTexture = uvMapTexture;
+            var mesh = RendererUtility.GetMesh(renderer);
+
+            if (mesh == null) return false;
+
+            uvMapTexture = GenerateUVMap(mesh, materialInfo);
             editMat.SetTexture("_UVMap", uvMapTexture);
+            return true;
         }
 
         public void SetUVMapLineColor(Color uvMapLineColor)
