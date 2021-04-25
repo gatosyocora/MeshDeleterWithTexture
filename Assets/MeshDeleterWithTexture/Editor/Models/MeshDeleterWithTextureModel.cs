@@ -38,6 +38,23 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             saveFolder = "Assets/";
         }
 
+        private void Initialize(CanvasView canvasView, bool initializeMaterialInfoIndex = true)
+        {
+            LoadRendererData(renderer);
+
+            if (initializeMaterialInfoIndex)
+            {
+                materialInfoIndex = 0;
+            }
+
+            if (matInfos == null || matInfos[materialInfoIndex] == null)
+            {
+                throw new NullReferenceException("Failed to load Material");
+            }
+
+            canvasView.Initialize(matInfos[materialInfoIndex], renderer);
+        }
+
         /// <summary>
         /// メッシュを削除する
         /// </summary>
@@ -113,13 +130,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
 
                 previousMesh = null;
 
-                LoadRendererData(renderer);
-
-                if (defaultMaterials != null)
-                {
-                    materialInfoIndex = 0;
-                    canvasView.Initialize(matInfos[materialInfoIndex], renderer);
-                }
+                Initialize(canvasView);
             }
         }
 
@@ -144,9 +155,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
 
             canvasView.uvMap.SetUVMapTexture(renderer, matInfos[materialInfoIndex]);
 
-            LoadRendererData(renderer);
-            materialInfoIndex = 0;
-            canvasView.InitializeDrawArea(matInfos[materialInfoIndex], renderer);
+            Initialize(canvasView);
 
             previousMesh = null;
             previousMaterials = null;
@@ -161,9 +170,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             renderer.sharedMaterials = previousMaterials;
             previousMaterials = null;
 
-            LoadRendererData(renderer);
-            materialInfoIndex = 0;
-            canvasView.InitializeDrawArea(matInfos[materialInfoIndex], renderer);
+            Initialize(canvasView);
         }
 
         public void DeleteMesh(CanvasView canvasView)
@@ -173,13 +180,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             var deletePos = canvasView.GetDeleteData();
             var deletedSubMesh = DeleteMesh(renderer, deletePos, matInfos[materialInfoIndex]);
 
-            LoadRendererData(renderer);
-
-            if (deletedSubMesh)
-            {
-                materialInfoIndex = 0;
-            }
-            canvasView.InitializeDrawArea(matInfos[materialInfoIndex], renderer);
+            Initialize(canvasView, deletedSubMesh);
         }
 
         public void SelectFolder()
