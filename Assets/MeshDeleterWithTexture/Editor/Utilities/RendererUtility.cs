@@ -119,26 +119,34 @@ namespace Gatosyocora.MeshDeleterWithTexture.Utilities
         {
             if (!PrefabUtility.IsPartOfAnyPrefab(renderer)) return;
 
-            SerializedObject so = null;
+            RevertMeshToPrefab(renderer, InteractionMode.UserAction);
+            RevertMaterialsToPrefab(renderer, InteractionMode.UserAction);
+        }
+
+        public static void RevertMeshToPrefab(Renderer renderer, InteractionMode interactionMode = InteractionMode.AutomatedAction)
+        {
             if (renderer is SkinnedMeshRenderer)
             {
-                so = new SerializedObject(renderer);
+                RevertPropertyToPrefab(renderer, "m_Mesh", interactionMode);
             }
             else if (renderer is MeshRenderer)
             {
-                so = new SerializedObject(renderer.GetComponent<MeshFilter>());
+                RevertPropertyToPrefab(renderer.GetComponent<MeshFilter>(), "m_Mesh", interactionMode);
             }
-            so.Update();
-            var sp = so.FindProperty("m_Mesh");
-            PrefabUtility.RevertPropertyOverride(sp, InteractionMode.UserAction);
-            sp.serializedObject.ApplyModifiedProperties();
+        }
 
-            SerializedObject renderer_so = null;
-            renderer_so = new SerializedObject(renderer);
-            renderer_so.Update();
-            var sp2 = renderer_so.FindProperty("m_Materials");
-            PrefabUtility.RevertPropertyOverride(sp2, InteractionMode.UserAction);
-            sp2.serializedObject.ApplyModifiedProperties();
+        public static void RevertMaterialsToPrefab(Renderer renderer, InteractionMode interactionMode = InteractionMode.AutomatedAction)
+            => RevertPropertyToPrefab(renderer, "m_Materials", interactionMode);
+
+        private static void RevertPropertyToPrefab(Component component, string propertyName, InteractionMode interactionMode = InteractionMode.AutomatedAction)
+        {
+            if (component == null) return;
+
+            var serializedObject = new SerializedObject(component);
+            serializedObject.Update();
+            var serializedProperty = serializedObject.FindProperty(propertyName);
+            PrefabUtility.RevertPropertyOverride(serializedProperty, interactionMode);
+            serializedObject.ApplyModifiedProperties();
         }
 
 
