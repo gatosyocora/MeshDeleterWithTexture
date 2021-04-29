@@ -119,10 +119,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Utilities
         {
             if (!PrefabUtility.IsPartOfAnyPrefab(renderer)) return;
 
-            PrefabUtility.ReconnectToLastPrefab(renderer.gameObject);
-
             SerializedObject so = null;
-            SerializedObject renderer_so = null;
             if (renderer is SkinnedMeshRenderer)
             {
                 so = new SerializedObject(renderer);
@@ -132,21 +129,16 @@ namespace Gatosyocora.MeshDeleterWithTexture.Utilities
                 so = new SerializedObject(renderer.GetComponent<MeshFilter>());
             }
             so.Update();
+            var sp = so.FindProperty("m_Mesh");
+            PrefabUtility.RevertPropertyOverride(sp, InteractionMode.UserAction);
+            sp.serializedObject.ApplyModifiedProperties();
 
+            SerializedObject renderer_so = null;
             renderer_so = new SerializedObject(renderer);
             renderer_so.Update();
-
-            var sp = so.FindProperty("m_Mesh");
             var sp2 = renderer_so.FindProperty("m_Materials");
-#if UNITY_2018_3_OR_NEWER
-            PrefabUtility.RevertPropertyOverride(sp, InteractionMode.UserAction);
             PrefabUtility.RevertPropertyOverride(sp2, InteractionMode.UserAction);
-#else
-            sp.prefabOverride = false;
-            sp.serializedObject.ApplyModifiedProperties();
-            sp2.prefabOverride = false;
             sp2.serializedObject.ApplyModifiedProperties();
-#endif
         }
 
 
