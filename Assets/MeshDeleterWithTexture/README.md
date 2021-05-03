@@ -1,6 +1,6 @@
 # MeshDeleterWithTexture
 
-テクスチャの箇所を指定することでメッシュの対応した箇所を削除できるEditor拡張です。
+テクスチャの箇所を指定することでメッシュの対応した箇所を削除できるEditor拡張
 
 ## 仕組み
 
@@ -10,44 +10,44 @@
 
 ## 使い方
 
-1. MeshDeleterWithTexture_vX.unitypackageをUnityプロジェクトにインポートします。
-2. メニューバーのGatoTool > MeshDeleter with Textureを選択します。
-3. "Renderer"に削除したい箇所を持つメッシュのオブジェクトを設定します。（SkinnedMeshRendererコンポーネントがついたオブジェクト）
-4. "Texture(Material)"のテクスチャ名を選択して削除したい箇所を持つテクスチャを選択してください。
-5. 以下の操作をおこなって削除したい箇所を指定します。
-   - "DrawType"を"Pen"にするように選択してテクスチャの削除したいところを塗りつぶします。
-   - "Eraser"を選択することで一部の塗りつぶしを消したり, "Clear All Drawing"ですべての塗りつぶしを削除したりできます。
-   - "Pen/Eraser size"を変更することでペンの大きさを変えられます。
-   - 塗りつぶしの際にマウスのホイールを動かしたり, "Scale"を変更することでテクスチャ表示画面の拡大縮小ができます。
-   - 右クリックをしながらマウスを動かすことで表示箇所を移動できます。
-6. 削除したい箇所の塗りつぶしが終わったら"Output Mesh"の"SaveFolder"と"Name"でメッシュ書き出しの設定をおこないます。
-7. "Delete Mesh"を押すと塗りつぶしの場所に対応した箇所を削除したメッシュが書き出され, 自動的に設定されます。
+1. MeshDeleterWithTexture_vX.unitypackageをUnityプロジェクトにインポートする
+2. メニューバーのGatoTool > MeshDeleter with Textureを選択する
+3. "Renderer"に削除したい箇所を持つメッシュのオブジェクトを設定する（SkinnedMeshRendererコンポーネントがついたオブジェクト）
+4. "Texture(Material)"のテクスチャ名を選択して削除したい箇所を持つテクスチャを選択する
+5. 以下の操作をおこなって削除したい箇所を指定する
+   - "DrawType"を"Pen"にするように選択してテクスチャの削除したいところを塗りつぶす
+   - "Eraser"を選択することで一部の塗りつぶしを消したり, "Clear All Drawing"ですべての塗りつぶしを削除したりできる
+   - "Pen/Eraser size"を変更することでペンの大きさを変えられる
+   - 塗りつぶしの際にマウスのホイールを動かしたり, "Scale"を変更することでテクスチャ表示画面の拡大縮小ができる
+   - 右クリックをしながらマウスを動かすことで表示箇所を移動できる
+6. 削除したい箇所の塗りつぶしが終わったら"Output Mesh"の"SaveFolder"と"Name"でメッシュ書き出しの設定をおこなう
+7. "Delete Mesh"を押すと塗りつぶしの場所に対応した箇所を削除したメッシュが書き出され, 自動的に設定される
 
-- メッシュ削除後, Ctrl+Zでメッシュ削除前に戻すこともできます。
-- SkinnedMeshRendererのMeshから別のメッシュに変更することもできます。
-- "Revert Mesh to Prefab"でfbxまたはPrefabに設定されているデフォルトのメッシュに戻すことができます
-- "Revert Mesh to previously"で削除前のメッシュに戻すことができます。
+- メッシュ削除後, Ctrl+Zでメッシュ削除前に戻せる
+- SkinnedMeshRendererのMeshから別のメッシュに変更できる
+- "Revert Mesh to Prefab"でfbxまたはPrefabに設定されているデフォルトのメッシュに戻せる
+- "Revert Mesh to previously"で削除前のメッシュに戻せる
 
-- "Import DeleteMask"は削除したい箇所をマスク画像で指定することができます。
-  - マスク画像はテクスチャと同じ大きさで黒の部分が塗りつぶされます。
-  - 現在, png形式とjpg形式に対応しています。
-- "Export DeleteMask"で塗りつぶした箇所を黒色, それ以外を白色としたマスク画像をpng形式で出力できます。
-- "Drag & Drop DeleteMeskTexture"にマスク画像をドラッグアンドドロップしても読み込むことができます。
-  - 現在はpngとjpgに対応しています。
+- "Import DeleteMask"は削除したい箇所をマスク画像で指定できる
+  - マスク画像はテクスチャと同じ大きさで黒の部分が塗りつぶされる
+  - 現在, png形式とjpg形式に対応
+- "Export DeleteMask"で塗りつぶした箇所を黒色, それ以外を白色としたマスク画像をpng形式で出力できる
+- "Drag & Drop DeleteMeskTexture"にマスク画像をドラッグアンドドロップしても読み込める
+  - 現在はpngとjpgに対応している
 
-- "Export UVMap"でUVマップテクスチャを出力できます。
-- "UVMap LineColor"でUVマップの線の色を変更できます。
+- "Export UVMap"でUVマップテクスチャを出力できる
+- "UVMap LineColor"でUVマップの線の色を変更できる
 
-- "Inverse FillArea"で塗りつぶされた箇所が反転します
+- "Inverse FillArea"で塗りつぶされた箇所が反転する
   - 塗られている箇所→塗られていない
   - 塗られていない箇所→塗られている
 
-- "Undo Drawing"でPenでの塗りつぶしやInverse FillArea, Clear All Drawingを実行前の状態に戻せます
-  - Zキーでもこの機能を使えます
-  - 最大10回まで遡れます。
+- "Undo Drawing"でPenでの塗りつぶしやInverse FillArea, Clear All Drawingを実行前の状態に戻せる
+  - Zキーでもこの機能を使用
+  - 最大10回までさかのぼれる
 
-- エディタを閉じたり、メッシュを変えたりしてもアバターの塗りつぶしが残っている場合はマテリアルのテクスチャを元のものに戻してください。
-- テクスチャには直接書き込みをしていないので戻すことができます。
+- エディタを閉じたり、メッシュを変えたりしてもアバターの塗りつぶしが残っている場合はマテリアルのテクスチャを元のものに戻してください
+- テクスチャには直接書き込みをしていないので戻せる
 
 ## 塗りつぶしのコツ
 
@@ -56,7 +56,7 @@
 
 ## アンインストール方法
 
-インストールしたUnityプロジェクトのAssetsフォルダの下にある「MeshDeleterWithTexture」のフォルダごと削除してください。
+インストールしたUnityプロジェクトのAssetsフォルダの下にある「MeshDeleterWithTexture」のフォルダごと削除する
 
 ## 利用規約
 
