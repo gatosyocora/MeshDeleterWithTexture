@@ -2,15 +2,6 @@
 
 テクスチャの箇所を指定することでメッシュの対応した箇所を削除できるEditor拡張です。
 
-## 内容物
-
-MeshDeleterWithTexture.cs : ソースコードです
-GatoGUILayout.cs : gatosyocoraオリジナルのEditor拡張用GUIのソースコードです
-Resources/TextureEdit.shader : テクスチャ補正用のシェーダーです
-Resources/TextureEditMat.mat : テクスチャ補正用のマテリアルです
-Resources/colorcheck2.compute : メインのコンピュートシェーダーです
-Resources/getUVMap.compute : UVMap取得用のコンピュートシェーダーです
-
 ## 仕組み
 
 複製したメッシュに対して
