@@ -21,10 +21,16 @@
 6. 削除したい箇所の塗りつぶしが終わったら"Output Mesh"の"SaveFolder"と"Name"でメッシュ書き出しの設定をおこなう
 7. "Delete Mesh"を押すと塗りつぶしの場所に対応した箇所を削除したメッシュが書き出され, 自動的に設定される
 
+## その他機能
+
+### Revert
+
 - メッシュ削除後, Ctrl+Zでメッシュ削除前に戻せる
 - SkinnedMeshRendererのMeshから別のメッシュに変更できる
 - "Revert Mesh to Prefab"でfbxまたはPrefabに設定されているデフォルトのメッシュに戻せる
 - "Revert Mesh to previously"で削除前のメッシュに戻せる
+
+### DeleteMask
 
 - "Import DeleteMask"は削除したい箇所をマスク画像で指定できる
   - マスク画像はテクスチャと同じ大きさで黒の部分が塗りつぶされる
@@ -33,12 +39,18 @@
 - "Drag & Drop DeleteMeskTexture"にマスク画像をドラッグアンドドロップしても読み込める
   - 現在はpngとjpgに対応している
 
+### UVMap
+
 - "Export UVMap"でUVマップテクスチャを出力できる
 - "UVMap LineColor"でUVマップの線の色を変更できる
+
+### Inverse
 
 - "Inverse FillArea"で塗りつぶされた箇所が反転する
   - 塗られている箇所->塗られていない
   - 塗られていない箇所->塗られている
+
+### Undo
 
 - "Undo Drawing"でPenでの塗りつぶしやInverse FillArea, Clear All Drawingを実行前の状態に戻せる
   - Zキーでもこの機能を使用
