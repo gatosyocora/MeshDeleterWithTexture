@@ -55,6 +55,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             if (uvs.Count() <= 0 || triangles.Count() <= 0) return null;
 
+            for (int i = 0; i < uvs.Length; i++)
+            {
+                uvs[i] = new Vector2(Mathf.Repeat(uvs[i].x, 1.0f), Mathf.Repeat(uvs[i].y, 1.0f));
+            }
+
             ComputeShader cs = Object.Instantiate(Resources.Load<ComputeShader>("getUVMap"));
             int kernel = cs.FindKernel("CSMain");
 
