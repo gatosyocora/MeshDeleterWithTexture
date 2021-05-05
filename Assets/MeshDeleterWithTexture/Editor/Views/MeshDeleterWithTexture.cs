@@ -13,7 +13,7 @@ using Gatosyocora.MeshDeleterWithTexture.Models;
  * see LICENSE.txt
  */
 
-// MeshDeleterWithTexture v0.6.1
+// MeshDeleterWithTexture v0.6.2
 
 namespace Gatosyocora.MeshDeleterWithTexture
 {
