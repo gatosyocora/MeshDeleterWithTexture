@@ -110,15 +110,17 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         private void ResetMaterialsToDefault(Renderer renderer) 
             => RendererUtility.SetMaterials(renderer, defaultMaterials);
 
-        public void OnChangeRenderer(CanvasView canvasView)
+        public void OnChangeRenderer(CanvasView canvasView, Renderer newRenderer)
         {
             if (defaultMaterials != null)
                 ResetMaterialsToDefault(renderer);
 
-            if (renderer != null)
+            renderer = newRenderer;
+
+            if (newRenderer != null)
             {
-                if (!(renderer is SkinnedMeshRenderer ||
-                    renderer is MeshRenderer))
+                if (!(newRenderer is SkinnedMeshRenderer ||
+                    newRenderer is MeshRenderer))
                 {
                     EditorUtility.DisplayDialog(
                         string.Empty,
