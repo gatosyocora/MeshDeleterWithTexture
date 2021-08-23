@@ -23,6 +23,12 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
         public bool SetUVMapTexture(Renderer renderer, MaterialInfo materialInfo)
         {
+            if (renderer == null || materialInfo == null)
+            {
+                editMat.SetTexture("_UVMap", null);
+                return true;
+            }
+
             var mesh = RendererUtility.GetMesh(renderer);
 
             if (mesh == null) return false;

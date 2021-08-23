@@ -35,23 +35,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Utilities
         /// <returns></returns>
         public static Texture2D GenerateTextureToEditting(Texture2D originTexture)
         {
-
-            // 書き込むために設定の変更が必要
-            // isReadable = true
-            // type = Default
-            // format = RGBA32
-            var assetPath = AssetDatabase.GetAssetPath(originTexture);
-            var importer = AssetImporter.GetAtPath(assetPath) as TextureImporter;
-            importer.isReadable = true;
-            importer.textureType = TextureImporterType.Default;
-            var setting = importer.GetDefaultPlatformTextureSettings();
-            setting.format = TextureImporterFormat.RGBA32;
-            importer.SetPlatformTextureSettings(setting);
-            AssetDatabase.ImportAsset(assetPath);
-            AssetDatabase.Refresh();
-
-            Texture2D editTexture = new Texture2D(originTexture.width, originTexture.height, TextureFormat.ARGB32, false);
-            editTexture.SetPixels(originTexture.GetPixels());
+            Texture2D editTexture = new Texture2D(originTexture.width, originTexture.height, originTexture.format, false);
+            Graphics.CopyTexture(originTexture, 0, 0, editTexture, 0, 0);
             editTexture.name = originTexture.name;
 
             editTexture.Apply();

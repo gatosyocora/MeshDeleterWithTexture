@@ -198,6 +198,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Utilities
 
         public static void SetMaterials(Renderer renderer, Material[] materials)
         {
+            if (renderer == null) return;
+
             if (renderer.sharedMaterials.Length != materials.Length)
             {
                 throw new Exception("renderer.sharedMaterials.Length is not equal to materials.Length");

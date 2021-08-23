@@ -13,7 +13,7 @@ using Gatosyocora.MeshDeleterWithTexture.Models;
  * see LICENSE.txt
  */
 
-// MeshDeleterWithTexture v0.6.2
+// MeshDeleterWithTexture v0.6.3
 
 namespace Gatosyocora.MeshDeleterWithTexture
 {
@@ -64,8 +64,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             using (var check = new EditorGUI.ChangeCheckScope())
             {
-                model.renderer = EditorGUILayout.ObjectField("Renderer", model.renderer, typeof(Renderer), true) as Renderer;
-                if (check.changed) model.OnChangeRenderer(canvasView);
+                var newRenderer = EditorGUILayout.ObjectField("Renderer", model.renderer, typeof(Renderer), true) as Renderer;
+                if (check.changed) model.OnChangeRenderer(canvasView, newRenderer);
             }
 
             using (new EditorGUILayout.HorizontalScope())
