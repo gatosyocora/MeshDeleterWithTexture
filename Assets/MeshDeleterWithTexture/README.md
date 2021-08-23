@@ -63,9 +63,25 @@
 消したいメッシュ部分のUVマップの線を隠すように塗りつぶすといい感じにできます。
 一部分のみ削除もできますが, 断面が綺麗にならないことが多いです。ご了承ください。
 
+## インストール方法
+いずれかの手順でインストールできます
+
+### 手順1 unitypackageを利用
+
+1. [GitHub](https://github.com/gatosyocora/MeshDeleterWithTexture/releases/latest)または[BOOTH](https://gatosyocora.booth.pm/items/1501527)で最新のバージョンのUnityPackageをダウンロードする
+2. MeshDeleterWithTexture_vx.x.x.unitypackageをUnityにドラッグ&ドロップでインストールする
+
+### 手順2 Unity Package Managerを利用
+
+1. Unity2019以降でのWindow > PackageManagerを開く
+2. 左上の+を選択し、`Add package from git URL...`を選択する
+3. 以下のURLを入力し、`Add`を選択する
+
+https://github.com/gatosyocora/MeshDeleterWithTexture.git?path=/Assets/MeshDeleterWithTexture
+
 ## アンインストール方法
 
-インストールしたUnityプロジェクトのAssetsフォルダの下にある「MeshDeleterWithTexture」のフォルダごと削除する
+インストールしたUnityプロジェクトのAssetsまたはPackagesフォルダの下にある「MeshDeleterWithTexture」のフォルダごと削除する
 
 ## 利用規約
 

@@ -63,9 +63,25 @@
 消したいメッシュ部分のUVマップの線を隠すように塗りつぶすといい感じにできます。
 一部分のみ削除もできますが, 断面が綺麗にならないことが多いです。ご了承ください。
 
+## インストール方法
+いずれかの手順でインストールできます
+
+### 手順1 unitypackageを利用
+
+1. [GitHub](https://github.com/gatosyocora/MeshDeleterWithTexture/releases/latest)または[BOOTH](https://gatosyocora.booth.pm/items/1501527)で最新のバージョンのUnityPackageをダウンロードする
+2. MeshDeleterWithTexture_vx.x.x.unitypackageをUnityにドラッグ&ドロップでインストールする
+
+### 手順2 Unity Package Managerを利用
+
+1. Unity2019以降でのWindow > PackageManagerを開く
+2. 左上の+を選択し、`Add package from git URL...`を選択する
+3. 以下のURLを入力し、`Add`を選択する
+
+https://github.com/gatosyocora/MeshDeleterWithTexture.git?path=/Assets/MeshDeleterWithTexture
+
 ## アンインストール方法
 
-インストールしたUnityプロジェクトのAssetsフォルダの下にある「MeshDeleterWithTexture」のフォルダごと削除する
+インストールしたUnityプロジェクトのAssetsまたはPackagesフォルダの下にある「MeshDeleterWithTexture」のフォルダごと削除する
 
 ## 利用規約
 
@@ -86,44 +102,7 @@ Unity 2018.4.20f1
 
 ## 更新履歴
 
-- v0.6.2
-  - 削除処理でポリゴン数が0になったSubMeshを削除
-  - プレビューでマテリアルを差し替えるように
-  - 削除を繰り返したときにMeshの名前が長くならないように対応
-- v0.6.1
-  - MeshRendererに対応
-  - 削除前のMeshに戻す機能を追加
-  - UVマップの線の色を変更できるように
-  - 削除処理をキャンセルできるように
-  - BuildTargetがAndroidの場合, 使えないことを示すメッセージを表示
-  - 拡大縮小とスクロール時にうまく更新できていなかった不具合を修正
-  - 削除処理の一部高速化
-- v0.6
-  - 塗りつぶし箇所を反転する機能を追加
-  - 塗りつぶしのUndo機能の追加
-  - ドラッグ&ドロップでDeleteMaskTextureを読み込めるように
-  - UIの調整
-- v0.5.2b
-  - VRChat/Mobile/ToonLit.shaderなど頂点カラーを使うシェーダーで削除後のメッシュが黒くなる不具合を修正
-- v0.5.1b
-  - 同じテクスチャや同じマテリアルが適用されているメッシュにも対応
-- v0.5b
-  - ペンカーソルを表示
-  - UVマップは表示されるように変更
-  - UVマップテクスチャを出力する機能を追加
-  - テクスチャを塗る機能をGPU処理に変更
-  - メッシュ削除処理を高速化
-- v0.4b
-  - 拡大縮小機能を追加
-  - マスク画像のエクスポート時にマテリアルからテクスチャが剥がれる不具合を修正
-  - ペン選択時に色が黒色にリセットされる不具合を修正
-  - UIを少し変更
-- v0.3b
-  - ポリゴン削除の方法を変更
-- v0.2b
-  - ペン色を追加（色は見えやすくするためで効果の違いはありません）
-  - 塗りつぶした箇所がSceneビューのアバターに反映されるように
-  - jpg形式もマスク画像として読み込めるように
+[CHANGELOG](./CHANGELOG.md)を確認してください
 
 ## 連絡先
 
