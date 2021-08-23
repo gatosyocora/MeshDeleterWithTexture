@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.3] - 2021-08-23
+### Added
+- Unity Package Managerに対応
+- CHANGELOG.mdを追加
+- アセンブリ定義ファイルを追加
+### Fixed
+- Mesh切り替え時に前のRendererに対してResetMaterialしていた不具合を修正
+- Meshを未選択状態に切り替えてもDrawAreaがリセットされていなかった不具合を修正
+
 ## [0.6.2] - 2021-05-05
 ### Changed
 - 削除処理でポリゴン数が0になったSubMeshを削除
@@ -79,7 +88,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - ツールを公開
 
-[Unreleased]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.6.2...HEAD
+[Unreleased]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.6.3...HEAD
+[0.6.3]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.6.1...v0.6.3
 [0.6.2]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.5.2...v0.6.0
