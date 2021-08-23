@@ -247,7 +247,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                 if (GUILayout.Button("Delete Mesh"))
                 {
-                    model.DeleteMesh(canvasView);
+                    model.OnDeleteMeshButtonClicked(canvasView);
                     GUIUtility.ExitGUI();
                 }
             }

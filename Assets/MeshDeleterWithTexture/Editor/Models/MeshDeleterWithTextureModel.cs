@@ -179,7 +179,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             Initialize(canvasView);
         }
 
-        public void DeleteMesh(CanvasView canvasView)
+        public void OnDeleteMeshButtonClicked(CanvasView canvasView)
         {
             ResetMaterialsToDefault(renderer);
 
