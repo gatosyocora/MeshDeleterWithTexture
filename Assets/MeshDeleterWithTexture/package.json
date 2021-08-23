@@ -1,6 +1,6 @@
 {
   "name": "com.gatosyocora.mesh-deleter-with-texture",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "displayName": "Mesh Deleter with Texture",
   "description": "Editor extension to remove polygons by filling texture",
   "unity": "2019.4",
