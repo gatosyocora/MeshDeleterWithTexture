@@ -12,7 +12,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
         public static (Mesh, bool[]) RemoveTriangles(Mesh mesh, bool[] deletePos, Vector2Int textureSize, List<int> materialIndexList, bool showProgressBar = true)
         {
             var deletedMesh = UnityEngine.Object.Instantiate(mesh);
-            var deletedSubMeshes = new bool[mesh.subMeshCount];
+            var hadDeletedSubMeshes = new bool[mesh.subMeshCount];
 
             deletedMesh.Clear();
             deletedMesh.MarkDynamic();
@@ -61,7 +61,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             deleteIndexsOrdered.Sort();
 
             // 削除する頂点がないので終了する
-            if (deleteIndexsOrdered.Count == 0) return (mesh, deletedSubMeshes);
+            if (deleteIndexsOrdered.Count == 0) return (mesh, hadDeletedSubMeshes);
 
             // 頂点を削除
             var nonDeleteVertices = mesh.vertices.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
@@ -145,7 +145,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 // ポリゴン数0のサブメッシュは追加しない
                 if (!triangleList.Any())
                 {
-                    deletedSubMeshes[subMeshIndex] = true;
+                    hadDeletedSubMeshes[subMeshIndex] = true;
                     continue;
                 }
 
@@ -154,7 +154,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             EditorUtility.ClearProgressBar();
 
-            if (deletedSubMeshes.Any(deletedSubMesh => deletedSubMesh == true))
+            if (hadDeletedSubMeshes.Any(deletedSubMesh => deletedSubMesh == true))
             {
                 // ポリゴン削除の結果, ポリゴン数0になったSubMeshは含めない
                 deletedMesh.subMeshCount = addSubMeshIndex;
@@ -186,7 +186,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     deltaNonDeleteTangentsList);
             }
 
-            return (deletedMesh, deletedSubMeshes);
+            return (deletedMesh, hadDeletedSubMeshes);
         }
 
     }

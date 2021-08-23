@@ -70,7 +70,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             var mesh = RendererUtility.GetMesh(renderer);
             var materials = renderer.sharedMaterials.ToArray();
             var textureSize = new Vector2Int(texture.width, texture.height);
-            var (deletedMesh, deletedSubMeshes) = MeshDeleter.RemoveTriangles(mesh, deletePos, textureSize, materialIndexList);
+            var (deletedMesh, hadDeletedSubMeshes) = MeshDeleter.RemoveTriangles(mesh, deletePos, textureSize, materialIndexList);
 
             if (meshName == "") meshName = mesh.name + "_deleteMesh";
             AssetDatabase.CreateAsset(deletedMesh, AssetDatabase.GenerateUniqueAssetPath(Path.Combine(saveFolder, $"{meshName}.asset")));
@@ -81,10 +81,10 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             previousMaterials = renderer.sharedMaterials;
             RendererUtility.SetMesh(renderer, deletedMesh);
 
-            if (deletedSubMeshes.Any(deletedSubMesh => deletedSubMesh == true))
+            if (hadDeletedSubMeshes.Any(deletedSubMesh => deletedSubMesh == true))
             {
                 // サブメッシュ削除によってマテリアルの対応を変更する必要がある
-                renderer.sharedMaterials = materials.Where((material, index) => !deletedSubMeshes[index]).ToArray();
+                renderer.sharedMaterials = materials.Where((material, index) => !hadDeletedSubMeshes[index]).ToArray();
                 return true;
             }
 
@@ -184,9 +184,9 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             ResetMaterialsToDefault(renderer);
 
             var deletePos = canvasView.GetDeleteData();
-            var deletedSubMesh = DeleteMesh(renderer, deletePos, matInfos[materialInfoIndex]);
+            var hadDeletedSubMesh = DeleteMesh(renderer, deletePos, matInfos[materialInfoIndex]);
 
-            Initialize(canvasView, deletedSubMesh);
+            Initialize(canvasView, hadDeletedSubMesh);
         }
 
         public void SelectFolder()
