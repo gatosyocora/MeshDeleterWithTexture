@@ -34,7 +34,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
         private void OnEnable()
         {
-            canvasView = new CanvasView();
+            canvasView = CreateInstance<CanvasView>();
             model = new MeshDeleterWithTextureModel();
         }
 

@@ -74,13 +74,13 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         public void OnEnable()
         {
             editMat = Resources.Load<Material>("TextureEditMat");
+            canvasModel = CreateInstance<CanvasModel>();
         }
 
         public CanvasView()
         {
             undo = new UndoCanvas();
             uvMap = new UVMapCanvas(ref editMat);
-            canvasModel = new CanvasModel();
 
             DrawType = DrawType.PEN;
             PenColor = Color.black;
