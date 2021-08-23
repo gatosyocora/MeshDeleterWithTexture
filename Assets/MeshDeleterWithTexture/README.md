@@ -81,7 +81,7 @@ https://github.com/gatosyocora/MeshDeleterWithTexture.git?path=/Assets/MeshDelet
 
 ## アンインストール方法
 
-インストールしたUnityプロジェクトのAssetsフォルダの下にある「MeshDeleterWithTexture」のフォルダごと削除する
+インストールしたUnityプロジェクトのAssetsまたはPackagesフォルダの下にある「MeshDeleterWithTexture」のフォルダごと削除する
 
 ## 利用規約
 
