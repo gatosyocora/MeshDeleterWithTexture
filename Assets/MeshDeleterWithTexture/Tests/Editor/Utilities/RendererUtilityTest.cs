@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-//using Gatosyocora.MeshDeleterWithTexture.Utilities;
+using Gatosyocora.MeshDeleterWithTexture.Utilities;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
@@ -69,88 +69,88 @@ namespace MeshDeleterWithTexture.Tests.Utilities
                     }));
         }
 
-        //[Test]
-        //public void GetMeshIsNotNull()
-        //{
-        //    Setup();
-        //    foreach (var model in models)
-        //    {
-        //        var mesh = RendererUtility.GetMesh(model.renderer);
-        //        Assert.IsNotNull(mesh);
-        //    }
-        //}
-        //[Test]
-        //public void GetMeshPathIsCorrect()
-        //{
-        //    Setup();
-        //    foreach (var model in models)
-        //    {
-        //        var mesh = RendererUtility.GetMesh(model.renderer);
-        //        var path = RendererUtility.GetMeshPath(mesh);
-        //        Assert.AreEqual(path, model.modelDataPath);
-        //    }
-        //}
-        //[Test]
-        //public void GetMeshTriangleCountIsCorrect()
-        //{
-        //    Setup();
-        //    foreach (var model in models)
-        //    {
-        //        var mesh = RendererUtility.GetMesh(model.renderer);
-        //        var triangleCount = RendererUtility.GetMeshTriangleCount(mesh);
-        //        Assert.AreEqual(triangleCount, model.rendererMeshTriangleCount);
-        //    }
-        //}
-        //[Test]
-        //public void GetMainTexturesNameIsCorrect()
-        //{
-        //    Setup();
-        //    foreach (var model in models)
-        //    {
-        //        var textures = RendererUtility.GetMainTextures(model.renderer);
-        //        Assert.AreEqual(textures.Length, model.textureNames.Length);
-        //        for (int i = 0; i < textures.Length; i++)
-        //        {
-        //            Assert.AreEqual(textures[i].name, model.textureNames[i]);
-        //        }
-        //    }
-        //}
-        //[Test]
-        //public void GetTextureNamesIsCorrect()
-        //{
-        //    Setup();
-        //    foreach (var model in models)
-        //    {
-        //        var textures = RendererUtility.GetMainTextures(model.renderer);
-        //        var textureNames = RendererUtility.GetTextureNames(textures);
-        //        Assert.AreEqual(textureNames.Length, model.textureNames.Length);
-        //        for (int i = 0; i < textures.Length; i++)
-        //        {
-        //            Assert.AreEqual(textureNames[i], model.textureNames[i]);
-        //        }
-        //    }
-        //}
-        //[Test]
-        //public void SetMeshIsCorrect()
-        //{
-        //    var mesh = new Mesh
-        //    {
-        //        name = "mesh2",
-        //        vertices = new Vector3[]
-        //        {
-        //            new Vector3(0, 0, 0),
-        //            new Vector3(0, 1, 0),
-        //            new Vector3(1, 0, 0)
-        //        },
-        //        triangles = new int[]{0, 1, 2}
-        //    };
+        [Test]
+        public void GetMeshIsNotNull()
+        {
+            Setup();
+            foreach (var model in models)
+            {
+                var mesh = RendererUtility.GetMesh(model.renderer);
+                Assert.IsNotNull(mesh);
+            }
+        }
+        [Test]
+        public void GetMeshPathIsCorrect()
+        {
+            Setup();
+            foreach (var model in models)
+            {
+                var mesh = RendererUtility.GetMesh(model.renderer);
+                var path = RendererUtility.GetMeshPath(mesh);
+                Assert.AreEqual(path, model.modelDataPath);
+            }
+        }
+        [Test]
+        public void GetMeshTriangleCountIsCorrect()
+        {
+            Setup();
+            foreach (var model in models)
+            {
+                var mesh = RendererUtility.GetMesh(model.renderer);
+                var triangleCount = RendererUtility.GetMeshTriangleCount(mesh);
+                Assert.AreEqual(triangleCount, model.rendererMeshTriangleCount);
+            }
+        }
+        [Test]
+        public void GetMainTexturesNameIsCorrect()
+        {
+            Setup();
+            foreach (var model in models)
+            {
+                var textures = RendererUtility.GetMainTextures(model.renderer);
+                Assert.AreEqual(textures.Length, model.textureNames.Length);
+                for (int i = 0; i < textures.Length; i++)
+                {
+                    Assert.AreEqual(textures[i].name, model.textureNames[i]);
+                }
+            }
+        }
+        [Test]
+        public void GetTextureNamesIsCorrect()
+        {
+            Setup();
+            foreach (var model in models)
+            {
+                var textures = RendererUtility.GetMainTextures(model.renderer);
+                var textureNames = RendererUtility.GetTextureNames(textures);
+                Assert.AreEqual(textureNames.Length, model.textureNames.Length);
+                for (int i = 0; i < textures.Length; i++)
+                {
+                    Assert.AreEqual(textureNames[i], model.textureNames[i]);
+                }
+            }
+        }
+        [Test]
+        public void SetMeshIsCorrect()
+        {
+            var mesh = new Mesh
+            {
+                name = "mesh2",
+                vertices = new Vector3[]
+                {
+                    new Vector3(0, 0, 0),
+                    new Vector3(0, 1, 0),
+                    new Vector3(1, 0, 0)
+                },
+                triangles = new int[]{0, 1, 2}
+            };
 
-        //    Setup();
-        //    foreach (var model in models)
-        //    {
-        //        RendererUtility.SetMesh(model.renderer, mesh);
-        //        Assert.AreEqual(model.renderer.sharedMesh, mesh);
-        //    }
-        //}
+            Setup();
+            foreach (var model in models)
+            {
+                RendererUtility.SetMesh(model.renderer, mesh);
+                Assert.AreEqual(model.renderer.sharedMesh, mesh);
+            }
+        }
     }
 }
