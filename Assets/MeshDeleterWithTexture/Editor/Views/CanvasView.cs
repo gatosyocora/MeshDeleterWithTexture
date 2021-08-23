@@ -75,10 +75,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         {
             editMat = Resources.Load<Material>("TextureEditMat");
             canvasModel = CreateInstance<CanvasModel>();
-        }
-
-        public CanvasView()
-        {
             undo = new UndoCanvas();
             uvMap = new UVMapCanvas(ref editMat);
 
