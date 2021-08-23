@@ -116,6 +116,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
                 ResetMaterialsToDefault(renderer);
 
             renderer = newRenderer;
+            previousMesh = null;
 
             if (newRenderer != null)
             {
@@ -130,9 +131,11 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
                     return;
                 }
 
-                previousMesh = null;
-
                 Initialize(canvasView);
+            } 
+            else
+            {
+                canvasView.InitializeDrawArea();
             }
         }
 

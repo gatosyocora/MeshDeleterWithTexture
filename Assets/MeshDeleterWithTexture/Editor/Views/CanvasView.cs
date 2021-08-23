@@ -221,6 +221,15 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             ResetScrollOffsetAndZoomScale();
         }
 
+        public void InitializeDrawArea()
+        {
+            this.materialInfo = null;
+            editTexture = null;
+            textureSize = Vector2Int.zero;
+            uvMap.SetUVMapTexture(null, null);
+            ResetScrollOffsetAndZoomScale();
+        }
+
         /// <summary>
         /// 描画エリアをリセットする
         /// </summary>
