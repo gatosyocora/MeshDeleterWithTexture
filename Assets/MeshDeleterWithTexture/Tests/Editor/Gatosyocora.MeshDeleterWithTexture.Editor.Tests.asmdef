@@ -1,0 +1,20 @@
+{
+    "name": "Gatosyocora.MeshDeleterWithTexture.Editor.Tests",
+    "references": [
+        "GUID:ec7b69ab392f3db409cfd1430c21f007"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [
+        "",
+        ""
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
