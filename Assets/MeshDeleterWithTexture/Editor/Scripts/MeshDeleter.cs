@@ -154,7 +154,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             EditorUtility.ClearProgressBar();
 
-            if (deletedSubMeshes.Any())
+            if (deletedSubMeshes.Any(deletedSubMesh => deletedSubMesh == true))
             {
                 // ポリゴン削除の結果, ポリゴン数0になったSubMeshは含めない
                 deletedMesh.subMeshCount = addSubMeshIndex;

@@ -81,7 +81,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             previousMaterials = renderer.sharedMaterials;
             RendererUtility.SetMesh(renderer, deletedMesh);
 
-            if (deletedSubMeshes.Any())
+            if (deletedSubMeshes.Any(deletedSubMesh => deletedSubMesh == true))
             {
                 // サブメッシュ削除によってマテリアルの対応を変更する必要がある
                 renderer.sharedMaterials = materials.Where((material, index) => !deletedSubMeshes[index]).ToArray();
