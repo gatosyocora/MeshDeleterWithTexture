@@ -28,6 +28,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
         private LocalizedText localizedText;
 
+        private string[] drawTypeTexts;
+
         [MenuItem("GatoTool/MeshDeleter with Texture")]
         private static void Open()
         {
@@ -39,6 +41,10 @@ namespace Gatosyocora.MeshDeleterWithTexture
             canvasView = CreateInstance<CanvasView>();
             model = new MeshDeleterWithTextureModel();
             LocalizedText.SetLanguage(Language.EN);
+            drawTypeTexts = new string[] {
+                LocalizedText.Data.penToolNameText,
+                LocalizedText.Data.eraserToolNameText
+            };
         }
 
         private void OnDisable()
@@ -165,7 +171,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 using (var check = new EditorGUI.ChangeCheckScope())
                 using (new EditorGUILayout.HorizontalScope())
                 {
-                    var drawType = (DrawType)GUILayout.Toolbar((int)canvasView.DrawType, Enum.GetNames(typeof(DrawType)));
+                    var drawType = (DrawType)GUILayout.Toolbar((int)canvasView.DrawType, drawTypeTexts);
                     if (check.changed) canvasView.DrawType = drawType;
                 }
 
