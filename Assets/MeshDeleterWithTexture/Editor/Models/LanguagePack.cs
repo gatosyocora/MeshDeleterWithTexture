@@ -7,7 +7,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
     [CreateAssetMenu(menuName = "MeshDeleterWithTexture/LanguagePack")]
     public class LanguagePack : ScriptableObject
     {
-        public string language = "EN";
+        public Language language = Language.EN;
 
         public string rendererLabelText = "Renderer";
 

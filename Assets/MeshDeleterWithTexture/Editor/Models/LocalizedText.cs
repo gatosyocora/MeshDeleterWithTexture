@@ -6,7 +6,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
 {
     public class LocalizedText
     {
-        public Dictionary<string, LanguagePack> Languages { get; private set; } 
+        public Dictionary<Language, LanguagePack> Languages { get; private set; } 
 
         public LocalizedText()
         {
