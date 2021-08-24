@@ -21,6 +21,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         public string uvMapLineColorLabelText = "UVMap LineColor";
         public string exportUvMapButtonText = "Export UVMap";
 
+        public string textureLabelText = "Texture (Material)";
+
         public string toolsTitleText = "Tools";
         public string drawTypeLabelText = "DrawType";
         public string penToolNameText = "PEN";
@@ -32,6 +34,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         public string colorBrueButtonText = "B";
         public string penEraserSizeLabelText = "Pen/Eraser size";
         public string inverseFillAreaButtonText = "Inverse FillArea";
+        public string clearAllDrawingButtonText = "Clear All Drawing";
         public string undoDrawingButtonText = "Undo Drawing";
 
         public string modelInformationTitleText = "Model Information";
@@ -46,5 +49,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         public string revertMeshToPreviouslyButtonText = "Revert Mesh to previously";
 
         public string deleteMeshButtonText = "Delete Mesh";
+
+        public string androidNotSupportMessageText = "Can't use with BuildTarget 'Android'.\nPlease switch BuildTarget to PC";
     }
 }
