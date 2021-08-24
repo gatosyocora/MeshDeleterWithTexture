@@ -7,19 +7,19 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
 {
     public class LocalizedText
     {
-        public static LanguagePack Data;
+        public LanguagePack Data;
 
-        public static Language selectedLanguage;
+        public Language selectedLanguage;
 
         private const string LOCAL_DATA_KEY = "mesh_deleter_language";
 
-        public static void Initialize()
+        public LocalizedText()
         {
             selectedLanguage = LoadLanguage();
             SetLanguage(selectedLanguage);
         }
 
-        public static void SetLanguage(Language language)
+        public void SetLanguage(Language language)
         {
             var packs = Resources.FindObjectsOfTypeAll<LanguagePack>();
             Data = packs.Single(pack => pack.language == language);
@@ -27,7 +27,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             SaveLanguage();
         }
 
-        private static Language LoadLanguage()
+        private Language LoadLanguage()
         {
             var languageString = EditorUserSettings.GetConfigValue(LOCAL_DATA_KEY);
             if (string.IsNullOrEmpty(languageString))
@@ -45,7 +45,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             }
         }
 
-        private static void SaveLanguage()
+        private void SaveLanguage()
         {
             EditorUserSettings.SetConfigValue(LOCAL_DATA_KEY, selectedLanguage.ToString());
         }

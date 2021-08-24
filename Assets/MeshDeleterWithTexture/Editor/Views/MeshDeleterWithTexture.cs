@@ -26,6 +26,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
         private MeshDeleterWithTextureModel model;
 
+        private LocalizedText localizedText;
+
         private string[] drawTypeTexts;
 
         [MenuItem("GatoTool/MeshDeleter with Texture")]
@@ -38,8 +40,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
         {
             canvasView = CreateInstance<CanvasView>();
             model = new MeshDeleterWithTextureModel();
-            LocalizedText.Initialize();
-            ChangeLanguage(LocalizedText.selectedLanguage);
+            localizedText = new LocalizedText();
+            ChangeLanguage(localizedText.selectedLanguage);
         }
 
         private void OnDisable()
@@ -70,7 +72,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             {
                 using (var check = new EditorGUI.ChangeCheckScope())
                 {
-                    var newRenderer = EditorGUILayout.ObjectField(LocalizedText.Data.rendererLabelText, model.renderer, typeof(Renderer), true) as Renderer;
+                    var newRenderer = EditorGUILayout.ObjectField(localizedText.Data.rendererLabelText, model.renderer, typeof(Renderer), true) as Renderer;
                     if (check.changed) model.OnChangeRenderer(canvasView, newRenderer);
                 }
 
@@ -78,7 +80,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                 using (var check = new EditorGUI.ChangeCheckScope())
                 {
-                    var selectLanguage = (Language)EditorGUILayout.EnumPopup(LocalizedText.selectedLanguage, GUILayout.Width(50));
+                    var selectLanguage = (Language)EditorGUILayout.EnumPopup(localizedText.selectedLanguage, GUILayout.Width(50));
                     if (check.changed) OnLanguagePopupChanged(selectLanguage);
                 }
             }
@@ -99,10 +101,10 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     using (new EditorGUILayout.HorizontalScope())
                     using (var check = new EditorGUI.ChangeCheckScope())
                     {
-                        var zoomScale = EditorGUILayout.Slider(LocalizedText.Data.scaleLabelText, canvasView.ZoomScale, 0.1f, 1.0f);
+                        var zoomScale = EditorGUILayout.Slider(localizedText.Data.scaleLabelText, canvasView.ZoomScale, 0.1f, 1.0f);
                         if (check.changed) canvasView.ZoomScale = zoomScale;
 
-                        if (GUILayout.Button(LocalizedText.Data.resetButtonText))
+                        if (GUILayout.Button(localizedText.Data.resetButtonText))
                         {
                             canvasView.ResetScrollOffsetAndZoomScale();
                         }
@@ -126,11 +128,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
             {
                 using (new EditorGUILayout.HorizontalScope())
                 {
-                    if (GUILayout.Button(LocalizedText.Data.importDeleteMaskButtonText))
+                    if (GUILayout.Button(localizedText.Data.importDeleteMaskButtonText))
                     {
                         canvasView.deleteMask.ImportDeleteMaskTexture();
                     }
-                    if (GUILayout.Button(LocalizedText.Data.exportDeleteMaskButtonText))
+                    if (GUILayout.Button(localizedText.Data.exportDeleteMaskButtonText))
                     {
                         canvasView.deleteMask.ExportDeleteMaskTexture();
                         model.SetPreviewTextureToMaterial(ref canvasView.previewTexture);
@@ -141,7 +143,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                 using (var check = new EditorGUI.ChangeCheckScope())
                 {
-                    var path = GatoGUILayout.DragAndDropableArea(LocalizedText.Data.dragAndDropDeleteMaskTextureAreaText, deleteMaskTextureExtensions);
+                    var path = GatoGUILayout.DragAndDropableArea(localizedText.Data.dragAndDropDeleteMaskTextureAreaText, deleteMaskTextureExtensions);
                     if (check.changed) canvasView.deleteMask.ApplyDeleteMaskTextureToBuffer(path);
                 }
 
@@ -151,11 +153,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 {
                     using (var check = new EditorGUI.ChangeCheckScope())
                     {
-                        var uvMapLineColor = EditorGUILayout.ColorField(LocalizedText.Data.uvMapLineColorLabelText, canvasView.uvMap.uvMapLineColor);
+                        var uvMapLineColor = EditorGUILayout.ColorField(localizedText.Data.uvMapLineColorLabelText, canvasView.uvMap.uvMapLineColor);
                         if (check.changed) canvasView.uvMap.SetUVMapLineColor(uvMapLineColor);
                     }
 
-                    if (GUILayout.Button(LocalizedText.Data.exportUvMapButtonText))
+                    if (GUILayout.Button(localizedText.Data.exportUvMapButtonText))
                     {
                         canvasView.uvMap.ExportUVMapTexture();
                     }
@@ -166,16 +168,16 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 using (var check = new EditorGUI.ChangeCheckScope())
                 {
                     if (model.HasMaterials())
-                        model.materialInfoIndex = EditorGUILayout.Popup(LocalizedText.Data.textureLabelText, model.materialInfoIndex, model.textureNames);
+                        model.materialInfoIndex = EditorGUILayout.Popup(localizedText.Data.textureLabelText, model.materialInfoIndex, model.textureNames);
 
                     if (check.changed) model.OnChangeMaterial(canvasView);
                 }
 
                 EditorGUILayout.Space();
 
-                EditorGUILayout.LabelField(LocalizedText.Data.toolsTitleText, EditorStyles.boldLabel);
+                EditorGUILayout.LabelField(localizedText.Data.toolsTitleText, EditorStyles.boldLabel);
 
-                EditorGUILayout.LabelField(LocalizedText.Data.drawTypeLabelText);
+                EditorGUILayout.LabelField(localizedText.Data.drawTypeLabelText);
                 using (var check = new EditorGUI.ChangeCheckScope())
                 using (new EditorGUILayout.HorizontalScope())
                 {
@@ -193,13 +195,13 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 {
                     GUILayout.FlexibleSpace();
 
-                    if (GUILayout.Button(LocalizedText.Data.inverseFillAreaButtonText))
+                    if (GUILayout.Button(localizedText.Data.inverseFillAreaButtonText))
                     {
                         canvasView.RegisterUndoTexture();
                         canvasView.InverseFillArea();
                     }
 
-                    if (GUILayout.Button(LocalizedText.Data.clearAllDrawingButtonText))
+                    if (GUILayout.Button(localizedText.Data.clearAllDrawingButtonText))
                     {
                         canvasView.RegisterUndoTexture();
 
@@ -212,7 +214,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     {
                         GUILayout.FlexibleSpace();
 
-                        if (GUILayout.Button(LocalizedText.Data.undoDrawingButtonText))
+                        if (GUILayout.Button(localizedText.Data.undoDrawingButtonText))
                         {
                             canvasView.UndoPreviewTexture();
                         }
@@ -222,10 +224,10 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                 GUILayout.Space(20);
 
-                EditorGUILayout.LabelField(LocalizedText.Data.modelInformationTitleText, EditorStyles.boldLabel);
+                EditorGUILayout.LabelField(localizedText.Data.modelInformationTitleText, EditorStyles.boldLabel);
                 using (new EditorGUI.IndentLevelScope())
                 {
-                    EditorGUILayout.LabelField(LocalizedText.Data.triangleCountLabelText, model.triangleCount + "");
+                    EditorGUILayout.LabelField(localizedText.Data.triangleCountLabelText, model.triangleCount + "");
                 }
 
                 GUILayout.Space(20);
@@ -239,7 +241,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 {
                     GUILayout.FlexibleSpace();
 
-                    if (GUILayout.Button(LocalizedText.Data.revertMeshToPrefabButtonText))
+                    if (GUILayout.Button(localizedText.Data.revertMeshToPrefabButtonText))
                     {
                         model.RevertMeshToPrefab(canvasView);
                     }
@@ -253,7 +255,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                     using (new EditorGUI.DisabledGroupScope(!model.HasPreviousMesh()))
                     {
-                        if (GUILayout.Button(LocalizedText.Data.revertMeshToPreviouslyButtonText))
+                        if (GUILayout.Button(localizedText.Data.revertMeshToPreviouslyButtonText))
                         {
                             model.RevertMeshToPreviously(canvasView);
                         }
@@ -262,7 +264,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                 EditorGUILayout.Space();
 
-                if (GUILayout.Button(LocalizedText.Data.deleteMeshButtonText))
+                if (GUILayout.Button(localizedText.Data.deleteMeshButtonText))
                 {
                     model.OnDeleteMeshButtonClicked(canvasView);
                     GUIUtility.ExitGUI();
@@ -275,21 +277,21 @@ namespace Gatosyocora.MeshDeleterWithTexture
             using (new EditorGUI.DisabledGroupScope(!model.HasTexture()))
             using (new EditorGUILayout.HorizontalScope())
             {
-                EditorGUILayout.LabelField(LocalizedText.Data.penColorLabelText);
+                EditorGUILayout.LabelField(localizedText.Data.penColorLabelText);
 
-                if (GUILayout.Button(LocalizedText.Data.colorBlackButtonText))
+                if (GUILayout.Button(localizedText.Data.colorBlackButtonText))
                 {
                     canvasView.PenColor = Color.black;
                 }
-                if (GUILayout.Button(LocalizedText.Data.colorRedButtonText))
+                if (GUILayout.Button(localizedText.Data.colorRedButtonText))
                 {
                     canvasView.PenColor = Color.red;
                 }
-                if (GUILayout.Button(LocalizedText.Data.colorGreenButtonText))
+                if (GUILayout.Button(localizedText.Data.colorGreenButtonText))
                 {
                     canvasView.PenColor = Color.green;
                 }
-                if (GUILayout.Button(LocalizedText.Data.colorBlueButtonText))
+                if (GUILayout.Button(localizedText.Data.colorBlueButtonText))
                 {
                     canvasView.PenColor = Color.blue;
                 }
@@ -309,7 +311,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             using (var check = new EditorGUI.ChangeCheckScope())
             {
                 var penSize = EditorGUILayout.IntSlider(
-                                LocalizedText.Data.penEraserSizeLabelText,
+                                localizedText.Data.penEraserSizeLabelText,
                                 canvasView.PenSize,
                                 1,
                                 !model.HasTexture() ? 100 : model.Texture.width / 20);
@@ -323,20 +325,20 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
         private void OutputMeshGUI()
         {
-            EditorGUILayout.LabelField(LocalizedText.Data.outputMeshTitleText, EditorStyles.boldLabel);
+            EditorGUILayout.LabelField(localizedText.Data.outputMeshTitleText, EditorStyles.boldLabel);
             using (new EditorGUI.IndentLevelScope())
             {
                 using (new EditorGUILayout.HorizontalScope())
                 {
-                    EditorGUILayout.LabelField(LocalizedText.Data.saveFolderLabelText, model.saveFolder);
+                    EditorGUILayout.LabelField(localizedText.Data.saveFolderLabelText, model.saveFolder);
 
-                    if (GUILayout.Button(LocalizedText.Data.selectFolderButtonText, GUILayout.Width(100)))
+                    if (GUILayout.Button(localizedText.Data.selectFolderButtonText, GUILayout.Width(100)))
                     {
                         model.SelectFolder();
                     }
                 }
 
-                model.meshName = EditorGUILayout.TextField(LocalizedText.Data.outputFileNameLabelText, model.meshName);
+                model.meshName = EditorGUILayout.TextField(localizedText.Data.outputFileNameLabelText, model.meshName);
             }
         }
 
@@ -346,7 +348,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             using (new EditorGUILayout.HorizontalScope())
             {
                 GUILayout.FlexibleSpace();
-                GUILayout.Label(LocalizedText.Data.androidNotSupportMessageText);
+                GUILayout.Label(localizedText.Data.androidNotSupportMessageText);
                 GUILayout.FlexibleSpace();
             }
             GUILayout.FlexibleSpace();
@@ -359,10 +361,10 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
         private void ChangeLanguage(Language language)
         {
-            LocalizedText.SetLanguage(language);
+            localizedText.SetLanguage(language);
             drawTypeTexts = new string[] {
-                LocalizedText.Data.penToolNameText,
-                LocalizedText.Data.eraserToolNameText
+                localizedText.Data.penToolNameText,
+                localizedText.Data.eraserToolNameText
             };
         }
     }
