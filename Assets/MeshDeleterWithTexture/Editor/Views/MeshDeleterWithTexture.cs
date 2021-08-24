@@ -41,7 +41,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             canvasView = CreateInstance<CanvasView>();
             model = new MeshDeleterWithTextureModel();
             localizedText = new LocalizedText();
-            ChangeLanguage(localizedText.selectedLanguage);
+            ChangeLanguage(localizedText.SelectedLanguage);
         }
 
         private void OnDisable()
@@ -80,7 +80,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                 using (var check = new EditorGUI.ChangeCheckScope())
                 {
-                    var selectLanguage = (Language)EditorGUILayout.EnumPopup(localizedText.selectedLanguage, GUILayout.Width(50));
+                    var selectLanguage = (Language)EditorGUILayout.EnumPopup(localizedText.SelectedLanguage, GUILayout.Width(50));
                     if (check.changed) OnLanguagePopupChanged(selectLanguage);
                 }
             }
