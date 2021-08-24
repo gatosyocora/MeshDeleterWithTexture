@@ -1,0 +1,50 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace Gatosyocora.MeshDeleterWithTexture.Models
+{
+    [CreateAssetMenu(menuName = "MeshDeleterWithTexture/LanguagePack")]
+    public class LanguagePack : ScriptableObject
+    {
+        public string language = "EN";
+
+        public string rendererLabelText = "Renderer";
+
+        public string scaleLabelText = "Scale";
+        public string resetButtonText = "Reset";
+
+        public string importDeleteMaskButtonText = "Import DeleteMask";
+        public string exportDeleteMaskButtonText = "Export DeleteMask";
+        public string dragAndDropDeleteMaskTextureAreaText = "Drag & Drop DeleteMaskTexture";
+
+        public string uvMapLineColorLabelText = "UVMap LineColor";
+        public string exportUvMapButtonText = "Export UVMap";
+
+        public string toolsTitleText = "Tools";
+        public string drawTypeLabelText = "DrawType";
+        public string penToolNameText = "PEN";
+        public string eraserToolNameText = "ERASER";
+        public string penColorLabelText = "PenColor";
+        public string colorBlackButtonText = "Black";
+        public string colorRedButtonText = "R";
+        public string colorGreenButtonText = "G";
+        public string colorBrueButtonText = "B";
+        public string penEraserSizeLabelText = "Pen/Eraser size";
+        public string inverseFillAreaButtonText = "Inverse FillArea";
+        public string undoDrawingButtonText = "Undo Drawing";
+
+        public string modelInformationTitleText = "Model Information";
+        public string triangleCountLabelText = "Triangle Count";
+
+        public string outputMeshTitleText = "Output Mesh";
+        public string saveFolderLabelText = "SaveFolder";
+        public string selectFolderButtonText = "Select Folder";
+        public string outputFileNameLabelText = "Name";
+
+        public string revertMeshToPrefabButtonText = "Revert Mesh to Prefab";
+        public string revertMeshToPreviouslyButtonText = "Revert Mesh to previously";
+
+        public string deleteMeshButtonText = "Delete Mesh";
+    }
+}
