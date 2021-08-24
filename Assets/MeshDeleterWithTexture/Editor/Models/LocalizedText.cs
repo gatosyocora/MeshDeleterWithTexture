@@ -1,17 +1,16 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using UnityEngine;
 
 namespace Gatosyocora.MeshDeleterWithTexture.Models
 {
     public class LocalizedText
     {
-        public Dictionary<Language, LanguagePack> Languages { get; private set; } 
+        public static LanguagePack Data;
 
-        public LocalizedText()
+        public static void SetLanguage(Language language)
         {
             var packs = Resources.FindObjectsOfTypeAll<LanguagePack>();
-            Languages = packs.ToDictionary(pack => pack.language);
+            Data = packs.Single(pack => pack.language == language);
         }
     }
 }
