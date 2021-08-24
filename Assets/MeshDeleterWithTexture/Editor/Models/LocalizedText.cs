@@ -29,11 +29,25 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
 
         private static Language LoadLanguage()
         {
+            var languageString = EditorUserSettings.GetConfigValue(LOCAL_DATA_KEY);
+            if (string.IsNullOrEmpty(languageString))
+            {
                 return Language.EN;
+            }
+
+            var obj = Enum.Parse(typeof(Language), languageString);
+            if (obj != null)
+            {
+                return (Language)obj;
+            } else
+            {
+                return Language.EN;
+            }
         }
 
         private static void SaveLanguage()
         {
+            EditorUserSettings.SetConfigValue(LOCAL_DATA_KEY, selectedLanguage.ToString());
         }
     }
 }
