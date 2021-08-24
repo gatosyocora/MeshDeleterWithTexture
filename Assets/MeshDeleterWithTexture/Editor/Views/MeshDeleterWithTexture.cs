@@ -27,6 +27,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
         private MeshDeleterWithTextureModel model;
 
         private LocalizedText localizedText;
+        private Language selectLanguage = Language.EN;
 
         private string[] drawTypeTexts;
 
@@ -40,11 +41,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
         {
             canvasView = CreateInstance<CanvasView>();
             model = new MeshDeleterWithTextureModel();
-            LocalizedText.SetLanguage(Language.EN);
-            drawTypeTexts = new string[] {
-                LocalizedText.Data.penToolNameText,
-                LocalizedText.Data.eraserToolNameText
-            };
+            ChangeLanguage(selectLanguage);
         }
 
         private void OnDisable()
@@ -71,11 +68,24 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 return;
             }
 
-            using (var check = new EditorGUI.ChangeCheckScope())
+            using (new EditorGUILayout.HorizontalScope())
             {
-                var newRenderer = EditorGUILayout.ObjectField(LocalizedText.Data.rendererLabelText, model.renderer, typeof(Renderer), true) as Renderer;
-                if (check.changed) model.OnChangeRenderer(canvasView, newRenderer);
+                using (var check = new EditorGUI.ChangeCheckScope())
+                {
+                    var newRenderer = EditorGUILayout.ObjectField(LocalizedText.Data.rendererLabelText, model.renderer, typeof(Renderer), true) as Renderer;
+                    if (check.changed) model.OnChangeRenderer(canvasView, newRenderer);
+                }
+
+                EditorGUILayout.Space();
+
+                using (var check = new EditorGUI.ChangeCheckScope())
+                {
+                    selectLanguage = (Language)EditorGUILayout.EnumPopup(selectLanguage, GUILayout.Width(50));
+                    if (check.changed) OnLanguagePopupChanged(selectLanguage);
+                }
             }
+
+            EditorGUILayout.Space(20);
 
             using (new EditorGUILayout.HorizontalScope())
             {
@@ -342,6 +352,21 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 GUILayout.FlexibleSpace();
             }
             GUILayout.FlexibleSpace();
+        }
+
+        private void OnLanguagePopupChanged(Language language)
+        {
+            ChangeLanguage(language);
+        }
+
+        private void ChangeLanguage(Language language)
+        {
+            selectLanguage = language;
+            LocalizedText.SetLanguage(selectLanguage);
+            drawTypeTexts = new string[] {
+                LocalizedText.Data.penToolNameText,
+                LocalizedText.Data.eraserToolNameText
+            };
         }
     }
 #endif
