@@ -198,6 +198,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         }
 
         public bool HasTexture() => matInfos != null &&
+                                    matInfos.Length > 0 &&
                                     materialInfoIndex >= 0 && 
                                     matInfos[materialInfoIndex] != null && 
                                     matInfos[materialInfoIndex].Texture != null;
