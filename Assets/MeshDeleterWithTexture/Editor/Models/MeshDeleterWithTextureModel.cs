@@ -47,6 +47,9 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
                 materialInfoIndex = 0;
             }
 
+            // TODO: SubMeshが1つのときに最後のSubMeshを消すとここにたどり着いて、後者がOutOfRangeでエラーを吐く
+            // Failedじゃなくて最後のメッシュ削除でここに入る可能性がある
+            // sharedMaterialsがなく、ポリゴン0のMeshがついたRendererだがどうするのか
             if (matInfos == null || matInfos.Length <= 0 || matInfos[materialInfoIndex] == null)
             {
                 throw new NullReferenceException("Failed to load Material");
