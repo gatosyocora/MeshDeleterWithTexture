@@ -47,7 +47,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
                 materialInfoIndex = 0;
             }
 
-            if (matInfos == null || matInfos[materialInfoIndex] == null)
+            if (matInfos == null || matInfos.Length <= 0 || matInfos[materialInfoIndex] == null)
             {
                 throw new NullReferenceException("Failed to load Material");
             }
