@@ -18,23 +18,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             deletedMesh.MarkDynamic();
 
             // 削除する頂点のリストを取得
-            var uvs = mesh.uv.ToList();
-            List<int> deleteIndexList = new List<int>();
-
-            for (int i = 0; i < uvs.Count(); i++)
-            {
-                var x = (int)(Mathf.Abs(uvs[i].x % 1.0f) * textureSize.x);
-                var y = (int)(Mathf.Abs(uvs[i].y % 1.0f) * textureSize.y);
-
-                if (x == textureSize.x || y == textureSize.y) continue;
-
-                int index = y * textureSize.x + x;
-
-                if (deletePos[index])
-                {
-                    deleteIndexList.Add(i);
-                }
-            }
+            var deleteIndexList = GetDeleteVertexIndices(mesh.uv.ToList(), deletePos, textureSize);
 
             // TODO: 共有されている頂点は存在しない？
             // これがないと他のサブメッシュのポリゴンも削除された
@@ -187,6 +171,28 @@ namespace Gatosyocora.MeshDeleterWithTexture
             }
 
             return (deletedMesh, hadDeletedSubMeshes);
+        }
+
+        private static List<int> GetDeleteVertexIndices(List<Vector2> uvs, bool[] deletePos, Vector2Int textureSize)
+        {
+            var deleteIndexList = new List<int>();
+
+            for (int i = 0; i < uvs.Count(); i++)
+            {
+                var x = (int)(Mathf.Abs(uvs[i].x % 1.0f) * textureSize.x);
+                var y = (int)(Mathf.Abs(uvs[i].y % 1.0f) * textureSize.y);
+
+                if (x == textureSize.x || y == textureSize.y) continue;
+
+                int index = y * textureSize.x + x;
+
+                if (deletePos[index])
+                {
+                    deleteIndexList.Add(i);
+                }
+            }
+
+            return deleteIndexList;
         }
 
     }
