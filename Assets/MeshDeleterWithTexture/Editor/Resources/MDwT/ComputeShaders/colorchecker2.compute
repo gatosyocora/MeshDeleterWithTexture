@@ -1,0 +1,47 @@
+﻿#pragma kernel CSPen
+#pragma kernel CSEraser
+
+Texture2D<float4> Tex;
+RWStructuredBuffer<int> Result;
+RWTexture2D<float4> PreviewTex;
+
+int Width;
+int Height;
+int Pos[2];
+
+float4 PenColor;
+int PenSize;
+
+[numthreads(32,32,1)]
+void CSPen (uint2 id : SV_DispatchThreadID)
+{
+	bool result;
+	
+	int index = id.y * Width + id.x;
+
+	int2 currentPos = int2(Pos[0], Pos[1]);
+	result = (distance(currentPos, id) <= PenSize);
+		
+	if (!result) return;
+
+	PreviewTex[id.xy] = PenColor;
+	Result[index] = true;
+}
+
+[numthreads(32,32,1)]
+void CSEraser (uint2 id : SV_DispatchThreadID)
+{
+	bool result;
+	
+	int index = id.y * Width + id.x;
+
+	int2 currentPos = int2(Pos[0], Pos[1]);
+	result = (distance(currentPos, id) <= PenSize);
+		
+	if (!result) return;
+
+	PreviewTex[id.xy] = Tex[id.xy];
+	Result[index] = false;
+}
+
+        
