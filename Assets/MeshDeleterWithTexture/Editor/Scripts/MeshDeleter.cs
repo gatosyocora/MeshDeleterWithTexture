@@ -70,7 +70,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             var nonDeleteTangents = mesh.tangents.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
             var nonDeleteColors = mesh.colors.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
             var nonDeleteColor32s = mesh.colors32.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
-            var nonDeleteUVs = uvs.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
+            var nonDeleteUVs = mesh.uv.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
             var nonDeleteUV2s = mesh.uv2.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
             var nonDeleteUV3s = mesh.uv3.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
             var nonDeleteUV4s = mesh.uv4.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToList();
