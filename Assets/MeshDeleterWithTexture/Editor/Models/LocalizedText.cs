@@ -21,7 +21,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
 
         public void SetLanguage(Language language)
         {
-            var packs = Resources.FindObjectsOfTypeAll<LanguagePack>();
+            var packs = AssetRepository.LoadLanguagePacks();
             Data = packs.Single(pack => pack.language == language);
             SelectedLanguage = language;
             SaveLanguage();

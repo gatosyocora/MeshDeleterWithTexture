@@ -1,4 +1,5 @@
-﻿using Gatosyocora.MeshDeleterWithTexture.Utilities;
+﻿using Gatosyocora.MeshDeleterWithTexture.Models;
+using Gatosyocora.MeshDeleterWithTexture.Utilities;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -66,7 +67,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 uvs[i] = new Vector2(Mathf.Repeat(uvs[i].x, 1.0f), Mathf.Repeat(uvs[i].y, 1.0f));
             }
 
-            ComputeShader cs = Object.Instantiate(Resources.Load<ComputeShader>("getUVMap"));
+            ComputeShader cs = Object.Instantiate(AssetRepository.LoadCreateUVMapComputeShader());
             int kernel = cs.FindKernel("CSMain");
 
             var uvMapRT = new RenderTexture(texture.width, texture.height, 0, RenderTextureFormat.ARGB32)

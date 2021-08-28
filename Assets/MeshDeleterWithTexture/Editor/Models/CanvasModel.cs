@@ -13,7 +13,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
 
         public void OnEnable()
         {
-            computeShader = Instantiate(Resources.Load<ComputeShader>("colorchecker2"));
+            computeShader = Instantiate(AssetRepository.LoadDrawComputeShader());
             penKernelId = computeShader.FindKernel("CSPen");
             eraserKernelId = computeShader.FindKernel("CSEraser");
         }
