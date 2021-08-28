@@ -5,7 +5,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
     public static class AssetRepository
     {
         public static Material LoadTextureEditMaterial()
-            => Resources.Load<Material>("TextureEditMat");
+            => new Material(Shader.Find("Unlit/TextureEdit"));
 
         public static ComputeShader LoadDrawComputeShader()
             => Resources.Load<ComputeShader>("colorchecker2");
