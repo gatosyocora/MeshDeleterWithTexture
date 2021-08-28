@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Gatosyocora.MeshDeleterWithTexture.Models;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             if (!deleteIndexList.Any())
             {
-                throw new Exception("Not found vertices to delete");
+                throw new NotFoundVerticesException("Not found vertices to delete");
             }
 
             // TODO: 共有されている頂点は存在しない？
