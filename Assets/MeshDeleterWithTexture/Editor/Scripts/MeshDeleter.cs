@@ -20,6 +20,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
             // 削除する頂点のリストを取得
             var deleteIndexList = GetDeleteVertexIndices(mesh.uv.ToList(), deletePos, textureSize);
 
+            if (!deleteIndexList.Any())
+            {
+                throw new Exception("Not found vertices to delete");
+            }
+
             // TODO: 共有されている頂点は存在しない？
             // これがないと他のサブメッシュのポリゴンも削除された
             // 他のサブメッシュで共有されている頂点は削除してはいけない
