@@ -272,6 +272,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     } 
                     catch (NotFoundVerticesException e)
                     {
+                        EditorUtility.DisplayDialog(
+                            localizedText.Data.errorDialogTitleText,
+                            localizedText.Data.notFoundVerticesExceptionDialogMessageText,
+                            localizedText.Data.errorDialogOkText
+                        );
                         Debug.LogError(e.Message);
                     }
                     GUIUtility.ExitGUI();

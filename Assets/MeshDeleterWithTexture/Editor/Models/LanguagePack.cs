@@ -51,5 +51,9 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         public string deleteMeshButtonText = "Delete Mesh";
 
         public string androidNotSupportMessageText = "Can't use with BuildTarget 'Android'.\nPlease switch BuildTarget to PC";
+
+        public string errorDialogTitleText = "Error has occurred";
+        public string notFoundVerticesExceptionDialogMessageText = "Not found vertices to delete.";
+        public string errorDialogOkText = "OK";
     }
 }
