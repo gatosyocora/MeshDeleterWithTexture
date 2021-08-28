@@ -16,7 +16,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             => Resources.Load<ComputeShader>(Path.Combine(MESHDELETER_COMPUTESHADER_FOLDER_PATH, "colorchecker2"));
 
         public static ComputeShader LoadCreateUVMapComputeShader()
-            => Resources.Load<ComputeShader>(Path.Combine(MESHDELETER_COMPUTESHADER_FOLDER_PATH, "getUVMap2"));
+            => Resources.Load<ComputeShader>(Path.Combine(MESHDELETER_COMPUTESHADER_FOLDER_PATH, "getUVMap"));
 
         public static LanguagePack[] LoadLanguagePacks()
             => new LanguagePack[] {
