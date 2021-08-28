@@ -8,15 +8,11 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 {
     public static class GatoGUILayout
     {
-        #region MiniMonitor Variable
-        public static Material gammaMat = AssetRepository.LoadTextureEditMaterial();
-        #endregion
-
-        public static Vector2 MiniMonitor(Texture texture, float width, float height, ref Rect rect, ref EventType type, bool isGammaCorrection)
+        public static Vector2 MiniMonitor(Texture texture, float width, float height, ref Rect rect, ref EventType type, Material material)
         {
             rect = GUILayoutUtility.GetRect(width, height, GUI.skin.box);
 
-            Graphics.DrawTexture(rect, texture, (isGammaCorrection) ? gammaMat : null);
+            Graphics.DrawTexture(rect, texture, material);
 
             var e = Event.current;
 

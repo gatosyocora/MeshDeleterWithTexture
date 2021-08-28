@@ -105,7 +105,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             var height = width * textureSize.y / textureSize.x;
             EventType mouseEventType = 0;
             Rect rect = new Rect(0, 0, 0, 0);
-            var delta = GatoGUILayout.MiniMonitor(previewTexture, width, height, ref rect, ref mouseEventType, true);
+            var delta = GatoGUILayout.MiniMonitor(previewTexture, width, height, ref rect, ref mouseEventType, editMat);
 
             if (rect.Contains(Event.current.mousePosition))
             {
