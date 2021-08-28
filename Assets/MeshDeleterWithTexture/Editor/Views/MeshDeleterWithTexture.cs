@@ -266,7 +266,14 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                 if (GUILayout.Button(localizedText.Data.deleteMeshButtonText))
                 {
-                    model.OnDeleteMeshButtonClicked(canvasView);
+                    try
+                    {
+                        model.OnDeleteMeshButtonClicked(canvasView);
+                    } 
+                    catch (NotFoundVerticesException e)
+                    {
+                        Debug.LogError(e.Message);
+                    }
                     GUIUtility.ExitGUI();
                 }
             }
