@@ -14,6 +14,9 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             => Resources.Load<ComputeShader>("getUVMap");
 
         public static LanguagePack[] LoadLanguagePacks()
-            => Resources.FindObjectsOfTypeAll<LanguagePack>();
+            => new LanguagePack[] {
+                Resources.Load<LanguagePack>("Lang/EN"),
+                Resources.Load<LanguagePack>("Lang/JA")
+            };
     }
 }
