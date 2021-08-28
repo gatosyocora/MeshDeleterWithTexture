@@ -3,7 +3,7 @@ using UnityEditor;
 using System.Linq;
 using System.IO;
 
-namespace Gatosyocora
+namespace Gatosyocora.MeshDeleterWithTexture.Views
 {
     public static class GatoGUILayout
     {
