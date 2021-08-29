@@ -193,6 +193,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
         /// <returns>削除する頂点のindexのList</returns>
         private static List<int> GetDeleteVertexIndices(List<Vector2> uvs, bool[] isDeletePositions, Vector2Int textureSize)
         {
+            if (isDeletePositions.Length != textureSize.x * textureSize.y)
+            {
+                throw new ArgumentException("isDeletePositions and (textureSize.x * textureSize.y) are not same size");
+            }
+
             var deleteIndexList = new List<int>();
 
             for (int i = 0; i < uvs.Count(); i++)
