@@ -14,8 +14,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
         public static (Mesh, bool[]) RemoveTriangles(Mesh mesh, bool[] deletePos, Vector2Int textureSize, List<int> materialIndexList, bool showProgressBar = true)
         {
-            var hadDeletedSubMeshes = new bool[mesh.subMeshCount];
-
             // 削除する頂点のリストを取得
             var deleteIndexList = GetDeleteVertexIndices(mesh.uv.ToList(), deletePos, textureSize);
 
@@ -65,79 +63,12 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     .OrderByDescending(value => value)
                     .ToArray();
 
-            // Mesh.GetTrianglesでアクセスするために一旦最大値を入れる
-            deletedMesh.subMeshCount = mesh.subMeshCount;
-
-            float progressMaxCount = mesh.subMeshCount;
-            float count = 0;
-            int addSubMeshIndex = 0;
-
-            for (int subMeshIndex = 0; subMeshIndex < mesh.subMeshCount; subMeshIndex++)
-            {
-                var subMeshTriangles = mesh.GetTriangles(subMeshIndex);
-                // インデックスがずれるので各頂点への対応付けが必要
-                // インデックスが大きいものから順に処理していく
-                foreach (var deleteVerticesIndex in deleteIndexListUniqueDescending)
-                {
-                    for (int i = 0; i < subMeshTriangles.Count(); i += 3)
-                    {
-                        // ポリゴンの3つの頂点1つでも削除されるならそのポリゴンを削除する
-                        // mesh.trianglesの要素数は3の倍数である必要がある
-                        if (subMeshTriangles[i] == deleteVerticesIndex ||
-                            subMeshTriangles[i + 1] == deleteVerticesIndex ||
-                            subMeshTriangles[i + 2] == deleteVerticesIndex)
-                        {
-                            subMeshTriangles[i] = DELETE;
-                            subMeshTriangles[i + 1] = DELETE;
-                            subMeshTriangles[i + 2] = DELETE;
-                        }
-                        else
-                        {
-                            if (subMeshTriangles[i] > deleteVerticesIndex)
-                                subMeshTriangles[i]--;
-                            if (subMeshTriangles[i + 1] > deleteVerticesIndex)
-                                subMeshTriangles[i + 1]--;
-                            if (subMeshTriangles[i + 2] > deleteVerticesIndex)
-                                subMeshTriangles[i + 2]--;
-                        }
-                    }
-                }
-
-                if (showProgressBar && EditorUtility.DisplayCancelableProgressBar("Delete triangles",
-                        Mathf.Floor(count / progressMaxCount * 100) + "%", count++ / progressMaxCount))
-                {
-                    EditorUtility.ClearProgressBar();
-                    return (null, Array.Empty<bool>());
-                }
-
-                // 不要なポリゴンを削除する
-                var triangleList = subMeshTriangles.Where(v => v != DELETE).ToArray();
-
-                // ポリゴン数0のサブメッシュは追加しない
-                if (!triangleList.Any())
-                {
-                    hadDeletedSubMeshes[subMeshIndex] = true;
-                    continue;
-                }
-
-                deletedMesh.SetTriangles(triangleList, addSubMeshIndex++);
-            }
-
-            EditorUtility.ClearProgressBar();
-
-            if (hadDeletedSubMeshes.Any(deletedSubMesh => deletedSubMesh == true))
-            {
-                // ポリゴン削除の結果, ポリゴン数0になったSubMeshは含めない
-                deletedMesh.subMeshCount = addSubMeshIndex;
-            }
-
-            //BindPoseをコピー
-            deletedMesh.bindposes = mesh.bindposes;
+            (var deletedMesh2, var hadDeletedSubMeshes) = RemoveTrianglesInSubMeshes(mesh, deletedMesh, deleteIndexListUniqueDescending, showProgressBar);
 
             // BlendShapeを設定する
-            deletedMesh = SetupBlendShape(mesh, deletedMesh, deleteIndexsOrdered);
+            deletedMesh2 = SetupBlendShape(mesh, deletedMesh2, deleteIndexsOrdered);
 
-            return (deletedMesh, hadDeletedSubMeshes);
+            return (deletedMesh2, hadDeletedSubMeshes);
         }
 
         /// <summary>
@@ -213,6 +144,82 @@ namespace Gatosyocora.MeshDeleterWithTexture
             deletedMesh.SetUVs(3, nonDeleteUV4s);
 
             return deletedMesh;
+        }
+
+        private static (Mesh, bool[] hadDeletedSubMeshes) RemoveTrianglesInSubMeshes(Mesh mesh, Mesh deletedMesh, int[] deleteIndexListUniqueDescending, bool showProgressBar)
+        {
+            var hadDeletedSubMeshes = new bool[mesh.subMeshCount];
+
+            // Mesh.GetTrianglesでアクセスするために一旦最大値を入れる
+            deletedMesh.subMeshCount = mesh.subMeshCount;
+
+            float progressMaxCount = mesh.subMeshCount;
+            float count = 0;
+            int addSubMeshIndex = 0;
+
+            for (int subMeshIndex = 0; subMeshIndex < mesh.subMeshCount; subMeshIndex++)
+            {
+                var subMeshTriangles = mesh.GetTriangles(subMeshIndex);
+                // インデックスがずれるので各頂点への対応付けが必要
+                // インデックスが大きいものから順に処理していく
+                foreach (var deleteVerticesIndex in deleteIndexListUniqueDescending)
+                {
+                    for (int i = 0; i < subMeshTriangles.Count(); i += 3)
+                    {
+                        // ポリゴンの3つの頂点1つでも削除されるならそのポリゴンを削除する
+                        // mesh.trianglesの要素数は3の倍数である必要がある
+                        if (subMeshTriangles[i] == deleteVerticesIndex ||
+                            subMeshTriangles[i + 1] == deleteVerticesIndex ||
+                            subMeshTriangles[i + 2] == deleteVerticesIndex)
+                        {
+                            subMeshTriangles[i] = DELETE;
+                            subMeshTriangles[i + 1] = DELETE;
+                            subMeshTriangles[i + 2] = DELETE;
+                        }
+                        else
+                        {
+                            if (subMeshTriangles[i] > deleteVerticesIndex)
+                                subMeshTriangles[i]--;
+                            if (subMeshTriangles[i + 1] > deleteVerticesIndex)
+                                subMeshTriangles[i + 1]--;
+                            if (subMeshTriangles[i + 2] > deleteVerticesIndex)
+                                subMeshTriangles[i + 2]--;
+                        }
+                    }
+                }
+
+                if (showProgressBar && EditorUtility.DisplayCancelableProgressBar("Delete triangles",
+                        Mathf.Floor(count / progressMaxCount * 100) + "%", count++ / progressMaxCount))
+                {
+                    EditorUtility.ClearProgressBar();
+                    return (null, Array.Empty<bool>());
+                }
+
+                // 不要なポリゴンを削除する
+                var triangleList = subMeshTriangles.Where(v => v != DELETE).ToArray();
+
+                // ポリゴン数0のサブメッシュは追加しない
+                if (!triangleList.Any())
+                {
+                    hadDeletedSubMeshes[subMeshIndex] = true;
+                    continue;
+                }
+
+                deletedMesh.SetTriangles(triangleList, addSubMeshIndex++);
+            }
+
+            EditorUtility.ClearProgressBar();
+
+            if (hadDeletedSubMeshes.Any(deletedSubMesh => deletedSubMesh == true))
+            {
+                // ポリゴン削除の結果, ポリゴン数0になったSubMeshは含めない
+                deletedMesh.subMeshCount = addSubMeshIndex;
+            }
+
+            //BindPoseをコピー
+            deletedMesh.bindposes = mesh.bindposes;
+
+            return (deletedMesh, hadDeletedSubMeshes);
         }
 
         private static Mesh SetupBlendShape(Mesh mesh, Mesh deletedMesh, List<int> deleteIndexsOrdered)
