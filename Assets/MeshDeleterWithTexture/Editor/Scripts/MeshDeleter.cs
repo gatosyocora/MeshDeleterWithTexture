@@ -171,9 +171,9 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                 mesh.GetBlendShapeFrameVertices(blendshapeIndex, 0, deltaVertices, deltaNormals, deltaTangents);
 
-                var deltaNonDeleteVerteicesList = deltaVertices.Where((value, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
-                var deltaNonDeleteNormalsList = deltaNormals.Where((value, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
-                var deltaNonDeleteTangentsList = deltaTangents.Where((value, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
+                var deltaNonDeleteVerteicesList = ExtractNonDeleteMeshInfo(deltaVertices, deleteIndexsOrdered);
+                var deltaNonDeleteNormalsList = ExtractNonDeleteMeshInfo(deltaNormals, deleteIndexsOrdered);
+                var deltaNonDeleteTangentsList = ExtractNonDeleteMeshInfo(deltaTangents, deleteIndexsOrdered);
 
                 deletedMesh.AddBlendShapeFrame(blendShapeName, frameWeight,
                     deltaNonDeleteVerteicesList,
