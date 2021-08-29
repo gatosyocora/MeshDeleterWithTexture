@@ -159,27 +159,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             deletedMesh.bindposes = mesh.bindposes;
 
             // BlendShapeを設定する
-            string blendShapeName;
-            float frameWeight;
-            var deltaVertices = new Vector3[mesh.vertexCount];
-            var deltaNormals = new Vector3[mesh.vertexCount];
-            var deltaTangents = new Vector3[mesh.vertexCount];
-            for (int blendshapeIndex = 0; blendshapeIndex < mesh.blendShapeCount; blendshapeIndex++)
-            {
-                blendShapeName = mesh.GetBlendShapeName(blendshapeIndex);
-                frameWeight = mesh.GetBlendShapeFrameWeight(blendshapeIndex, 0);
-
-                mesh.GetBlendShapeFrameVertices(blendshapeIndex, 0, deltaVertices, deltaNormals, deltaTangents);
-
-                var deltaNonDeleteVerteicesList = ExtractMeshInfosWithIndices(deltaVertices, deleteIndexsOrdered);
-                var deltaNonDeleteNormalsList = ExtractMeshInfosWithIndices(deltaNormals, deleteIndexsOrdered);
-                var deltaNonDeleteTangentsList = ExtractMeshInfosWithIndices(deltaTangents, deleteIndexsOrdered);
-
-                deletedMesh.AddBlendShapeFrame(blendShapeName, frameWeight,
-                    deltaNonDeleteVerteicesList,
-                    deltaNonDeleteNormalsList,
-                    deltaNonDeleteTangentsList);
-            }
+            deletedMesh = SetupBlendShape(mesh, deletedMesh, deleteIndexsOrdered);
 
             return (deletedMesh, hadDeletedSubMeshes);
         }
@@ -227,6 +207,33 @@ namespace Gatosyocora.MeshDeleterWithTexture
         /// <returns>indicesOrderedに含まれないindexの要素の配列</returns>
         private static T[] ExtractMeshInfosWithIndices<T>(T[] array, List<int> indicesOrdered)
             => array.Where((v, index) => indicesOrdered.BinarySearch(index) < 0).ToArray();
+
+        private static Mesh SetupBlendShape(Mesh mesh, Mesh deletedMesh, List<int> deleteIndexsOrdered)
+        {
+            string blendShapeName;
+            float frameWeight;
+            var deltaVertices = new Vector3[mesh.vertexCount];
+            var deltaNormals = new Vector3[mesh.vertexCount];
+            var deltaTangents = new Vector3[mesh.vertexCount];
+            for (int blendshapeIndex = 0; blendshapeIndex < mesh.blendShapeCount; blendshapeIndex++)
+            {
+                blendShapeName = mesh.GetBlendShapeName(blendshapeIndex);
+                frameWeight = mesh.GetBlendShapeFrameWeight(blendshapeIndex, 0);
+
+                mesh.GetBlendShapeFrameVertices(blendshapeIndex, 0, deltaVertices, deltaNormals, deltaTangents);
+
+                var deltaNonDeleteVerteicesList = ExtractMeshInfosWithIndices(deltaVertices, deleteIndexsOrdered);
+                var deltaNonDeleteNormalsList = ExtractMeshInfosWithIndices(deltaNormals, deleteIndexsOrdered);
+                var deltaNonDeleteTangentsList = ExtractMeshInfosWithIndices(deltaTangents, deleteIndexsOrdered);
+
+                deletedMesh.AddBlendShapeFrame(blendShapeName, frameWeight,
+                    deltaNonDeleteVerteicesList,
+                    deltaNonDeleteNormalsList,
+                    deltaNonDeleteTangentsList);
+            }
+
+            return deletedMesh;
+        }
 
     }
 }
