@@ -89,8 +89,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             for (int i = 0; i < uvs.Count(); i++)
             {
-                var x = (int)(Mathf.Abs(uvs[i].x % 1.0f) * textureSize.x);
-                var y = (int)(Mathf.Abs(uvs[i].y % 1.0f) * textureSize.y);
+                var u = uvs[i].x < 0 ? 1f - Mathf.Abs(uvs[i].x % 1.0f) : uvs[i].x % 1.0f;
+                var v = uvs[i].y < 0 ? 1f - Mathf.Abs(uvs[i].y % 1.0f) : uvs[i].y % 1.0f;
+
+                var x = (int)(u * textureSize.x);
+                var y = (int)(v * textureSize.y);
 
                 if (x == textureSize.x || y == textureSize.y) continue;
 
