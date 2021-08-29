@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2021-08-29
+### Added
+- 言語を切り替える機能を追加(EN, JA)
+- 削除後にSubMeshが0個になる場合の暫定対応
+### Changed
+- 使用するAssetの管理方法を変更
+- 塗りで使用していたMaterialを毎回生成するように変更
+### Fixed
+- UVがミラーリングされているメッシュで塗った部分と異なるポリゴンが消える不具合を修正
+- SubMeshを消していないのに選択しているTextureがIndex0のMaterialになっていた不具合を修正
+
 ## [0.6.3] - 2021-08-23
 ### Added
 - Unity Package Managerに対応
@@ -88,8 +99,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - ツールを公開
 
-[Unreleased]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.6.3...HEAD
-[0.6.3]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.6.1...v0.6.3
+[Unreleased]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.6.3...v0.7.0
+[0.6.3]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.6.2...v0.6.3
 [0.6.2]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.5.2...v0.6.0

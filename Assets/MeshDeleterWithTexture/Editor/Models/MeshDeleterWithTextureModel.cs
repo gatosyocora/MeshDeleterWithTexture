@@ -47,7 +47,10 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
                 materialInfoIndex = 0;
             }
 
-            if (matInfos == null || matInfos[materialInfoIndex] == null)
+            // TODO: SubMeshが1つのときに最後のSubMeshを消すとここにたどり着いて、後者がOutOfRangeでエラーを吐く
+            // Failedじゃなくて最後のメッシュ削除でここに入る可能性がある
+            // sharedMaterialsがなく、ポリゴン0のMeshがついたRendererだがどうするのか
+            if (matInfos == null || matInfos.Length <= 0 || matInfos[materialInfoIndex] == null)
             {
                 throw new NullReferenceException("Failed to load Material");
             }
@@ -70,7 +73,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             var mesh = RendererUtility.GetMesh(renderer);
             var materials = renderer.sharedMaterials.ToArray();
             var textureSize = new Vector2Int(texture.width, texture.height);
-            var (deletedMesh, deletedSubMeshes) = MeshDeleter.RemoveTriangles(mesh, deletePos, textureSize, materialIndexList);
+            var (deletedMesh, hadDeletedSubMeshes) = MeshDeleter.RemoveTriangles(mesh, deletePos, textureSize, materialIndexList);
 
             if (meshName == "") meshName = mesh.name + "_deleteMesh";
             AssetDatabase.CreateAsset(deletedMesh, AssetDatabase.GenerateUniqueAssetPath(Path.Combine(saveFolder, $"{meshName}.asset")));
@@ -81,13 +84,14 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             previousMaterials = renderer.sharedMaterials;
             RendererUtility.SetMesh(renderer, deletedMesh);
 
-            if (deletedSubMeshes.Any())
+            if (hadDeletedSubMeshes.Any(deletedSubMesh => deletedSubMesh == true))
             {
                 // サブメッシュ削除によってマテリアルの対応を変更する必要がある
-                renderer.sharedMaterials = materials.Where((material, index) => !deletedSubMeshes[index]).ToArray();
+                renderer.sharedMaterials = materials.Where((material, index) => !hadDeletedSubMeshes[index]).ToArray();
+                return true;
             }
 
-            return deletedSubMeshes.Any();
+            return false;
         }
 
         /// <summary>
@@ -178,14 +182,14 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             Initialize(canvasView);
         }
 
-        public void DeleteMesh(CanvasView canvasView)
+        public void OnDeleteMeshButtonClicked(CanvasView canvasView)
         {
             ResetMaterialsToDefault(renderer);
 
             var deletePos = canvasView.GetDeleteData();
-            var deletedSubMesh = DeleteMesh(renderer, deletePos, matInfos[materialInfoIndex]);
+            var hadDeletedSubMesh = DeleteMesh(renderer, deletePos, matInfos[materialInfoIndex]);
 
-            Initialize(canvasView, deletedSubMesh);
+            Initialize(canvasView, hadDeletedSubMesh);
         }
 
         public void SelectFolder()
@@ -197,6 +201,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         }
 
         public bool HasTexture() => matInfos != null &&
+                                    matInfos.Length > 0 &&
                                     materialInfoIndex >= 0 && 
                                     matInfos[materialInfoIndex] != null && 
                                     matInfos[materialInfoIndex].Texture != null;

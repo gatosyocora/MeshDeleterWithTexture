@@ -73,14 +73,10 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         public void OnEnable()
         {
-            editMat = Resources.Load<Material>("TextureEditMat");
-        }
-
-        public CanvasView()
-        {
+            editMat = AssetRepository.LoadTextureEditMaterial();
+            canvasModel = CreateInstance<CanvasModel>();
             undo = new UndoCanvas();
             uvMap = new UVMapCanvas(ref editMat);
-            canvasModel = new CanvasModel();
 
             DrawType = DrawType.PEN;
             PenColor = Color.black;
@@ -109,7 +105,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             var height = width * textureSize.y / textureSize.x;
             EventType mouseEventType = 0;
             Rect rect = new Rect(0, 0, 0, 0);
-            var delta = GatoGUILayout.MiniMonitor(previewTexture, width, height, ref rect, ref mouseEventType, true);
+            var delta = GatoGUILayout.MiniMonitor(previewTexture, width, height, ref rect, ref mouseEventType, editMat);
 
             if (rect.Contains(Event.current.mousePosition))
             {

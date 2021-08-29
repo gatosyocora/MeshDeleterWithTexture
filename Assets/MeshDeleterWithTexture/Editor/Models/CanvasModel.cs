@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Gatosyocora.MeshDeleterWithTexture.Models
 {
-    public class CanvasModel : IDisposable
+    public class CanvasModel : ScriptableObject, IDisposable
     {
         private ComputeShader computeShader;
         public ComputeBuffer buffer;
@@ -11,9 +11,9 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
 
         private Vector2Int textureSize;
 
-        public CanvasModel()
+        public void OnEnable()
         {
-            computeShader = UnityEngine.Object.Instantiate(Resources.Load<ComputeShader>("colorchecker2"));
+            computeShader = Instantiate(AssetRepository.LoadDrawComputeShader());
             penKernelId = computeShader.FindKernel("CSPen");
             eraserKernelId = computeShader.FindKernel("CSEraser");
         }

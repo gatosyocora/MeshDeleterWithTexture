@@ -1,0 +1,46 @@
+﻿#pragma kernel CSMain
+
+RWTexture2D<float4> UVMap;
+
+StructuredBuffer<float2> UVs;
+StructuredBuffer<int> Triangles;
+
+int Width;
+int Height;
+
+CGPROGRAM
+void drawline(uint2 p1, uint2 p2, float4 color) {
+
+	int2 diffp12 = int2(p2.x-p1.x, p2.y-p1.y);
+	float distp12 = distance(p1, p2);
+	for (int i = 0; i < distp12; i++) 
+	{
+		UVMap[p1 + diffp12 / distp12 * i] = color;	
+	}
+
+}
+ENDCG
+
+[numthreads(1,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+	int p1Index = Triangles[id.x * 3];
+	int p2Index = Triangles[id.x * 3 + 1];
+	int p3Index = Triangles[id.x * 3 + 2];
+
+	float2 uv1 = UVs[p1Index];
+	float2 uv2 = UVs[p2Index];
+	float2 uv3 = UVs[p3Index];
+
+	uint2 p1Pos = uint2(uv1.x * Width, uv1.y * Height);
+	uint2 p2Pos = uint2(uv2.x * Width, uv2.y * Height);
+	uint2 p3Pos = uint2(uv3.x * Width, uv3.y * Height);
+
+	float4 color = float4(1, 1, 1, 1);
+
+	drawline(p1Pos, p2Pos, color);
+	
+	drawline(p2Pos, p3Pos, color);
+	
+	drawline(p3Pos, p1Pos, color);
+}

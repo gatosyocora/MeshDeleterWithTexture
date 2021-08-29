@@ -98,7 +98,7 @@ https://github.com/gatosyocora/MeshDeleterWithTexture.git?path=/Assets/MeshDelet
 
 ## 動作保証環境
 
-Unity 2018.4.20f1
+Unity 2019.4.29f1
 
 ## 更新履歴
 
