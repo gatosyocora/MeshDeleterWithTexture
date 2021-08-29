@@ -55,7 +55,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             }
 
             // 頂点を削除
-            var deletedMesh = DeleteVertices(mesh, deleteIndexsOrdered);
+            var deletedMesh = RemoveVertices(mesh, deleteIndexsOrdered);
 
             // サブメッシュごとにポリゴンを処理
 
@@ -184,7 +184,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
         private static T[] ExtractMeshInfosWithIndices<T>(T[] array, List<int> indicesOrdered)
             => array.Where((v, index) => indicesOrdered.BinarySearch(index) < 0).ToArray();
 
-        private static Mesh DeleteVertices(Mesh mesh, List<int> deleteIndexsOrdered)
+        private static Mesh RemoveVertices(Mesh mesh, List<int> deleteIndexsOrdered)
         {
             var deletedMesh = UnityEngine.Object.Instantiate(mesh);
             deletedMesh.Clear();
