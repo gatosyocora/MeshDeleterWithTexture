@@ -184,6 +184,13 @@ namespace Gatosyocora.MeshDeleterWithTexture
             return (deletedMesh, hadDeletedSubMeshes);
         }
 
+        /// <summary>
+        /// 削除する頂点のIndexのListを取得する
+        /// </summary>
+        /// <param name="uvs">各頂点のUV座標</param>
+        /// <param name="deletePos">削除するかどうか(テクスチャの幅×高さのサイズ)</param>
+        /// <param name="textureSize">テクスチャのサイズ</param>
+        /// <returns>削除する頂点のindexのList</returns>
         private static List<int> GetDeleteVertexIndices(List<Vector2> uvs, bool[] deletePos, Vector2Int textureSize)
         {
             var deleteIndexList = new List<int>();
@@ -206,6 +213,13 @@ namespace Gatosyocora.MeshDeleterWithTexture
             return deleteIndexList;
         }
 
+        /// <summary>
+        /// indicesOrderedに含まれていないindexの要素の配列を作る
+        /// </summary>
+        /// <typeparam name="T">要素</typeparam>
+        /// <param name="array">要素の配列</param>
+        /// <param name="indicesOrdered">抽出されない要素のindexの配列</param>
+        /// <returns>indicesOrderedに含まれないindexの要素の配列</returns>
         private static T[] ExtractMeshInfosWithIndices<T>(T[] array, List<int> indicesOrdered)
             => array.Where((v, index) => indicesOrdered.BinarySearch(index) < 0).ToArray();
 
