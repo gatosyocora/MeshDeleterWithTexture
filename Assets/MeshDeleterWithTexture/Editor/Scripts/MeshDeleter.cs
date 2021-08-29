@@ -10,6 +10,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
 {
     public static class MeshDeleter
     {
+        private const int DELETE = -1;
+
         public static (Mesh, bool[]) RemoveTriangles(Mesh mesh, bool[] deletePos, Vector2Int textureSize, List<int> materialIndexList, bool showProgressBar = true)
         {
             var deletedMesh = UnityEngine.Object.Instantiate(mesh);
@@ -109,9 +111,9 @@ namespace Gatosyocora.MeshDeleterWithTexture
                             subMeshTriangles[i + 1] == deleteVerticesIndex ||
                             subMeshTriangles[i + 2] == deleteVerticesIndex)
                         {
-                            subMeshTriangles[i] = -1;
-                            subMeshTriangles[i + 1] = -1;
-                            subMeshTriangles[i + 2] = -1;
+                            subMeshTriangles[i] = DELETE;
+                            subMeshTriangles[i + 1] = DELETE;
+                            subMeshTriangles[i + 2] = DELETE;
                         }
                         else
                         {
@@ -133,7 +135,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 }
 
                 // 不要なポリゴンを削除する
-                var triangleList = subMeshTriangles.Where(v => v != -1).ToArray();
+                var triangleList = subMeshTriangles.Where(v => v != DELETE).ToArray();
 
                 // ポリゴン数0のサブメッシュは追加しない
                 if (!triangleList.Any())
