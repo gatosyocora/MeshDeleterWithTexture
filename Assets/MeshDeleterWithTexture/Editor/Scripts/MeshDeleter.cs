@@ -67,10 +67,10 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             deletedMesh.SetVertices(nonDeleteVertices);
             deletedMesh.boneWeights = nonDeleteWeights;
-            deletedMesh.normals = nonDeleteNormals;
-            deletedMesh.tangents = nonDeleteTangents;
-            deletedMesh.colors = nonDeleteColors;
-            deletedMesh.colors32 = nonDeleteColor32s;
+            deletedMesh.SetNormals(nonDeleteNormals);
+            deletedMesh.SetTangents(nonDeleteTangents);
+            deletedMesh.SetColors(nonDeleteColors);
+            deletedMesh.SetColors(nonDeleteColor32s);
             deletedMesh.SetUVs(0, nonDeleteUVs);
             deletedMesh.SetUVs(1, nonDeleteUV2s);
             deletedMesh.SetUVs(2, nonDeleteUV3s);
