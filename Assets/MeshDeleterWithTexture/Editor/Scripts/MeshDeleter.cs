@@ -14,11 +14,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
         public static (Mesh, bool[]) RemoveTriangles(Mesh mesh, bool[] deletePos, Vector2Int textureSize, List<int> materialIndexList, bool showProgressBar = true)
         {
-            var deletedMesh = UnityEngine.Object.Instantiate(mesh);
             var hadDeletedSubMeshes = new bool[mesh.subMeshCount];
-
-            deletedMesh.Clear();
-            deletedMesh.MarkDynamic();
 
             // 削除する頂点のリストを取得
             var deleteIndexList = GetDeleteVertexIndices(mesh.uv.ToList(), deletePos, textureSize);
@@ -59,27 +55,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             }
 
             // 頂点を削除
-            var nonDeleteVertices = ExtractMeshInfosWithIndices(mesh.vertices, deleteIndexsOrdered);
-            var nonDeleteWeights = ExtractMeshInfosWithIndices(mesh.boneWeights, deleteIndexsOrdered);
-            var nonDeleteNormals = ExtractMeshInfosWithIndices(mesh.normals, deleteIndexsOrdered);
-            var nonDeleteTangents = ExtractMeshInfosWithIndices(mesh.tangents, deleteIndexsOrdered);
-            var nonDeleteColors = ExtractMeshInfosWithIndices(mesh.colors, deleteIndexsOrdered);
-            var nonDeleteColor32s = ExtractMeshInfosWithIndices(mesh.colors32, deleteIndexsOrdered);
-            var nonDeleteUVs = ExtractMeshInfosWithIndices(mesh.uv, deleteIndexsOrdered);
-            var nonDeleteUV2s = ExtractMeshInfosWithIndices(mesh.uv2, deleteIndexsOrdered);
-            var nonDeleteUV3s = ExtractMeshInfosWithIndices(mesh.uv3, deleteIndexsOrdered);
-            var nonDeleteUV4s = ExtractMeshInfosWithIndices(mesh.uv4, deleteIndexsOrdered);
-
-            deletedMesh.SetVertices(nonDeleteVertices);
-            deletedMesh.boneWeights = nonDeleteWeights;
-            deletedMesh.SetNormals(nonDeleteNormals);
-            deletedMesh.SetTangents(nonDeleteTangents);
-            deletedMesh.SetColors(nonDeleteColors);
-            deletedMesh.SetColors(nonDeleteColor32s);
-            deletedMesh.SetUVs(0, nonDeleteUVs);
-            deletedMesh.SetUVs(1, nonDeleteUV2s);
-            deletedMesh.SetUVs(2, nonDeleteUV3s);
-            deletedMesh.SetUVs(3, nonDeleteUV4s);
+            var deletedMesh = DeleteVertices(mesh, deleteIndexsOrdered);
 
             // サブメッシュごとにポリゴンを処理
 
@@ -207,6 +183,37 @@ namespace Gatosyocora.MeshDeleterWithTexture
         /// <returns>indicesOrderedに含まれないindexの要素の配列</returns>
         private static T[] ExtractMeshInfosWithIndices<T>(T[] array, List<int> indicesOrdered)
             => array.Where((v, index) => indicesOrdered.BinarySearch(index) < 0).ToArray();
+
+        private static Mesh DeleteVertices(Mesh mesh, List<int> deleteIndexsOrdered)
+        {
+            var deletedMesh = UnityEngine.Object.Instantiate(mesh);
+            deletedMesh.Clear();
+            deletedMesh.MarkDynamic();
+
+            var nonDeleteVertices = ExtractMeshInfosWithIndices(mesh.vertices, deleteIndexsOrdered);
+            var nonDeleteWeights = ExtractMeshInfosWithIndices(mesh.boneWeights, deleteIndexsOrdered);
+            var nonDeleteNormals = ExtractMeshInfosWithIndices(mesh.normals, deleteIndexsOrdered);
+            var nonDeleteTangents = ExtractMeshInfosWithIndices(mesh.tangents, deleteIndexsOrdered);
+            var nonDeleteColors = ExtractMeshInfosWithIndices(mesh.colors, deleteIndexsOrdered);
+            var nonDeleteColor32s = ExtractMeshInfosWithIndices(mesh.colors32, deleteIndexsOrdered);
+            var nonDeleteUVs = ExtractMeshInfosWithIndices(mesh.uv, deleteIndexsOrdered);
+            var nonDeleteUV2s = ExtractMeshInfosWithIndices(mesh.uv2, deleteIndexsOrdered);
+            var nonDeleteUV3s = ExtractMeshInfosWithIndices(mesh.uv3, deleteIndexsOrdered);
+            var nonDeleteUV4s = ExtractMeshInfosWithIndices(mesh.uv4, deleteIndexsOrdered);
+
+            deletedMesh.SetVertices(nonDeleteVertices);
+            deletedMesh.boneWeights = nonDeleteWeights;
+            deletedMesh.SetNormals(nonDeleteNormals);
+            deletedMesh.SetTangents(nonDeleteTangents);
+            deletedMesh.SetColors(nonDeleteColors);
+            deletedMesh.SetColors(nonDeleteColor32s);
+            deletedMesh.SetUVs(0, nonDeleteUVs);
+            deletedMesh.SetUVs(1, nonDeleteUV2s);
+            deletedMesh.SetUVs(2, nonDeleteUV3s);
+            deletedMesh.SetUVs(3, nonDeleteUV4s);
+
+            return deletedMesh;
+        }
 
         private static Mesh SetupBlendShape(Mesh mesh, Mesh deletedMesh, List<int> deleteIndexsOrdered)
         {
