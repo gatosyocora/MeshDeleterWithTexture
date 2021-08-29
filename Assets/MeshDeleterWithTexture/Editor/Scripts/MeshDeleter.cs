@@ -59,16 +59,16 @@ namespace Gatosyocora.MeshDeleterWithTexture
             }
 
             // 頂点を削除
-            var nonDeleteVertices = ExtractNonDeleteMeshInfo(mesh.vertices, deleteIndexsOrdered);
-            var nonDeleteWeights = ExtractNonDeleteMeshInfo(mesh.boneWeights, deleteIndexsOrdered);
-            var nonDeleteNormals = ExtractNonDeleteMeshInfo(mesh.normals, deleteIndexsOrdered);
-            var nonDeleteTangents = ExtractNonDeleteMeshInfo(mesh.tangents, deleteIndexsOrdered);
-            var nonDeleteColors = ExtractNonDeleteMeshInfo(mesh.colors, deleteIndexsOrdered);
-            var nonDeleteColor32s = ExtractNonDeleteMeshInfo(mesh.colors32, deleteIndexsOrdered);
-            var nonDeleteUVs = ExtractNonDeleteMeshInfo(mesh.uv, deleteIndexsOrdered);
-            var nonDeleteUV2s = ExtractNonDeleteMeshInfo(mesh.uv2, deleteIndexsOrdered);
-            var nonDeleteUV3s = ExtractNonDeleteMeshInfo(mesh.uv3, deleteIndexsOrdered);
-            var nonDeleteUV4s = ExtractNonDeleteMeshInfo(mesh.uv4, deleteIndexsOrdered);
+            var nonDeleteVertices = ExtractMeshInfosWithIndices(mesh.vertices, deleteIndexsOrdered);
+            var nonDeleteWeights = ExtractMeshInfosWithIndices(mesh.boneWeights, deleteIndexsOrdered);
+            var nonDeleteNormals = ExtractMeshInfosWithIndices(mesh.normals, deleteIndexsOrdered);
+            var nonDeleteTangents = ExtractMeshInfosWithIndices(mesh.tangents, deleteIndexsOrdered);
+            var nonDeleteColors = ExtractMeshInfosWithIndices(mesh.colors, deleteIndexsOrdered);
+            var nonDeleteColor32s = ExtractMeshInfosWithIndices(mesh.colors32, deleteIndexsOrdered);
+            var nonDeleteUVs = ExtractMeshInfosWithIndices(mesh.uv, deleteIndexsOrdered);
+            var nonDeleteUV2s = ExtractMeshInfosWithIndices(mesh.uv2, deleteIndexsOrdered);
+            var nonDeleteUV3s = ExtractMeshInfosWithIndices(mesh.uv3, deleteIndexsOrdered);
+            var nonDeleteUV4s = ExtractMeshInfosWithIndices(mesh.uv4, deleteIndexsOrdered);
 
             deletedMesh.SetVertices(nonDeleteVertices);
             deletedMesh.boneWeights = nonDeleteWeights;
@@ -171,9 +171,9 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                 mesh.GetBlendShapeFrameVertices(blendshapeIndex, 0, deltaVertices, deltaNormals, deltaTangents);
 
-                var deltaNonDeleteVerteicesList = ExtractNonDeleteMeshInfo(deltaVertices, deleteIndexsOrdered);
-                var deltaNonDeleteNormalsList = ExtractNonDeleteMeshInfo(deltaNormals, deleteIndexsOrdered);
-                var deltaNonDeleteTangentsList = ExtractNonDeleteMeshInfo(deltaTangents, deleteIndexsOrdered);
+                var deltaNonDeleteVerteicesList = ExtractMeshInfosWithIndices(deltaVertices, deleteIndexsOrdered);
+                var deltaNonDeleteNormalsList = ExtractMeshInfosWithIndices(deltaNormals, deleteIndexsOrdered);
+                var deltaNonDeleteTangentsList = ExtractMeshInfosWithIndices(deltaTangents, deleteIndexsOrdered);
 
                 deletedMesh.AddBlendShapeFrame(blendShapeName, frameWeight,
                     deltaNonDeleteVerteicesList,
@@ -206,8 +206,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
             return deleteIndexList;
         }
 
-        private static T[] ExtractNonDeleteMeshInfo<T>(T[] array, List<int> deleteIndexsOrdered)
-            => array.Where((v, index) => deleteIndexsOrdered.BinarySearch(index) < 0).ToArray();
+        private static T[] ExtractMeshInfosWithIndices<T>(T[] array, List<int> indicesOrdered)
+            => array.Where((v, index) => indicesOrdered.BinarySearch(index) < 0).ToArray();
 
     }
 }
