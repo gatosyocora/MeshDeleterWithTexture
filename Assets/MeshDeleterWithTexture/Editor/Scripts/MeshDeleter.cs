@@ -23,7 +23,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             if (!deleteIndexList.Any())
             {
-                throw new NotFoundVerticesException("Not found vertices to delete");
+                throw new NotFoundVerticesException();
             }
 
             // TODO: 共有されている頂点は存在しない？
@@ -53,7 +53,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             // 削除する頂点がないので終了する
             if (!deleteIndexsOrdered.Any())
             {
-                throw new NotFoundVerticesException("Not found vertices to delete");
+                throw new NotFoundVerticesException();
             }
 
             // 頂点を削除
