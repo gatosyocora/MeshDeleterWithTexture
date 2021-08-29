@@ -191,7 +191,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
         /// <param name="deletePos">削除するかどうか(テクスチャの幅×高さのサイズ)</param>
         /// <param name="textureSize">テクスチャのサイズ</param>
         /// <returns>削除する頂点のindexのList</returns>
-        private static List<int> GetDeleteVertexIndices(List<Vector2> uvs, bool[] deletePos, Vector2Int textureSize)
+        private static List<int> GetDeleteVertexIndices(List<Vector2> uvs, bool[] isDeletePositions, Vector2Int textureSize)
         {
             var deleteIndexList = new List<int>();
 
@@ -204,7 +204,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                 int index = y * textureSize.x + x;
 
-                if (deletePos[index])
+                if (isDeletePositions[index])
                 {
                     deleteIndexList.Add(i);
                 }
