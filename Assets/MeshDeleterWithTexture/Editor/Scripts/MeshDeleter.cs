@@ -51,7 +51,10 @@ namespace Gatosyocora.MeshDeleterWithTexture
             deleteIndexsOrdered.Sort();
 
             // 削除する頂点がないので終了する
-            if (deleteIndexsOrdered.Count == 0) return (mesh, hadDeletedSubMeshes);
+            if (!deleteIndexsOrdered.Any())
+            {
+                throw new NotFoundVerticesException("Not found vertices to delete");
+            }
 
             // 頂点を削除
             var nonDeleteVertices = ExtractNonDeleteMeshInfo(mesh.vertices, deleteIndexsOrdered);
