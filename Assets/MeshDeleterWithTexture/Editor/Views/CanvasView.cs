@@ -236,6 +236,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             ZoomScale = 1;
         }
 
+        // Textureのuv座標的にどの範囲が表示されているかを元に補正している
         private Vector2Int ConvertWindowPosToTexturePos(Vector2Int textureSize, Vector2 windowPos, Rect rect, float zoomScale, Vector2 scrollOffset)
         {
             var invZoomScale = 1 - zoomScale;
@@ -252,6 +253,11 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 Mathf.InverseLerp(-(invZoomScale), invZoomScale, scrollOffset.y) * 2f - 1f 
             ) : Vector2.zero;
 
+            // テクスチャのuv座標的な最小値と最大値
+            // zoomScaleが0.5でoffsetが0,0ならuv座標的に[0.25, 0.75]の範囲が表示されている
+            // zoomScale = uv座標の表示範囲幅
+            // offsetXがマイナス（左の方を表示している）のとき、左の未表示範囲 < 右の未表示範囲
+            // offsetXがプラス（右の方を表示している）のとき、左の未表示範囲 > 右の未表示範囲
             var minCanvasPosX = 0.5f - zoomScale / 2f + normalizedOffset.x * (invZoomScale / 2f);
             var maxCanvasPosX = 0.5f + zoomScale / 2f + normalizedOffset.x * (invZoomScale / 2f);
             var minCanvasPosY = 0.5f - zoomScale / 2f + normalizedOffset.y * (invZoomScale / 2f);
