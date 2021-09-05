@@ -45,13 +45,13 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             }
         }
 
-        private Vector4 _scrollOffset;
-        public Vector4 ScrollOffset
+        private Vector2 _scrollOffset;
+        public Vector2 ScrollOffset
         {
             get => _scrollOffset;
             private set
             {
-                editMat.SetVector("_Offset", value);
+                editMat.SetVector("_Offset", new Vector4(value.x, value.y, 0, 0));
                 _scrollOffset = value;
             }
         }
@@ -123,7 +123,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                         if (ZoomScale < 1)
                             ScrollOffset *= ZoomScale;
                         else
-                            ScrollOffset = Vector4.zero;
+                            ScrollOffset = Vector2.zero;
                     }
                 }
                 // テクスチャの表示箇所を移動する機能
@@ -258,11 +258,11 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         /// </summary>
         public void ResetScrollOffsetAndZoomScale()
         {
-            ScrollOffset = Vector4.zero;
+            ScrollOffset = Vector2.zero;
             ZoomScale = 1;
         }
 
-        private Vector2Int ConvertWindowPosToTexturePos(Vector2Int textureSize, Vector2 windowPos, Rect rect, float zoomScale, Vector4 scrollOffset)
+        private Vector2Int ConvertWindowPosToTexturePos(Vector2Int textureSize, Vector2 windowPos, Rect rect, float zoomScale, Vector2 scrollOffset)
         {
             float raito = textureSize.x / rect.width;
 
