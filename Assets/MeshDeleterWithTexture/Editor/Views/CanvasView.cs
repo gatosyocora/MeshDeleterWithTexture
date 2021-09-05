@@ -24,6 +24,9 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         private const float MIN_ZOOM_SCALE = 0.1f;
         private const float ZOOM_STEP = 0.1f;
 
+        private const int LEFT_BUTTON = 0;
+        private const int RIGHT_BUTTON = 1;
+
         public DrawType DrawType { get; set; }
 
         private Color _penColor;
@@ -121,7 +124,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                     ZoomScale = scale;
                 }
                 // テクスチャの表示箇所を移動する機能
-                else if (Event.current.button == 1 &&
+                else if (Event.current.button == RIGHT_BUTTON &&
                     mouseEventType == EventType.MouseDrag)
                 {
                     ScrollOffset = UpdateScrollOffset(ScrollOffset, delta, rect.size, ZoomScale);
@@ -136,14 +139,14 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                     editMat.SetVector("_CurrentPos", new Vector4(uvPos.x, uvPos.y, 0, 0));
 
                     if (Event.current.type == EventType.MouseDown &&
-                        Event.current.button == 0 &&
+                        Event.current.button == LEFT_BUTTON &&
                         !isDrawing)
                     {
                         RegisterUndoTexture();
                         isDrawing = true;
                     }
                     else if (Event.current.type == EventType.MouseUp &&
-                        Event.current.button == 0 &&
+                        Event.current.button == LEFT_BUTTON &&
                         isDrawing)
                     {
                         isDrawing = false;
