@@ -248,14 +248,14 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
             // ScrollOffsetを[-1, 1]の範囲にしたもの(中心からどれぐらいずれているか)
             var normalizedOffset = zoomScale < 1 ? new Vector2(
-            var minCanvasPosX = 0.5f - zoomScale * (1f - normalizedOffset.x);
-            var maxCanvasPosX = 0.5f + zoomScale * normalizedOffset.x;
-            var minCanvasPosY = 0.5f - zoomScale * (1f - normalizedOffset.y);
-            var maxCanvasPosY = 0.5f + zoomScale * normalizedOffset.y;
                 Mathf.InverseLerp(-(invZoomScale), invZoomScale, scrollOffset.x) * 2f - 1f,
                 Mathf.InverseLerp(-(invZoomScale), invZoomScale, scrollOffset.y) * 2f - 1f 
             ) : Vector2.zero;
 
+            var minCanvasPosX = 0.5f - zoomScale / 2f + normalizedOffset.x * (zoomScale / 2f);
+            var maxCanvasPosX = 0.5f + zoomScale / 2f + normalizedOffset.x * (zoomScale / 2f);
+            var minCanvasPosY = 0.5f - zoomScale / 2f + normalizedOffset.y * (zoomScale / 2f);
+            var maxCanvasPosY = 0.5f + zoomScale / 2f + normalizedOffset.y * (zoomScale / 2f);
 
             // ScaleとOffsetによって変化しているので戻す
             var x = (int)(Mathf.Lerp(minCanvasPosX, maxCanvasPosX, normalizedCanvasPosX) * textureSize.x);
