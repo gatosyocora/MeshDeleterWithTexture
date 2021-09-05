@@ -247,10 +247,10 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             var normalizedCanvasPosY = (textureSize.y - (windowPos.y - rect.position.y) * raito) / textureSize.y;
 
             // ScrollOffsetを[0, 1]の範囲にしたもの(左下からどれぐらい右上に向かって動いているか)
-            var normalizedOffset = new Vector2(
+            var normalizedOffset = zoomScale < 1 ? new Vector2(
                 Mathf.InverseLerp(-(invZoomScale), invZoomScale, scrollOffset.x),
                 Mathf.InverseLerp(-(invZoomScale), invZoomScale, scrollOffset.y)
-            );
+            ) : Vector2.one * 0.5f;
 
             var minCanvasPosX = 0.5f - zoomScale * (1f - normalizedOffset.x);
             var maxCanvasPosX = 0.5f + zoomScale * normalizedOffset.x;
