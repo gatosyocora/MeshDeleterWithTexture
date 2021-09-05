@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.1] - 2021-09-05
+### Fixed
+- 拡大時にカーソルがずれる不具合を修正
+- Reset時に選択しているTextureがIndex0のものになるのを修正
+- 一部ダークテーマ対応漏れを修正
+
 ## [0.7.0] - 2021-08-29
 ### Added
 - 言語を切り替える機能を追加(EN, JA)
@@ -99,7 +105,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - ツールを公開
 
-[Unreleased]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.7.1...HEAD
+[0.7.1]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.6.3...v0.7.0
 [0.6.3]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.6.2...v0.6.3
 [0.6.2]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.6.1...v0.6.2
