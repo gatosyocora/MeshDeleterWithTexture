@@ -245,13 +245,13 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         /// ペン
         /// </summary>
         /// <param name="pos"></param>
-        private void DrawOnTexture(Vector2 pos) => canvasModel.Mark(pos);
+        private void DrawOnTexture(Vector2Int pos) => canvasModel.Mark(pos);
 
         /// <summary>
         /// 消しゴム
         /// </summary>
         /// <param name="pos"></param>
-        private void ClearOnTexture(Vector2 pos) => canvasModel.UnMark(pos);
+        private void ClearOnTexture(Vector2Int pos) => canvasModel.UnMark(pos);
 
         /// <summary>
         /// ScrollOffsetとZoomScaleをリセットする
@@ -262,7 +262,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             ZoomScale = 1;
         }
 
-        private Vector2 ConvertWindowPosToTexturePos(Vector2Int textureSize, Vector2 windowPos, Rect rect, float zoomScale, Vector4 scrollOffset)
+        private Vector2Int ConvertWindowPosToTexturePos(Vector2Int textureSize, Vector2 windowPos, Rect rect, float zoomScale, Vector4 scrollOffset)
         {
             float raito = textureSize.x / rect.width;
 
@@ -271,10 +271,10 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             var texY = textureSize.y - (int)((windowPos.y - rect.position.y) * raito);
 
             // ScaleとOffsetによって変化しているので戻す
-            var x = texX / 2 * (1 + zoomScale + scrollOffset.x);
-            var y = texY / 2 * (1 + zoomScale + scrollOffset.y);
+            var x = (int)(texX / 2 * (1 + zoomScale + scrollOffset.x));
+            var y = (int)(texY / 2 * (1 + zoomScale + scrollOffset.y));
 
-            return new Vector2(x, y);
+            return new Vector2Int(x, y);
         }
 
         private Vector2 ConvertTexturePosToUVPos(Vector2Int textureSize, Vector2 texturePos) => texturePos / textureSize;
