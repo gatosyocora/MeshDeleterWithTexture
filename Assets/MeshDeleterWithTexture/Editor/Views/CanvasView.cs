@@ -116,47 +116,15 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 // テクスチャの拡大縮小機能
                 if (mouseEventType == EventType.ScrollWheel)
                 {
-                    ZoomScale += Mathf.Sign(delta.y) * ZOOM_STEP;
-
-                    if (ZoomScale > MAX_ZOOM_SCALE) ZoomScale = MAX_ZOOM_SCALE;
-                    else if (ZoomScale < MIN_ZOOM_SCALE) ZoomScale = MIN_ZOOM_SCALE;
-
-                    // 縮小ではOffsetも中心に戻していく
-                    if (Mathf.Sign(delta.y) > 0)
-                    {
-                        if (ZoomScale < MAX_ZOOM_SCALE)
-                            ScrollOffset *= ZoomScale;
-                        else
-                            ScrollOffset = Vector2.zero;
-                    }
+                    var (off, scale) = UpdateByZoomScale(ScrollOffset, ZoomScale, delta);
+                    ScrollOffset = off;
+                    ZoomScale = scale;
                 }
                 // テクスチャの表示箇所を移動する機能
                 else if (Event.current.button == 1 &&
                     mouseEventType == EventType.MouseDrag)
                 {
-                    var scrollOffset = ScrollOffset;
-
-                    if (delta.x != 0)
-                    {
-                        scrollOffset.x -= delta.x / rect.width;
-
-                        if (scrollOffset.x > 1 - ZoomScale)
-                            scrollOffset.x = 1 - ZoomScale;
-                        else if (scrollOffset.x < -(1 - ZoomScale))
-                            scrollOffset.x = -(1 - ZoomScale);
-                    }
-
-                    if (delta.y != 0)
-                    {
-                        scrollOffset.y += delta.y / rect.height;
-
-                        if (scrollOffset.y > 1 - ZoomScale)
-                            scrollOffset.y = 1 - ZoomScale;
-                        else if (scrollOffset.y < -(1 - ZoomScale))
-                            scrollOffset.y = -(1 - ZoomScale);
-                    }
-
-                    ScrollOffset = scrollOffset;
+                    ScrollOffset = UpdateScrollOffset(ScrollOffset, delta, rect.size, ZoomScale);
                 }
 
 
@@ -333,6 +301,50 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         public void Dispose()
         {
             canvasModel.Dispose();
+        }
+
+        private static (Vector2, float) UpdateByZoomScale(Vector2 scrollOffset, float zoomScale, Vector2 delta)
+        {
+            zoomScale += Mathf.Sign(delta.y) * ZOOM_STEP;
+
+            if (zoomScale > MAX_ZOOM_SCALE) zoomScale = MAX_ZOOM_SCALE;
+            else if (zoomScale < MIN_ZOOM_SCALE) zoomScale = MIN_ZOOM_SCALE;
+
+            // 縮小ではOffsetも中心に戻していく
+            if (Mathf.Sign(delta.y) > 0)
+            {
+                if (zoomScale < MAX_ZOOM_SCALE)
+                    scrollOffset *= zoomScale;
+                else
+                    scrollOffset = Vector2.zero;
+            }
+
+            return (scrollOffset, zoomScale);
+        }
+
+        private static Vector2 UpdateScrollOffset(Vector2 scrollOffset, Vector2 delta, Vector2 rectSize, float zoomScale)
+        {
+            if (delta.x != 0)
+            {
+                scrollOffset.x -= delta.x / rectSize.x;
+
+                if (scrollOffset.x > 1 - zoomScale)
+                    scrollOffset.x = 1 - zoomScale;
+                else if (scrollOffset.x < -(1 - zoomScale))
+                    scrollOffset.x = -(1 - zoomScale);
+            }
+
+            if (delta.y != 0)
+            {
+                scrollOffset.y += delta.y / rectSize.y;
+
+                if (scrollOffset.y > 1 - zoomScale)
+                    scrollOffset.y = 1 - zoomScale;
+                else if (scrollOffset.y < -(1 - zoomScale))
+                    scrollOffset.y = -(1 - zoomScale);
+            }
+
+            return scrollOffset;
         }
     }
 }
