@@ -240,13 +240,13 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         {
             float raito = textureSize.x / rect.width;
 
-            // Textureの場所に変換
-            var texX = (int)((windowPos.x - rect.position.x) * raito);
-            var texY = textureSize.y - (int)((windowPos.y - rect.position.y) * raito);
+            // 正規化されたCanvasのポジションに変換
+            var normalizedCanvasPosX = ((windowPos.x - rect.position.x) * raito) / textureSize.x;
+            var normalizedCanvasPosY = (textureSize.y - (windowPos.y - rect.position.y) * raito) / textureSize.y;
 
             // ScaleとOffsetによって変化しているので戻す
-            var x = (int)(texX / 2 * (1 + zoomScale + scrollOffset.x));
-            var y = (int)(texY / 2 * (1 + zoomScale + scrollOffset.y));
+            var x = (int)(normalizedCanvasPosX * textureSize.x / 2 * (1 + zoomScale + scrollOffset.x));
+            var y = (int)(normalizedCanvasPosY * textureSize.y / 2 * (1 + zoomScale + scrollOffset.y));
 
             return new Vector2Int(x, y);
         }
