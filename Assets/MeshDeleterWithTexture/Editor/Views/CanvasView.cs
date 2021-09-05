@@ -134,27 +134,29 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 else if (Event.current.button == 1 &&
                     mouseEventType == EventType.MouseDrag)
                 {
+                    var scrollOffset = ScrollOffset;
+
                     if (delta.x != 0)
                     {
-                        _scrollOffset.x -= delta.x / rect.width;
+                        scrollOffset.x -= delta.x / rect.width;
 
-                        if (_scrollOffset.x > 1 - ZoomScale)
-                            _scrollOffset.x = 1 - ZoomScale;
-                        else if (_scrollOffset.x < -(1 - ZoomScale))
-                            _scrollOffset.x = -(1 - ZoomScale);
+                        if (scrollOffset.x > 1 - ZoomScale)
+                            scrollOffset.x = 1 - ZoomScale;
+                        else if (scrollOffset.x < -(1 - ZoomScale))
+                            scrollOffset.x = -(1 - ZoomScale);
                     }
 
                     if (delta.y != 0)
                     {
-                        _scrollOffset.y += delta.y / rect.height;
+                        scrollOffset.y += delta.y / rect.height;
 
-                        if (_scrollOffset.y > 1 - ZoomScale)
-                            _scrollOffset.y = 1 - ZoomScale;
-                        else if (_scrollOffset.y < -(1 - ZoomScale))
-                            _scrollOffset.y = -(1 - ZoomScale);
+                        if (scrollOffset.y > 1 - ZoomScale)
+                            scrollOffset.y = 1 - ZoomScale;
+                        else if (scrollOffset.y < -(1 - ZoomScale))
+                            scrollOffset.y = -(1 - ZoomScale);
                     }
 
-                    editMat.SetVector("_Offset", _scrollOffset);
+                    ScrollOffset = scrollOffset;
                 }
 
 
