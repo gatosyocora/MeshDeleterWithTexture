@@ -20,6 +20,10 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         private MaterialInfo materialInfo;
 
+        private const float MAX_ZOOM_SCALE = 1;
+        private const float MIN_ZOOM_SCALE = 0.1f;
+        private const float ZOOM_STEP = 0.1f;
+
         public DrawType DrawType { get; set; }
 
         private Color _penColor;
@@ -112,15 +116,15 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 // テクスチャの拡大縮小機能
                 if (mouseEventType == EventType.ScrollWheel)
                 {
-                    ZoomScale += Mathf.Sign(delta.y) * 0.1f;
+                    ZoomScale += Mathf.Sign(delta.y) * ZOOM_STEP;
 
-                    if (ZoomScale > 1) ZoomScale = 1;
-                    else if (ZoomScale < 0.1f) ZoomScale = 0.1f;
+                    if (ZoomScale > MAX_ZOOM_SCALE) ZoomScale = MAX_ZOOM_SCALE;
+                    else if (ZoomScale < MIN_ZOOM_SCALE) ZoomScale = MIN_ZOOM_SCALE;
 
                     // 縮小ではOffsetも中心に戻していく
                     if (Mathf.Sign(delta.y) > 0)
                     {
-                        if (ZoomScale < 1)
+                        if (ZoomScale < MAX_ZOOM_SCALE)
                             ScrollOffset *= ZoomScale;
                         else
                             ScrollOffset = Vector2.zero;
