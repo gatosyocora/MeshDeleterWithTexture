@@ -252,12 +252,14 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 Mathf.InverseLerp(-(invZoomScale), invZoomScale, scrollOffset.y)
             );
 
-            var minCanvasPos = 0.5f - zoomScale / 2f;
-            var maxCanvasPos = 0.5f + zoomScale / 2f;
+            var minCanvasPosX = 0.5f - zoomScale / 2f;
+            var maxCanvasPosX = 0.5f + zoomScale / 2f;
+            var minCanvasPosY = 0.5f - zoomScale / 2f;
+            var maxCanvasPosY = 0.5f + zoomScale / 2f;
 
             // ScaleとOffsetによって変化しているので戻す
-            var x = (int)(Mathf.Lerp(minCanvasPos, maxCanvasPos, normalizedCanvasPosX) * textureSize.x);
-            var y = (int)(Mathf.Lerp(minCanvasPos, maxCanvasPos, normalizedCanvasPosY) * textureSize.y);
+            var x = (int)(Mathf.Lerp(minCanvasPosX, maxCanvasPosX, normalizedCanvasPosX) * textureSize.x);
+            var y = (int)(Mathf.Lerp(minCanvasPosY, maxCanvasPosY, normalizedCanvasPosY) * textureSize.y);
 
             return new Vector2Int(x, y);
         }
