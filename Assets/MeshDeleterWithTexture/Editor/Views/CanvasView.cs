@@ -238,11 +238,19 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         private Vector2Int ConvertWindowPosToTexturePos(Vector2Int textureSize, Vector2 windowPos, Rect rect, float zoomScale, Vector2 scrollOffset)
         {
+            var invZoomScale = 1 - zoomScale;
+
             float raito = textureSize.x / rect.width;
 
             // 正規化されたCanvasのポジションに変換
             var normalizedCanvasPosX = ((windowPos.x - rect.position.x) * raito) / textureSize.x;
             var normalizedCanvasPosY = (textureSize.y - (windowPos.y - rect.position.y) * raito) / textureSize.y;
+
+            // ScrollOffsetを[0, 1]の範囲にしたもの(左下からどれぐらい右上に向かって動いているか)
+            var normalizedOffset = new Vector2(
+                Mathf.InverseLerp(-(invZoomScale), invZoomScale, scrollOffset.x),
+                Mathf.InverseLerp(-(invZoomScale), invZoomScale, scrollOffset.y)
+            );
 
             // ScaleとOffsetによって変化しているので戻す
             var x = (int)(normalizedCanvasPosX * textureSize.x / 2 * (1 + zoomScale + scrollOffset.x));
