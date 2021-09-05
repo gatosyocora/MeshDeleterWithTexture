@@ -305,10 +305,11 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         private static (Vector2, float) UpdateByZoomScale(Vector2 scrollOffset, float zoomScale, Vector2 delta)
         {
-            zoomScale += Mathf.Sign(delta.y) * ZOOM_STEP;
-
-            if (zoomScale > MAX_ZOOM_SCALE) zoomScale = MAX_ZOOM_SCALE;
-            else if (zoomScale < MIN_ZOOM_SCALE) zoomScale = MIN_ZOOM_SCALE;
+            zoomScale = Mathf.Clamp(
+                zoomScale + Mathf.Sign(delta.y) * ZOOM_STEP,
+                MIN_ZOOM_SCALE,
+                MAX_ZOOM_SCALE
+            );
 
             // 縮小ではOffsetも中心に戻していく
             if (Mathf.Sign(delta.y) > 0)
@@ -328,22 +329,20 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
             if (delta.x != 0)
             {
-                scrollOffset.x -= delta.x / rectSize.x;
-
-                if (scrollOffset.x > inverseZoomScale)
-                    scrollOffset.x = inverseZoomScale;
-                else if (scrollOffset.x < -inverseZoomScale)
-                    scrollOffset.x = -inverseZoomScale;
+                scrollOffset.x = Mathf.Clamp(
+                    scrollOffset.x - delta.x / rectSize.x,
+                    -inverseZoomScale,
+                    inverseZoomScale
+                );
             }
 
             if (delta.y != 0)
             {
-                scrollOffset.y += delta.y / rectSize.y;
-
-                if (scrollOffset.y > inverseZoomScale)
-                    scrollOffset.y = inverseZoomScale;
-                else if (scrollOffset.y < -inverseZoomScale)
-                    scrollOffset.y = -inverseZoomScale;
+                scrollOffset.y = Mathf.Clamp(
+                    scrollOffset.y + delta.y / rectSize.y,
+                    -inverseZoomScale,
+                    inverseZoomScale
+                );
             }
 
             return scrollOffset;
