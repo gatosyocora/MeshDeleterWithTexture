@@ -324,24 +324,26 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         private static Vector2 UpdateScrollOffset(Vector2 scrollOffset, Vector2 delta, Vector2 rectSize, float zoomScale)
         {
+            var inverseZoomScale = 1 - zoomScale;
+
             if (delta.x != 0)
             {
                 scrollOffset.x -= delta.x / rectSize.x;
 
-                if (scrollOffset.x > 1 - zoomScale)
-                    scrollOffset.x = 1 - zoomScale;
-                else if (scrollOffset.x < -(1 - zoomScale))
-                    scrollOffset.x = -(1 - zoomScale);
+                if (scrollOffset.x > inverseZoomScale)
+                    scrollOffset.x = inverseZoomScale;
+                else if (scrollOffset.x < -inverseZoomScale)
+                    scrollOffset.x = -inverseZoomScale;
             }
 
             if (delta.y != 0)
             {
                 scrollOffset.y += delta.y / rectSize.y;
 
-                if (scrollOffset.y > 1 - zoomScale)
-                    scrollOffset.y = 1 - zoomScale;
-                else if (scrollOffset.y < -(1 - zoomScale))
-                    scrollOffset.y = -(1 - zoomScale);
+                if (scrollOffset.y > inverseZoomScale)
+                    scrollOffset.y = inverseZoomScale;
+                else if (scrollOffset.y < -inverseZoomScale)
+                    scrollOffset.y = -inverseZoomScale;
             }
 
             return scrollOffset;
