@@ -164,7 +164,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
 
             canvasView.uvMap.SetUVMapTexture(renderer, matInfos[materialInfoIndex]);
 
-            Initialize(canvasView);
+            Initialize(canvasView, false);
 
             previousMesh = null;
             previousMaterials = null;
@@ -179,7 +179,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             renderer.sharedMaterials = previousMaterials;
             previousMaterials = null;
 
-            Initialize(canvasView);
+            Initialize(canvasView, false);
         }
 
         public void OnDeleteMeshButtonClicked(CanvasView canvasView)

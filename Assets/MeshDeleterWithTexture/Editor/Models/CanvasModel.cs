@@ -46,11 +46,11 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         /// </summary>
         /// <param name="pos"></param>
         /// <param name="textureSize"></param>
-        public void Mark(Vector2 pos)
+        public void Mark(Vector2Int pos)
         {
             var posArray = new int[2 * sizeof(int)];
-            posArray[0 * sizeof(int)] = (int)pos.x;
-            posArray[1 * sizeof(int)] = (int)pos.y;
+            posArray[0 * sizeof(int)] = pos.x;
+            posArray[1 * sizeof(int)] = pos.y;
             computeShader.SetInts("Pos", posArray);
 
             computeShader.Dispatch(penKernelId, textureSize.x / 32, textureSize.y / 32, 1);
@@ -61,11 +61,11 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         /// </summary>
         /// <param name="pos"></param>
         /// <param name="textureSize"></param>
-        public void UnMark(Vector2 pos)
+        public void UnMark(Vector2Int pos)
         {
             var posArray = new int[2 * sizeof(int)];
-            posArray[0 * sizeof(int)] = (int)pos.x;
-            posArray[1 * sizeof(int)] = (int)pos.y;
+            posArray[0 * sizeof(int)] = pos.x;
+            posArray[1 * sizeof(int)] = pos.y;
             computeShader.SetInts("Pos", posArray);
 
             computeShader.Dispatch(eraserKernelId, textureSize.x / 32, textureSize.y / 32, 1);

@@ -20,6 +20,13 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         private MaterialInfo materialInfo;
 
+        private const float MAX_ZOOM_SCALE = 1;
+        private const float MIN_ZOOM_SCALE = 0.1f;
+        private const float ZOOM_STEP = 0.1f;
+
+        private const int LEFT_BUTTON = 0;
+        private const int RIGHT_BUTTON = 1;
+
         public DrawType DrawType { get; set; }
 
         private Color _penColor;
@@ -45,13 +52,13 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             }
         }
 
-        private Vector4 _scrollOffset;
-        public Vector4 ScrollOffset
+        private Vector2 _scrollOffset;
+        public Vector2 ScrollOffset
         {
             get => _scrollOffset;
             private set
             {
-                editMat.SetVector("_Offset", value);
+                editMat.SetVector("_Offset", new Vector4(value.x, value.y, 0, 0));
                 _scrollOffset = value;
             }
         }
@@ -112,45 +119,15 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 // テクスチャの拡大縮小機能
                 if (mouseEventType == EventType.ScrollWheel)
                 {
-                    ZoomScale += Mathf.Sign(delta.y) * 0.1f;
-
-                    if (ZoomScale > 1) ZoomScale = 1;
-                    else if (ZoomScale < 0.1f) ZoomScale = 0.1f;
-
-                    // 縮小ではOffsetも中心に戻していく
-                    if (Mathf.Sign(delta.y) > 0)
-                    {
-                        if (ZoomScale < 1)
-                            ScrollOffset *= ZoomScale;
-                        else
-                            ScrollOffset = Vector4.zero;
-                    }
+                    var (off, scale) = UpdateByZoomScale(ScrollOffset, ZoomScale, delta);
+                    ScrollOffset = off;
+                    ZoomScale = scale;
                 }
                 // テクスチャの表示箇所を移動する機能
-                else if (Event.current.button == 1 &&
+                else if (Event.current.button == RIGHT_BUTTON &&
                     mouseEventType == EventType.MouseDrag)
                 {
-                    if (delta.x != 0)
-                    {
-                        _scrollOffset.x -= delta.x / rect.width;
-
-                        if (_scrollOffset.x > 1 - ZoomScale)
-                            _scrollOffset.x = 1 - ZoomScale;
-                        else if (_scrollOffset.x < -(1 - ZoomScale))
-                            _scrollOffset.x = -(1 - ZoomScale);
-                    }
-
-                    if (delta.y != 0)
-                    {
-                        _scrollOffset.y += delta.y / rect.height;
-
-                        if (_scrollOffset.y > 1 - ZoomScale)
-                            _scrollOffset.y = 1 - ZoomScale;
-                        else if (_scrollOffset.y < -(1 - ZoomScale))
-                            _scrollOffset.y = -(1 - ZoomScale);
-                    }
-
-                    editMat.SetVector("_Offset", _scrollOffset);
+                    ScrollOffset = UpdateScrollOffset(ScrollOffset, delta, rect.size, ZoomScale);
                 }
 
 
@@ -162,14 +139,14 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                     editMat.SetVector("_CurrentPos", new Vector4(uvPos.x, uvPos.y, 0, 0));
 
                     if (Event.current.type == EventType.MouseDown &&
-                        Event.current.button == 0 &&
+                        Event.current.button == LEFT_BUTTON &&
                         !isDrawing)
                     {
                         RegisterUndoTexture();
                         isDrawing = true;
                     }
                     else if (Event.current.type == EventType.MouseUp &&
-                        Event.current.button == 0 &&
+                        Event.current.button == LEFT_BUTTON &&
                         isDrawing)
                     {
                         isDrawing = false;
@@ -245,36 +222,55 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         /// ペン
         /// </summary>
         /// <param name="pos"></param>
-        private void DrawOnTexture(Vector2 pos) => canvasModel.Mark(pos);
+        private void DrawOnTexture(Vector2Int pos) => canvasModel.Mark(pos);
 
         /// <summary>
         /// 消しゴム
         /// </summary>
         /// <param name="pos"></param>
-        private void ClearOnTexture(Vector2 pos) => canvasModel.UnMark(pos);
+        private void ClearOnTexture(Vector2Int pos) => canvasModel.UnMark(pos);
 
         /// <summary>
         /// ScrollOffsetとZoomScaleをリセットする
         /// </summary>
         public void ResetScrollOffsetAndZoomScale()
         {
-            ScrollOffset = Vector4.zero;
+            ScrollOffset = Vector2.zero;
             ZoomScale = 1;
         }
 
-        private Vector2 ConvertWindowPosToTexturePos(Vector2Int textureSize, Vector2 windowPos, Rect rect, float zoomScale, Vector4 scrollOffset)
+        // Textureのuv座標的にどの範囲が表示されているかを元に補正している
+        private Vector2Int ConvertWindowPosToTexturePos(Vector2Int textureSize, Vector2 windowPos, Rect rect, float zoomScale, Vector2 scrollOffset)
         {
+            var invZoomScale = 1 - zoomScale;
+
             float raito = textureSize.x / rect.width;
 
-            // Textureの場所に変換
-            var texX = (int)((windowPos.x - rect.position.x) * raito);
-            var texY = textureSize.y - (int)((windowPos.y - rect.position.y) * raito);
+            // 正規化されたCanvasのポジションに変換
+            var normalizedCanvasPosX = ((windowPos.x - rect.position.x) * raito) / textureSize.x;
+            var normalizedCanvasPosY = (textureSize.y - (windowPos.y - rect.position.y) * raito) / textureSize.y;
+
+            // ScrollOffsetを[-1, 1]の範囲にしたもの(中心からどれぐらいずれているか)
+            var normalizedOffset = zoomScale < 1 ? new Vector2(
+                Mathf.InverseLerp(-(invZoomScale), invZoomScale, scrollOffset.x) * 2f - 1f,
+                Mathf.InverseLerp(-(invZoomScale), invZoomScale, scrollOffset.y) * 2f - 1f 
+            ) : Vector2.zero;
+
+            // テクスチャのuv座標的な最小値と最大値
+            // zoomScaleが0.5でoffsetが0,0ならuv座標的に[0.25, 0.75]の範囲が表示されている
+            // zoomScale = uv座標の表示範囲幅
+            // offsetXがマイナス（左の方を表示している）のとき、左の未表示範囲 < 右の未表示範囲
+            // offsetXがプラス（右の方を表示している）のとき、左の未表示範囲 > 右の未表示範囲
+            var minCanvasPosX = 0.5f - zoomScale / 2f + normalizedOffset.x * (invZoomScale / 2f);
+            var maxCanvasPosX = 0.5f + zoomScale / 2f + normalizedOffset.x * (invZoomScale / 2f);
+            var minCanvasPosY = 0.5f - zoomScale / 2f + normalizedOffset.y * (invZoomScale / 2f);
+            var maxCanvasPosY = 0.5f + zoomScale / 2f + normalizedOffset.y * (invZoomScale / 2f);
 
             // ScaleとOffsetによって変化しているので戻す
-            var x = texX / 2 * (1 + zoomScale + scrollOffset.x);
-            var y = texY / 2 * (1 + zoomScale + scrollOffset.y);
+            var x = (int)(Mathf.Lerp(minCanvasPosX, maxCanvasPosX, normalizedCanvasPosX) * textureSize.x);
+            var y = (int)(Mathf.Lerp(minCanvasPosY, maxCanvasPosY, normalizedCanvasPosY) * textureSize.y);
 
-            return new Vector2(x, y);
+            return new Vector2Int(x, y);
         }
 
         private Vector2 ConvertTexturePosToUVPos(Vector2Int textureSize, Vector2 texturePos) => texturePos / textureSize;
@@ -327,6 +323,51 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         public void Dispose()
         {
             canvasModel.Dispose();
+        }
+
+        private static (Vector2, float) UpdateByZoomScale(Vector2 scrollOffset, float zoomScale, Vector2 delta)
+        {
+            zoomScale = Mathf.Clamp(
+                zoomScale + Mathf.Sign(delta.y) * ZOOM_STEP,
+                MIN_ZOOM_SCALE,
+                MAX_ZOOM_SCALE
+            );
+
+            // 縮小ではOffsetも中心に戻していく
+            if (Mathf.Sign(delta.y) > 0)
+            {
+                if (zoomScale < MAX_ZOOM_SCALE)
+                    scrollOffset *= zoomScale;
+                else
+                    scrollOffset = Vector2.zero;
+            }
+
+            return (scrollOffset, zoomScale);
+        }
+
+        private static Vector2 UpdateScrollOffset(Vector2 scrollOffset, Vector2 delta, Vector2 rectSize, float zoomScale)
+        {
+            var inverseZoomScale = 1 - zoomScale;
+
+            if (delta.x != 0)
+            {
+                scrollOffset.x = Mathf.Clamp(
+                    scrollOffset.x - delta.x / rectSize.x,
+                    -inverseZoomScale,
+                    inverseZoomScale
+                );
+            }
+
+            if (delta.y != 0)
+            {
+                scrollOffset.y = Mathf.Clamp(
+                    scrollOffset.y + delta.y / rectSize.y,
+                    -inverseZoomScale,
+                    inverseZoomScale
+                );
+            }
+
+            return scrollOffset;
         }
     }
 }
