@@ -36,7 +36,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         public static string DragAndDropableArea(string text, string[] permissonExtensions)
         {
             var rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight * 2);
-            GUI.Label(rect, text, GUI.skin.box);
+            EditorGUI.LabelField(rect, text, GUI.skin.box);
             var e = Event.current;
             if ((e.type == EventType.DragPerform || e.type == EventType.DragUpdated) &&
                 rect.Contains(e.mousePosition))
