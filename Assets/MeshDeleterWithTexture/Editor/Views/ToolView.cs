@@ -222,19 +222,13 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
             EditorGUILayout.Space();
 
-            using (var check = new EditorGUI.ChangeCheckScope())
-            {
-                var penSize = EditorGUILayout.IntSlider(
-                                localizedText.Data.penEraserSizeLabelText,
-                                canvasView.PenSize,
-                                1,
-                                !model.HasTexture() ? 100 : model.Texture.width / 20);
-
-                if (check.changed)
-                {
-                    canvasView.PenSize = penSize;
-                }
-            }
+            GatoGUILayout.IntSlider(
+                localizedText.Data.penEraserSizeLabelText,
+                canvasView.PenSize,
+                1,
+                !model.HasTexture() ? 100 : model.Texture.width / 20,
+                penSize => canvasView.PenSize = penSize
+            );
         }
 
         private void OutputMeshGUI(MeshDeleterWithTextureModel model, LocalizedText localizedText)
