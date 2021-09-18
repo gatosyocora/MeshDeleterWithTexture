@@ -12,6 +12,9 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
 {
     public class MeshDeleterWithTextureModel : IDisposable
     {
+        private const string MESH_SUFFIX = "_deleteMesh";
+
+
         private MaterialInfo[] matInfos;
         public int materialInfoIndex = 0;
 
@@ -75,7 +78,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             var textureSize = new Vector2Int(texture.width, texture.height);
             var (deletedMesh, hadDeletedSubMeshes) = MeshDeleter.RemoveTriangles(mesh, deletePos, textureSize, materialIndexList);
 
-            if (meshName == "") meshName = mesh.name + "_deleteMesh";
+            if (meshName == "") meshName = mesh.name + MESH_SUFFIX;
             AssetDatabase.CreateAsset(deletedMesh, AssetDatabase.GenerateUniqueAssetPath(Path.Combine(saveFolder, $"{meshName}.asset")));
             AssetDatabase.SaveAssets();
 
@@ -108,7 +111,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             defaultMaterials = RendererUtility.GetMaterials(renderer);
             matInfos = RendererUtility.GetMaterialInfos(renderer);
             textureNames = matInfos.Select(x => x.Name).ToArray();
-            meshName = StringUtility.AddKeywordToEnd(mesh.name, "_deleteMesh");
+            meshName = StringUtility.AddKeywordToEnd(mesh.name, MESH_SUFFIX);
         }
 
         private void ResetMaterialsToDefault(Renderer renderer) 
