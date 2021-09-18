@@ -119,6 +119,14 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             }
         }
 
+        public static void DisabledButton(string text, Action onClicked, bool disable)
+        {
+            using (new EditorGUI.DisabledGroupScope(disable))
+            {
+                Button(text, onClicked);
+            }
+        }
+
         public class RightAlignedScope : GUI.Scope
         {
             EditorGUILayout.HorizontalScope horizontalScope;

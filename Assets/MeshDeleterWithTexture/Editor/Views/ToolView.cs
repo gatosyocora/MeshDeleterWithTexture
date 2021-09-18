@@ -13,22 +13,26 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         public void Render(MeshDeleterWithTextureModel model, LocalizedText localizedText, CanvasView canvasView)
         {
-            using (new EditorGUI.DisabledGroupScope(!model.HasTexture()))
             using (new EditorGUILayout.VerticalScope())
             {
                 using (new EditorGUILayout.HorizontalScope())
                 {
-                    if (GUILayout.Button(localizedText.Data.importDeleteMaskButtonText))
-                    {
-                        canvasView.deleteMask.ImportDeleteMaskTexture();
-                    }
-                    if (GUILayout.Button(localizedText.Data.exportDeleteMaskButtonText))
-                    {
-                        canvasView.deleteMask.ExportDeleteMaskTexture();
-                        model.SetPreviewTextureToMaterial(ref canvasView.previewTexture);
+                    GatoGUILayout.DisabledButton(
+                        localizedText.Data.importDeleteMaskButtonText,
+                        () => canvasView.deleteMask.ImportDeleteMaskTexture(),
+                        !model.HasTexture()
+                    );
 
-                        canvasView.uvMap.SetUVMapTexture(model.renderer, model.currentMaterialInfo);
-                    }
+                    GatoGUILayout.DisabledButton(
+                        localizedText.Data.exportDeleteMaskButtonText,
+                        () => {
+                            canvasView.deleteMask.ExportDeleteMaskTexture();
+                            model.SetPreviewTextureToMaterial(ref canvasView.previewTexture);
+
+                            canvasView.uvMap.SetUVMapTexture(model.renderer, model.currentMaterialInfo);
+                        },
+                        !model.HasTexture()
+                    );
                 }
 
                 using (var check = new EditorGUI.ChangeCheckScope())
