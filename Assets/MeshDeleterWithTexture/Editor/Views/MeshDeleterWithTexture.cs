@@ -111,8 +111,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 toolView.Render(model, localizedText, canvasView);
             }
 
-            if (Event.current.type == EventType.KeyDown && 
-                Event.current.keyCode == KeyCode.Z)
+            if (InputKeyDown(KeyCode.Z))
             {
                 canvasView.UndoPreviewTexture();
             }
@@ -139,6 +138,12 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 GUILayout.FlexibleSpace();
             }
             GUILayout.FlexibleSpace();
+        }
+
+        private bool InputKeyDown(KeyCode keyCode)
+        {
+            return Event.current.type == EventType.KeyDown && 
+                Event.current.keyCode == keyCode;
         }
 
         private void OnLanguagePopupChanged(Language language)
