@@ -34,15 +34,16 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             return Vector2.zero;
         }
 
-        public static string DragAndDropableArea(string text, string[] permissonExtensions)
+        public static string DragAndDropableArea(string text, string[] permissonExtensions, Action<string> onChanged)
         {
             EditorGUILayout.LabelField(
-                text, 
-                GUI.skin.box, 
+                text,
+                GUI.skin.box,
                 GUILayout.ExpandWidth(true),
                 GUILayout.Height(EditorGUIUtility.singleLineHeight * 2)
             );
             var rect = GUILayoutUtility.GetLastRect();
+
             var e = Event.current;
             if ((e.type == EventType.DragPerform || e.type == EventType.DragUpdated) &&
                 rect.Contains(e.mousePosition))
@@ -57,7 +58,9 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                     return string.Empty;
 
                 DragAndDrop.AcceptDrag();
-                GUI.changed = true;
+
+                onChanged(path);
+
                 return path;
             }
 

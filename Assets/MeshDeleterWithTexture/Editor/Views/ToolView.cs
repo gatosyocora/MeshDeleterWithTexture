@@ -35,11 +35,11 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                     );
                 }
 
-                using (var check = new EditorGUI.ChangeCheckScope())
-                {
-                    var path = GatoGUILayout.DragAndDropableArea(localizedText.Data.dragAndDropDeleteMaskTextureAreaText, deleteMaskTextureExtensions);
-                    if (check.changed) canvasView.deleteMask.ApplyDeleteMaskTextureToBuffer(path);
-                }
+                GatoGUILayout.DragAndDropableArea(
+                    localizedText.Data.dragAndDropDeleteMaskTextureAreaText,
+                    deleteMaskTextureExtensions,
+                    path => canvasView.deleteMask.ApplyDeleteMaskTextureToBuffer(path)
+                );
 
                 GUILayout.Space(10f);
 
