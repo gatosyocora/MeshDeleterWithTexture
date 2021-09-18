@@ -71,7 +71,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             using (new EditorGUILayout.HorizontalScope())
             {
-                var newRenderer = GatoGUILayout.ObjectField(
+                GatoGUILayout.ObjectField(
                     localizedText.Data.rendererLabelText,
                     model.renderer,
                     renderer => model.OnChangeRenderer(canvasView, renderer)
@@ -79,7 +79,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                 EditorGUILayout.Space();
 
-                var selectLanguage = GatoGUILayout.EnumPopup(
+                GatoGUILayout.EnumPopup(
                     localizedText.SelectedLanguage,
                     language => OnLanguagePopupChanged(language),
                     GUILayout.Width(50)
