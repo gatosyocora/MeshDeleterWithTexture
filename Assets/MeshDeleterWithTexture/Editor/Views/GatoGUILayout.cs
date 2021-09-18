@@ -114,19 +114,19 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             }
         }
 
-        public static void Button(string text, Action onClicked)
+        public static void Button(string text, Action onClicked, params GUILayoutOption[] options)
         {
-            if (GUILayout.Button(text))
+            if (GUILayout.Button(text, options))
             {
                 onClicked();
             }
         }
 
-        public static void DisabledButton(string text, Action onClicked, bool disable)
+        public static void DisabledButton(string text, Action onClicked, bool disable, params GUILayoutOption[] options)
         {
             using (new EditorGUI.DisabledGroupScope(disable))
             {
-                Button(text, onClicked);
+                Button(text, onClicked, options);
             }
         }
 
