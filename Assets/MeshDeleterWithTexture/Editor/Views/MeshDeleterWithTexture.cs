@@ -71,11 +71,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
             using (new EditorGUILayout.HorizontalScope())
             {
-                using (var check = new EditorGUI.ChangeCheckScope())
-                {
-                    var newRenderer = GatoGUILayout.ObjectField(localizedText.Data.rendererLabelText, model.renderer);
-                    if (check.changed) model.OnChangeRenderer(canvasView, newRenderer);
-                }
+                var newRenderer = GatoGUILayout.ObjectField(
+                    localizedText.Data.rendererLabelText,
+                    model.renderer,
+                    renderer => model.OnChangeRenderer(canvasView, renderer)
+                );
 
                 EditorGUILayout.Space();
 

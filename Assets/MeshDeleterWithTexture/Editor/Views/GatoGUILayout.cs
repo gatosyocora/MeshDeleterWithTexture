@@ -3,6 +3,7 @@ using UnityEditor;
 using System.Linq;
 using System.IO;
 using Gatosyocora.MeshDeleterWithTexture.Models;
+using System;
 
 namespace Gatosyocora.MeshDeleterWithTexture.Views
 {
@@ -63,9 +64,23 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             return string.Empty;
         }
 
-        public static T ObjectField<T>(string label, T value, bool allowSceneObjects = true) where T : Object
+        public static T ObjectField<T>(string label, T value, bool allowSceneObjects = true) where T : UnityEngine.Object
         {
             return EditorGUILayout.ObjectField(label, value, typeof(T), allowSceneObjects) as T;
+        }
+
+        public static T ObjectField<T>(string label, T value, Action<T> onChanged, bool allowSceneObjects = true) where T : UnityEngine.Object
+        {
+            using (var check = new EditorGUI.ChangeCheckScope())
+            {
+                var newValue = ObjectField(label, value, allowSceneObjects);
+                if (check.changed)
+                {
+                    onChanged(newValue);
+                }
+
+                return newValue;
+            }
         }
 
         public class RightAlignedScope : GUI.Scope
