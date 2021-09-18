@@ -71,57 +71,58 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
                 EditorGUILayout.Space();
 
-                EditorGUILayout.LabelField(localizedText.Data.toolsTitleText, EditorStyles.boldLabel);
-
-                EditorGUILayout.LabelField(localizedText.Data.drawTypeLabelText);
-
-                GatoGUILayout.Toolbar(
-                    canvasView.DrawType,
-                    drawTypeTexts,
-                    drawType => { canvasView.DrawType = drawType; }
-                );
-
-                EditorGUILayout.Space();
-
-                PenEraserGUI(model, localizedText, canvasView);
-
-                EditorGUILayout.Space();
-
-                using (new GatoGUILayout.RightAlignedScope())
+                using (new GatoGUILayout.TitleScope(localizedText.Data.toolsTitleText))
                 {
-                    GatoGUILayout.Button(
-                        localizedText.Data.inverseFillAreaButtonText,
-                        () =>
-                        {
-                            canvasView.RegisterUndoTexture();
-                            canvasView.InverseFillArea();
-                        }
+                    EditorGUILayout.LabelField(localizedText.Data.drawTypeLabelText);
+
+                    GatoGUILayout.Toolbar(
+                        canvasView.DrawType,
+                        drawTypeTexts,
+                        drawType => { canvasView.DrawType = drawType; }
                     );
 
-                    GatoGUILayout.Button(
-                        localizedText.Data.clearAllDrawingButtonText,
-                        () =>
-                        {
-                            canvasView.RegisterUndoTexture();
+                    EditorGUILayout.Space();
 
-                            canvasView.ClearAllDrawing();
+                    PenEraserGUI(model, localizedText, canvasView);
 
-                            model.SetPreviewTextureToMaterial(ref canvasView.previewTexture);
-                        }
-                    );
+                    EditorGUILayout.Space();
 
-                    GUILayout.FlexibleSpace();
+                    using (new GatoGUILayout.RightAlignedScope())
+                    {
+                        GatoGUILayout.Button(
+                            localizedText.Data.inverseFillAreaButtonText,
+                            () =>
+                            {
+                                canvasView.RegisterUndoTexture();
+                                canvasView.InverseFillArea();
+                            }
+                        );
 
-                    GatoGUILayout.DisabledButton(
-                        localizedText.Data.undoDrawingButtonText,
-                        () => canvasView.UndoPreviewTexture(),
-                        !canvasView.undo.canUndo()
-                    );
+                        GatoGUILayout.Button(
+                            localizedText.Data.clearAllDrawingButtonText,
+                            () =>
+                            {
+                                canvasView.RegisterUndoTexture();
+
+                                canvasView.ClearAllDrawing();
+
+                                model.SetPreviewTextureToMaterial(ref canvasView.previewTexture);
+                            }
+                        );
+
+                        GUILayout.FlexibleSpace();
+
+                        GatoGUILayout.DisabledButton(
+                            localizedText.Data.undoDrawingButtonText,
+                            () => canvasView.UndoPreviewTexture(),
+                            !canvasView.undo.canUndo()
+                        );
+                    }
                 }
 
                 GUILayout.Space(20);
 
-                EditorGUILayout.LabelField(localizedText.Data.modelInformationTitleText, EditorStyles.boldLabel);
+                using (new GatoGUILayout.TitleScope(localizedText.Data.modelInformationTitleText))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     EditorGUILayout.LabelField(localizedText.Data.triangleCountLabelText, model.triangleCount + "");
@@ -231,7 +232,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         private void OutputMeshGUI(MeshDeleterWithTextureModel model, LocalizedText localizedText)
         {
-            EditorGUILayout.LabelField(localizedText.Data.outputMeshTitleText, EditorStyles.boldLabel);
+            using (new GatoGUILayout.TitleScope(localizedText.Data.outputMeshTitleText))
             using (new EditorGUI.IndentLevelScope())
             {
                 using (new EditorGUILayout.HorizontalScope())

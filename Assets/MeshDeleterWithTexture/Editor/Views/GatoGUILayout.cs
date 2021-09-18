@@ -212,5 +212,15 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 horizontalScope.Dispose();
             }
         }
+
+        public class TitleScope : GUI.Scope
+        {
+            public TitleScope(string label)
+            {
+                EditorGUILayout.LabelField(label, EditorStyles.boldLabel);
+            }
+
+            protected override void CloseScope() {}
+        }
     }
 }
