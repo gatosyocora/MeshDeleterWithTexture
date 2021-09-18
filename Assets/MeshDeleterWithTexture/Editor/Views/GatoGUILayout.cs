@@ -158,6 +158,24 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             }
         }
 
+        public static T Toolbar<T>(T value, string[] texts, Action<T> onChanged) where T : Enum
+        {
+            var enumValues = Enum.GetValues(typeof(T)) as T[];
+            var intValue = Array.IndexOf(enumValues, value);
+
+            using (var check = new EditorGUI.ChangeCheckScope())
+            {
+                var newIntValue = GUILayout.Toolbar(intValue, texts);
+                var newValue = enumValues[newIntValue];
+                if (check.changed)
+                {
+                    onChanged(newValue);
+                }
+
+                return newValue;
+            }
+        }
+
         public class RightAlignedScope : GUI.Scope
         {
             EditorGUILayout.HorizontalScope horizontalScope;

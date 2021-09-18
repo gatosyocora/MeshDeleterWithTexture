@@ -72,12 +72,12 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 EditorGUILayout.LabelField(localizedText.Data.toolsTitleText, EditorStyles.boldLabel);
 
                 EditorGUILayout.LabelField(localizedText.Data.drawTypeLabelText);
-                using (var check = new EditorGUI.ChangeCheckScope())
-                using (new EditorGUILayout.HorizontalScope())
-                {
-                    var drawType = (DrawType)GUILayout.Toolbar((int)canvasView.DrawType, drawTypeTexts);
-                    if (check.changed) canvasView.DrawType = drawType;
-                }
+
+                GatoGUILayout.Toolbar(
+                    canvasView.DrawType,
+                    drawTypeTexts,
+                    drawType => { canvasView.DrawType = drawType; }
+                );
 
                 EditorGUILayout.Space();
 
