@@ -91,11 +91,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 using (new EditorGUILayout.VerticalScope())
                 {
                     if (model.HasTexture()) canvasView.Render(0.6f);
-                    else GUI.Box(
-                            GUILayoutUtility.GetRect(
-                                EditorGUIUtility.currentViewWidth * 0.6f,
-                                EditorGUIUtility.currentViewWidth * 0.6f),
-                            "");
+                    else DrawDummyCanvasView(0.6f);
 
                     using (new EditorGUILayout.HorizontalScope())
                     using (var check = new EditorGUI.ChangeCheckScope())
@@ -118,6 +114,17 @@ namespace Gatosyocora.MeshDeleterWithTexture
             {
                 canvasView.UndoPreviewTexture();
             }
+        }
+
+        private void DrawDummyCanvasView(float canvasSizeRaito)
+        {
+            GUI.Box(
+                GUILayoutUtility.GetRect(
+                    EditorGUIUtility.currentViewWidth * canvasSizeRaito,
+                    EditorGUIUtility.currentViewWidth * canvasSizeRaito
+                ),
+                string.Empty
+            );
         }
 
         private void DrawNotSupportBuildTarget()
