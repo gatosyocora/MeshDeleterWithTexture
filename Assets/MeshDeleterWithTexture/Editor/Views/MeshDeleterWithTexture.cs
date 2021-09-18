@@ -20,6 +20,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
 #if UNITY_EDITOR
     public class MeshDeleterWithTexture : EditorWindow
     {
+        private const float CANVAS_SIZE_RAITO = 0.6f;
+
         private CanvasView canvasView;
         private ToolView toolView;
 
@@ -90,8 +92,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
             {
                 using (new EditorGUILayout.VerticalScope())
                 {
-                    if (model.HasTexture()) canvasView.Render(0.6f);
-                    else DrawDummyCanvasView(0.6f);
+                    if (model.HasTexture()) canvasView.Render(CANVAS_SIZE_RAITO);
+                    else DrawDummyCanvasView(CANVAS_SIZE_RAITO);
 
                     using (new EditorGUILayout.HorizontalScope())
                     using (var check = new EditorGUI.ChangeCheckScope())
