@@ -100,6 +100,21 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             }
         }
 
+        public static int Popup(string label, int value, string[] texts, Action<int> onChanged)
+        {
+            using (var check = new EditorGUI.ChangeCheckScope())
+            {
+                var newValue = EditorGUILayout.Popup(label, value, texts);
+
+                if (check.changed)
+                {
+                    onChanged(newValue);
+                }
+
+                return newValue;
+            }
+        }
+
         public static float Slider(string label, float value, float min, float max, Action<float> onChanged)
         {
             using (var check = new EditorGUI.ChangeCheckScope())
