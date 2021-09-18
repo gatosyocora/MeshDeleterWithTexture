@@ -81,10 +81,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
                 EditorGUILayout.Space();
 
-                using (new EditorGUILayout.HorizontalScope())
+                using (new GatoGUILayout.RightAlignedScope())
                 {
-                    GUILayout.FlexibleSpace();
-
                     if (GUILayout.Button(localizedText.Data.inverseFillAreaButtonText))
                     {
                         canvasView.RegisterUndoTexture();
@@ -109,7 +107,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                             canvasView.UndoPreviewTexture();
                         }
                     }
-
                 }
 
                 GUILayout.Space(20);
@@ -126,11 +123,9 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
                 GUILayout.Space(50);
 
-                using (new EditorGUILayout.HorizontalScope())
+                using (new GatoGUILayout.RightAlignedScope())
                 using (new EditorGUI.DisabledGroupScope(model.renderer == null || !PrefabUtility.IsPartOfAnyPrefab(model.renderer)))
                 {
-                    GUILayout.FlexibleSpace();
-
                     if (GUILayout.Button(localizedText.Data.revertMeshToPrefabButtonText))
                     {
                         model.RevertMeshToPrefab(canvasView);
@@ -139,16 +134,12 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
                 GUILayout.Space(10f);
 
-                using (new EditorGUILayout.HorizontalScope())
+                using (new GatoGUILayout.RightAlignedScope())
+                using (new EditorGUI.DisabledGroupScope(!model.HasPreviousMesh()))
                 {
-                    GUILayout.FlexibleSpace();
-
-                    using (new EditorGUI.DisabledGroupScope(!model.HasPreviousMesh()))
+                    if (GUILayout.Button(localizedText.Data.revertMeshToPreviouslyButtonText))
                     {
-                        if (GUILayout.Button(localizedText.Data.revertMeshToPreviouslyButtonText))
-                        {
-                            model.RevertMeshToPreviously(canvasView);
-                        }
+                        model.RevertMeshToPreviously(canvasView);
                     }
                 }
 

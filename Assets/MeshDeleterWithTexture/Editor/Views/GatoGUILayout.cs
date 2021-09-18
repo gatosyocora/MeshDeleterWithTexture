@@ -62,5 +62,22 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
             return string.Empty;
         }
+
+        public class RightAlignedScope : GUI.Scope
+        {
+            EditorGUILayout.HorizontalScope horizontalScope;
+
+            public RightAlignedScope()
+            {
+                horizontalScope = new EditorGUILayout.HorizontalScope();
+
+                GUILayout.FlexibleSpace();
+            }
+
+            protected override void CloseScope()
+            {
+                horizontalScope.Dispose();
+            }
+        }
     }
 }
