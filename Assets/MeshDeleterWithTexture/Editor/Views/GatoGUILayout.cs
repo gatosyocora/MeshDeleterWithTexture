@@ -97,6 +97,20 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             }
         }
 
+        public static float Slider(string label, float value, float min, float max, Action<float> onChanged)
+        {
+            using (var check = new EditorGUI.ChangeCheckScope())
+            {
+                var newValue = EditorGUILayout.Slider(label, value, min, max);
+                if (check.changed)
+                {
+                    onChanged(newValue);
+                }
+
+                return newValue;
+            }
+        }
+
         public class RightAlignedScope : GUI.Scope
         {
             EditorGUILayout.HorizontalScope horizontalScope;

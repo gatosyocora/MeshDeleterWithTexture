@@ -95,10 +95,14 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     canvasView.Render(model.HasTexture(), CANVAS_SIZE_RAITO);
 
                     using (new EditorGUILayout.HorizontalScope())
-                    using (var check = new EditorGUI.ChangeCheckScope())
                     {
-                        var zoomScale = EditorGUILayout.Slider(localizedText.Data.scaleLabelText, canvasView.ZoomScale, 0.1f, 1.0f);
-                        if (check.changed) canvasView.ZoomScale = zoomScale;
+                         GatoGUILayout.Slider(
+                            localizedText.Data.scaleLabelText,
+                            canvasView.ZoomScale,
+                            0.1f,
+                            1.0f,
+                            scale => canvasView.ZoomScale = scale
+                        );
 
                         if (GUILayout.Button(localizedText.Data.resetButtonText))
                         {
