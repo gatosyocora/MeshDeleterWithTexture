@@ -111,6 +111,14 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             }
         }
 
+        public static void Button(string text, Action onClicked)
+        {
+            if (GUILayout.Button(text))
+            {
+                onClicked();
+            }
+        }
+
         public class RightAlignedScope : GUI.Scope
         {
             EditorGUILayout.HorizontalScope horizontalScope;

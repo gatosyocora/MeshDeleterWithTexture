@@ -104,10 +104,10 @@ namespace Gatosyocora.MeshDeleterWithTexture
                             scale => canvasView.ZoomScale = scale
                         );
 
-                        if (GUILayout.Button(localizedText.Data.resetButtonText))
-                        {
-                            canvasView.ResetScrollOffsetAndZoomScale();
-                        }
+                        GatoGUILayout.Button(
+                            localizedText.Data.resetButtonText,
+                            () => canvasView.ResetScrollOffsetAndZoomScale()
+                        );
                     }
                 }
 
