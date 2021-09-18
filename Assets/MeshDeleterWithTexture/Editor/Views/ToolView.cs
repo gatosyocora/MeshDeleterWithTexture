@@ -141,12 +141,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                         () => model.RevertMeshToPrefab(canvasView),
                         model.renderer == null || !PrefabUtility.IsPartOfAnyPrefab(model.renderer)
                     );
-                }
 
-                GUILayout.Space(10f);
-
-                using (new GatoGUILayout.RightAlignedScope())
-                {
                     GatoGUILayout.DisabledButton(
                         localizedText.Data.revertMeshToPreviouslyButtonText,
                         () => model.RevertMeshToPreviously(canvasView),
