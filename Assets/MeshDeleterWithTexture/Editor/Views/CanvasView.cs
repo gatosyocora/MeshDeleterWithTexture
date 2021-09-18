@@ -104,8 +104,14 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             PenSize = 20;
         }
 
-        public void Render(float canvasSizeRaito)
+        public void Render(bool hasTexture, float canvasSizeRaito)
         {
+            if (!hasTexture)
+            {
+                DrawDummyCanvasView(canvasSizeRaito);
+                return;
+            }
+
             if (textureSize == null) return;
 
             var width = EditorGUIUtility.currentViewWidth * canvasSizeRaito;
@@ -368,6 +374,17 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             }
 
             return scrollOffset;
+        }
+
+        private void DrawDummyCanvasView(float canvasSizeRaito)
+        {
+            GUI.Box(
+                GUILayoutUtility.GetRect(
+                    EditorGUIUtility.currentViewWidth * canvasSizeRaito,
+                    EditorGUIUtility.currentViewWidth * canvasSizeRaito
+                ),
+                string.Empty
+            );
         }
     }
 }
