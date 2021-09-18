@@ -45,11 +45,11 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
                 using (new EditorGUILayout.HorizontalScope())
                 {
-                    using (var check = new EditorGUI.ChangeCheckScope())
-                    {
-                        var uvMapLineColor = EditorGUILayout.ColorField(localizedText.Data.uvMapLineColorLabelText, canvasView.uvMap.uvMapLineColor);
-                        if (check.changed) canvasView.uvMap.SetUVMapLineColor(uvMapLineColor);
-                    }
+                    GatoGUILayout.ColorField(
+                        localizedText.Data.uvMapLineColorLabelText,
+                        canvasView.uvMap.uvMapLineColor,
+                        uvMapLineColor => canvasView.uvMap.SetUVMapLineColor(uvMapLineColor)
+                    );
 
                     GatoGUILayout.Button(
                         localizedText.Data.exportUvMapButtonText,
