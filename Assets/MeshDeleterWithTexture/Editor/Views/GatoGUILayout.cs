@@ -63,6 +63,11 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             return string.Empty;
         }
 
+        public static T ObjectField<T>(string label, T value, bool allowSceneObjects = true) where T : Object
+        {
+            return EditorGUILayout.ObjectField(label, value, typeof(T), allowSceneObjects) as T;
+        }
+
         public class RightAlignedScope : GUI.Scope
         {
             EditorGUILayout.HorizontalScope horizontalScope;
