@@ -79,11 +79,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
                 EditorGUILayout.Space();
 
-                using (var check = new EditorGUI.ChangeCheckScope())
-                {
-                    var selectLanguage = (Language)EditorGUILayout.EnumPopup(localizedText.SelectedLanguage, GUILayout.Width(50));
-                    if (check.changed) OnLanguagePopupChanged(selectLanguage);
-                }
+                var selectLanguage = GatoGUILayout.EnumPopup(
+                    localizedText.SelectedLanguage,
+                    language => OnLanguagePopupChanged(language),
+                    GUILayout.Width(50)
+                );
             }
 
             EditorGUILayout.Space(20);

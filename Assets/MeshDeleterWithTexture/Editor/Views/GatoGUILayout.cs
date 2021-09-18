@@ -83,6 +83,20 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             }
         }
 
+        public static T EnumPopup<T>(T value, Action<T> onChanged, params GUILayoutOption[] options) where T : Enum
+        {
+            using (var check = new EditorGUI.ChangeCheckScope())
+            {
+                var newValue = (T)EditorGUILayout.EnumPopup(value, options);
+                if (check.changed)
+                {
+                    onChanged(newValue);
+                }
+
+                return newValue;
+            }
+        }
+
         public class RightAlignedScope : GUI.Scope
         {
             EditorGUILayout.HorizontalScope horizontalScope;
