@@ -128,6 +128,20 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             }
         }
 
+        public static Color ColorField(Color color, Action<Color> onChanged)
+        {
+            using (var check = new EditorGUI.ChangeCheckScope())
+            {
+                var newColor = EditorGUILayout.ColorField(color);
+                if (check.changed)
+                {
+                    onChanged(newColor);
+                }
+
+                return newColor;
+            }
+        }
+
         public static void Button(string text, Action onClicked, params GUILayoutOption[] options)
         {
             if (GUILayout.Button(text, options))

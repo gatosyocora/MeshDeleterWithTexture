@@ -210,14 +210,10 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                     () => canvasView.PenColor = Color.blue
                 );
 
-                using (var check = new EditorGUI.ChangeCheckScope())
-                {
-                    var penColor = EditorGUILayout.ColorField(canvasView.PenColor);
-                    if (check.changed)
-                    {
-                        canvasView.PenColor = penColor;
-                    }
-                }
+                GatoGUILayout.ColorField(
+                    canvasView.PenColor,
+                    penColor => { canvasView.PenColor = penColor; }
+                );
             }
 
             EditorGUILayout.Space();
