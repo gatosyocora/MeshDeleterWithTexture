@@ -104,11 +104,11 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             PenSize = 20;
         }
 
-        public void Render()
+        public void Render(float canvasSizeRaito)
         {
             if (textureSize == null) return;
 
-            var width = EditorGUIUtility.currentViewWidth * 0.6f;
+            var width = EditorGUIUtility.currentViewWidth * canvasSizeRaito;
             var height = width * textureSize.y / textureSize.x;
             EventType mouseEventType = 0;
             Rect rect = new Rect(0, 0, 0, 0);

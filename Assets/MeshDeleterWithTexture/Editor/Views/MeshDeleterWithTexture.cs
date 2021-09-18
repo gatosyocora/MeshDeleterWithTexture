@@ -91,7 +91,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             {
                 using (new EditorGUILayout.VerticalScope())
                 {
-                    if (model.HasTexture()) canvasView.Render();
+                    if (model.HasTexture()) canvasView.Render(0.6f);
                     else GUI.Box(
                             GUILayoutUtility.GetRect(
                                 EditorGUIUtility.currentViewWidth * 0.6f,
