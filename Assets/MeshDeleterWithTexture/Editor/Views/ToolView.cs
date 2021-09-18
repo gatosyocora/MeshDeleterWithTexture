@@ -125,7 +125,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 using (new GatoGUILayout.TitleScope(localizedText.Data.modelInformationTitleText))
                 using (new EditorGUI.IndentLevelScope())
                 {
-                    EditorGUILayout.LabelField(localizedText.Data.triangleCountLabelText, model.triangleCount + "");
+                    EditorGUILayout.LabelField(localizedText.Data.triangleCountLabelText, model.triangleCount.ToString());
                 }
 
                 GUILayout.Space(20);
