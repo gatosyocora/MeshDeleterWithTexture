@@ -185,6 +185,32 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             Initialize(canvasView, false);
         }
 
+        // TODO: Sceneファイルを保存してから実行する必要がある
+        public void DeleteUnUsedMeshes()
+        {
+            // 本ツールで作成したMeshをSuffixを元に取得する
+            var createdMeshPaths = AssetDatabase.FindAssets($"t:Mesh {MESH_SUFFIX}")
+                .Select(guid => AssetDatabase.GUIDToAssetPath(guid));
+
+            // AssetsフォルダにあるAssetが使用しているAssetのパス一覧を取得する（Sceneファイルも含む）
+            // 依存関係があるファイルが1つの場合、それは自分自身なので場外
+            var dependenciesPaths = AssetDatabase.GetAllAssetPaths()
+                .Select(assetPath => AssetDatabase.GetDependencies(assetPath, true))
+                .Where(paths => paths.Length > 1)
+                .ToArray();
+
+            var foundMeshPaths = createdMeshPaths
+                .Where(path => !dependenciesPaths.Any(paths => paths.Contains(path)))
+                .ToArray();
+
+            foreach (var path in foundMeshPaths)
+            {
+                // TODO: このファイルに対して削除処理をおこなう
+                Debug.Log(path);
+                //UnityEngine.Object.DestroyImmediate(AssetDatabase.LoadAssetAtPath(path));
+            }
+        }
+
         public void OnDeleteMeshButtonClicked(CanvasView canvasView)
         {
             ResetMaterialsToDefault(renderer);
