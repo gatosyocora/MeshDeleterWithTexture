@@ -13,7 +13,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
         private List<Vector4> points = new List<Vector4>();
         private Vector4 latestPoint = Vector4.one * -1;
-
+        
         private ComputeShader cs;
         private int addPointKernelId;
         public SelectAreaCanvas(ref Material editMat)
@@ -45,8 +45,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
         public void AddSelectAreaPoint(Vector2 pos)
         {
+            cs.SetVector("PreviousPoint", latestPoint);
+
             var point = new Vector4(pos.x, pos.y, 0, 0);
             points.Add(point);
+            latestPoint = point;
             cs.SetVector("NewPoint", point);
             cs.Dispatch(addPointKernelId, selectAreaRT.width, selectAreaRT.height, 1);
         }
