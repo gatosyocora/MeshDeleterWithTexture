@@ -178,7 +178,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         {
             drawTypeTexts = new string[] {
                 localizedText.Data.penToolNameText,
-                localizedText.Data.eraserToolNameText
+                localizedText.Data.eraserToolNameText,
+                "SELECT"
             };
         }
 

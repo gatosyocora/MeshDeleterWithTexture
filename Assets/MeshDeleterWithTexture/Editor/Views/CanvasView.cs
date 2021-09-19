@@ -77,6 +77,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         public UndoCanvas undo;
         public UVMapCanvas uvMap;
         public DeleteMaskCanvas deleteMask;
+        public SelectAreaCanvas selectArea;
 
         public void OnEnable()
         {
@@ -84,6 +85,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             canvasModel = CreateInstance<CanvasModel>();
             undo = new UndoCanvas();
             uvMap = new UVMapCanvas(ref editMat);
+            selectArea = new SelectAreaCanvas(ref editMat);
 
             DrawType = DrawType.PEN;
             PenColor = Color.black;
@@ -186,6 +188,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 ClearAllDrawing(materialInfo);
 
                 uvMap.SetUVMapTexture(renderer, materialInfo);
+
+                selectArea.SetSelectAreaTexture(renderer, materialInfo);
 
                 // TODO: _MainTexが存在しないマテリアルは違うやつに入れないといけない
                 var materials = renderer.sharedMaterials;
