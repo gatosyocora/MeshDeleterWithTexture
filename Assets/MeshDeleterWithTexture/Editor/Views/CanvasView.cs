@@ -150,6 +150,11 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                     {
                         RegisterUndoTexture();
                         isDrawing = true;
+
+                        if (DrawType == DrawType.SELECT)
+                        {
+                            selectArea.ClearSelectArea();
+                        }
                     }
                     else if (Event.current.type == EventType.MouseUp &&
                         Event.current.button == LEFT_BUTTON &&
