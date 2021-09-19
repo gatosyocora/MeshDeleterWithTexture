@@ -156,6 +156,11 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                         isDrawing)
                     {
                         isDrawing = false;
+
+                        if (DrawType == DrawType.SELECT)
+                        {
+                            selectArea.FillSelectArea();
+                        }
                     }
 
                     if (isDrawing)

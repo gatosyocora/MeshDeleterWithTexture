@@ -1,6 +1,7 @@
 ﻿using Gatosyocora.MeshDeleterWithTexture.Models;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace Gatosyocora.MeshDeleterWithTexture
@@ -16,6 +17,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
         
         private ComputeShader cs;
         private int addPointKernelId;
+        private int fillKernelId;
+
         public SelectAreaCanvas(ref Material editMat)
         {
             this.editMat = editMat;
@@ -54,12 +57,25 @@ namespace Gatosyocora.MeshDeleterWithTexture
             cs.Dispatch(addPointKernelId, selectAreaRT.width, selectAreaRT.height, 1);
         }
 
+        public void FillSelectArea()
+        {
+            var buffer = new ComputeBuffer(points.Count, Marshal.SizeOf(typeof(Vector4)));
+            buffer.SetData(points);
+            cs.SetBuffer(fillKernelId, "Points", buffer);
+            cs.SetInt("PointCount", points.Count);
+            cs.Dispatch(fillKernelId, selectAreaRT.width, selectAreaRT.height, 1);
+
+            buffer.Dispose();
+        }
+
         private void SetupComputeShader(ref RenderTexture renderTexture)
         {
             cs = Object.Instantiate(AssetRepository.LoadCalculateSelectAreaComputeShader());
             addPointKernelId = cs.FindKernel("CSAddPoint");
+            fillKernelId = cs.FindKernel("CSFill");
 
             cs.SetTexture(addPointKernelId, "SelectAreaTex", renderTexture);
+            cs.SetTexture(fillKernelId, "SelectAreaTex", renderTexture);
             cs.SetInt("PenSize", 5);
         }
     }

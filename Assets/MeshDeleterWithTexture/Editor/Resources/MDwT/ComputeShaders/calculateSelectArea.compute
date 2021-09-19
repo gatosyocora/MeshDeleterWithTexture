@@ -1,9 +1,14 @@
 ﻿#pragma kernel CSAddPoint
+#pragma kernel CSFill
 
 RWTexture2D<float4> SelectAreaTex;
 
 float4 PreviousPoint;
 float4 NewPoint;
+
+StructuredBuffer<float4> Points;
+
+int PointCount;
 
 int PenSize;
 
@@ -15,6 +20,15 @@ bool isOnLine(float2 p1, float2 p2, float2 p, float lineSize)
     return  abs(p.y - (a * p.x + b)) <= lineSize &&
         p.x >= min(p1.x, p2.x) && p.x <= max(p1.x, p2.x) &&
         p.y >= min(p1.y, p2.y) && p.y <= max(p1.y, p2.y);
+}
+
+float mycross(float2 vec1, float2 vec2) {
+    return vec1.x * vec2.y - vec1.y * vec2.x;
+}
+
+bool isCrossLine(float2 a, float2 b, float2 c, float2 d) {
+    return mycross(b - a, c - a) * mycross(b - a, d - a) < 0 &&
+        mycross(d - c, a - c) * mycross(d - c, b - c) < 0;
 }
 ENDCG
 
@@ -29,6 +43,27 @@ void CSAddPoint(uint2 id : SV_DispatchThreadID)
     if (PreviousPoint.x == -1) return;
 
     if (isOnLine(PreviousPoint.xy, NewPoint.xy, id, PenSize)) {
+        SelectAreaTex[id] = float4(1, 1, 1, 1);
+    }
+}
+
+[numthreads(1, 1, 1)]
+void CSFill(int2 id : SV_DispatchThreadID)
+{
+    int count = 0;
+
+    for (int i = 0; i < PointCount; i++) {
+        int j = i + 1;
+        if (j >= PointCount) {
+            j = 0;
+        }
+
+        if (isCrossLine(Points[i].xy, Points[j].xy, float2(0, 0), id)) {
+            count++;
+        }
+    }
+
+    if (fmod(count, 2) == 1) {
         SelectAreaTex[id] = float4(1, 1, 1, 1);
     }
 }
