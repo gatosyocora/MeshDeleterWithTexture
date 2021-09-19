@@ -141,7 +141,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
                 var pos = ConvertWindowPosToTexturePos(textureSize, Event.current.mousePosition, rect, ZoomScale, ScrollOffset);
 
-                if (DrawType == DrawType.PEN || DrawType == DrawType.ERASER)
+                if (DrawType == DrawType.PEN || DrawType == DrawType.ERASER || DrawType == DrawType.SELECT)
                 {
                     var uvPos = ConvertTexturePosToUVPos(textureSize, pos);
                     editMat.SetVector("_CurrentPos", new Vector4(uvPos.x, uvPos.y, 0, 0));
@@ -164,8 +164,10 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                     {
                         if (DrawType == DrawType.PEN)
                             DrawOnTexture(pos);
-                        else
+                        else if (DrawType == DrawType.ERASER)
                             ClearOnTexture(pos);
+                        else
+                            selectArea.AddSelectAreaPoint(pos);
                     }
                 }
             }

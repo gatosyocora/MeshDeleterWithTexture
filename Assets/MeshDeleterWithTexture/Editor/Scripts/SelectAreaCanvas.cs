@@ -10,6 +10,10 @@ namespace Gatosyocora.MeshDeleterWithTexture
         private Material editMat;
 
         private RenderTexture selectAreaRT;
+
+        private List<Vector4> points = new List<Vector4>();
+        private Vector4 latestPoint = Vector4.one * -1;
+
         private ComputeShader cs;
         private int addPointKernelId;
         public SelectAreaCanvas(ref Material editMat)
@@ -39,12 +43,21 @@ namespace Gatosyocora.MeshDeleterWithTexture
             return true;
         }
 
+        public void AddSelectAreaPoint(Vector2 pos)
+        {
+            var point = new Vector4(pos.x, pos.y, 0, 0);
+            points.Add(point);
+            cs.SetVector("NewPoint", point);
+            cs.Dispatch(addPointKernelId, selectAreaRT.width, selectAreaRT.height, 1);
+        }
+
         private void SetupComputeShader(ref RenderTexture renderTexture)
         {
             cs = Object.Instantiate(AssetRepository.LoadCalculateSelectAreaComputeShader());
             addPointKernelId = cs.FindKernel("CSAddPoint");
 
             cs.SetTexture(addPointKernelId, "SelectAreaTex", renderTexture);
+            cs.SetInt("PenSize", 5);
         }
     }
 }
