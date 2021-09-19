@@ -11,6 +11,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
         private Material editMat;
 
         private RenderTexture selectAreaRT;
+        private ComputeBuffer buffer;
 
         private List<Vector4> points;
         private Vector4 latestPoint;
@@ -93,6 +94,13 @@ namespace Gatosyocora.MeshDeleterWithTexture
             cs.SetTexture(addPointKernelId, "SelectAreaTex", renderTexture);
             cs.SetTexture(fillKernelId, "SelectAreaTex", renderTexture);
             cs.SetTexture(clearKernelId, "SelectAreaTex", renderTexture);
+
+            buffer = new ComputeBuffer(renderTexture.width * renderTexture.height, sizeof(int));
+            cs.SetBuffer(addPointKernelId, "Result", buffer);
+            cs.SetBuffer(fillKernelId, "Result", buffer);
+            cs.SetBuffer(clearKernelId, "Result", buffer);
+
+            cs.SetInt("Width", renderTexture.width);
             cs.SetInt("PenSize", 5);
         }
     }

@@ -2,6 +2,7 @@
 #pragma kernel CSFill
 #pragma kernel CSClear
 
+RWStructuredBuffer<int> Result;
 RWTexture2D<float4> SelectAreaTex;
 
 float4 PreviousPoint;
@@ -12,6 +13,8 @@ StructuredBuffer<float4> Points;
 int PointCount;
 
 int PenSize;
+
+int Width;
 
 CGPROGRAM
 bool isOnLine(float2 p1, float2 p2, float2 p, float lineSize)
@@ -45,6 +48,7 @@ void CSAddPoint(uint2 id : SV_DispatchThreadID)
 
     if (isOnLine(PreviousPoint.xy, NewPoint.xy, id, PenSize)) {
         SelectAreaTex[id] = float4(1, 1, 1, 1);
+        Result[id.y * Width + id.x] = true;
     }
 }
 
@@ -66,6 +70,7 @@ void CSFill(int2 id : SV_DispatchThreadID)
 
     if (fmod(count, 2) == 1) {
         SelectAreaTex[id] = float4(1, 1, 1, 1);
+        Result[id.y * Width + id.x] = true;
     }
 }
 
@@ -73,4 +78,5 @@ void CSFill(int2 id : SV_DispatchThreadID)
 void CSClear(int2 id : SV_DispatchThreadID)
 {
     SelectAreaTex[id] = float4(0, 0, 0, 1);
+    Result[id.y * Width + id.x] = false;
 }
