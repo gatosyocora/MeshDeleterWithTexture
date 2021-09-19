@@ -87,6 +87,13 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
                     EditorGUILayout.Space();
 
+                    GatoGUILayout.Button(
+                        "Apply SelectArea",
+                        () => canvasView.ApplySelectArea()
+                    ); ;
+
+                    EditorGUILayout.Space();
+
                     using (new GatoGUILayout.RightAlignedScope())
                     {
                         GatoGUILayout.Button(

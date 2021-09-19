@@ -340,6 +340,12 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         public void UndoPreviewTexture() => undo.UndoPreviewTexture(ref previewTexture, ref canvasModel.buffer);
 
+        public void ApplySelectArea()
+        {
+            var selectAreaData = selectArea.GetFillArea();
+            canvasModel.MarkArea(selectAreaData);
+        }
+
         public void Dispose()
         {
             canvasModel.Dispose();
