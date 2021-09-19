@@ -72,10 +72,6 @@
 
 			float _ApplyGammaCorrection;
 
-			float4 _Points[1000];
-			int _PointNum;
-			float _IsSelectingArea;
-
 			sampler2D _SelectTex;
 			
 			v2f vert (appdata v)
@@ -98,65 +94,8 @@
 
 				float2 startPos = (float2(0.5, 0.5) * (1-_TextureScale) + _Offset.xy * 0.5) + _StartPos.xy * _TextureScale;
 				float2 endPos = (float2(0.5, 0.5) * (1-_TextureScale) + _Offset.xy * 0.5) + _EndPos.xy * _TextureScale;
-				
-				// 範囲選択用の枠を表示
-				/*
-				if ((abs(uv.x - _StartPos.x) <= _LineWidth || abs(uv.x - _EndPos.x) <= _LineWidth) && uv.y >= min(_StartPos.y, _EndPos.y)-_LineWidth && uv.y <= max(_StartPos.y, _EndPos.y)+_LineWidth ||
-					(abs(uv.y - _StartPos.y) <= _LineWidth || abs(uv.y - _EndPos.y) <= _LineWidth) && uv.x >= min(_StartPos.x, _EndPos.x)-_LineWidth && uv.x <= max(_StartPos.x, _EndPos.x)+_LineWidth
-				)
-					col = fixed4(1, 0.7, 0, 1);
-
-				int p1Index, p2Index;
-				float pointRadius;
-				for (int k = 0; k < _PointNum; k++) {
-					
-					if (k == 0)
-						pointRadius = 0.01;
-					else
-						pointRadius = 0.005;
-
-					if (_PointNum > 1) {
-						if (k != _PointNum-1) {
-							p1Index = k;
-							p2Index = k+1;
-
-							float4 p1 = _Points[p1Index];
-							float4 p2 = _Points[p2Index];
-
-							float innerP1 = dot(normalize(p2.xy-p1.xy), normalize(uv-p1.xy));
-							float innerP2 = dot(normalize(p1.xy-p2.xy), normalize(uv-p2.xy));
-
-							if (innerP1 > 0.99999 && innerP1 <= 1 && innerP2 > 0.9999 && innerP2)
-								col = fixed4(1, 0.7, 0, 1);
-						}
-						// 閉路完成状態のときだけ始点と終点をつなぐ線を描画
-						else if (!_IsSelectingArea)
-						{
-							p1Index = _PointNum-1;
-							p2Index = 0;
-
-							float4 p1 = _Points[p1Index];
-							float4 p2 = _Points[p2Index];
-
-							float innerP1 = dot(normalize(p2.xy-p1.xy), normalize(uv-p1.xy));
-							float innerP2 = dot(normalize(p1.xy-p2.xy), normalize(uv-p2.xy));
-
-							if (innerP1 > 0.99999 && innerP1 <= 1 && innerP2 > 0.9999 && innerP2)
-								col = fixed4(1, 0.7, 0, 1);
-						}
-
-					}
-
-					float2 p1 = _Points[k].xy;
-
-					float raito = _MainTex_TexelSize.x / _MainTex_TexelSize.y;
-					if (distance (uv * float2(1, raito), p1 * float2(1, raito)) <= pointRadius)
-						col = fixed4(1, 0.7, 0, 1);
-
-				}
 
 				col.rgb = lerp(col.rgb, fixed3(1, 0.7, 0), tex2D(_SelectTex, uv));
-				*/
 
 				// UVMapを表示
 				col.rgb = lerp(col.rgb, _UVMapLineColor, tex2D(_UVMap, uv).r);
