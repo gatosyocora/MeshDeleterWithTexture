@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using UnityEngine;
 
 namespace Gatosyocora.MeshDeleterWithTexture.Models
@@ -7,7 +8,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
     {
         private ComputeShader computeShader;
         public ComputeBuffer buffer;
-        private int penKernelId, eraserKernelId;
+        private int penKernelId, eraserKernelId, markAreaKernelId;
 
         private Vector2Int textureSize;
 
@@ -16,6 +17,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             computeShader = Instantiate(AssetRepository.LoadDrawComputeShader());
             penKernelId = computeShader.FindKernel("CSPen");
             eraserKernelId = computeShader.FindKernel("CSEraser");
+            markAreaKernelId = computeShader.FindKernel("CSMarkArea");
         }
 
         /// <summary>
@@ -29,14 +31,17 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             buffer = new ComputeBuffer(texture.width * texture.height, sizeof(int));
             computeShader.SetBuffer(penKernelId, "Result", buffer);
             computeShader.SetBuffer(eraserKernelId, "Result", buffer);
+            computeShader.SetBuffer(markAreaKernelId, "Result", buffer);
 
             computeShader.SetTexture(penKernelId, "Tex", texture);
             computeShader.SetTexture(eraserKernelId, "Tex", texture);
+            computeShader.SetTexture(markAreaKernelId, "Tex", texture);
             computeShader.SetInt("Width", texture.width);
             computeShader.SetInt("Height", texture.height);
 
             computeShader.SetTexture(penKernelId, "PreviewTex", previewTexture);
             computeShader.SetTexture(eraserKernelId, "PreviewTex", previewTexture);
+            computeShader.SetTexture(markAreaKernelId, "PreviewTex", previewTexture);
 
             textureSize = new Vector2Int(texture.width, texture.height);
         }
@@ -80,6 +85,16 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         {
             computeShader.SetInt("PenSize", penSize);
             computeShader.SetVector("PenColor", penColor);
+        }
+
+        public void MarkArea(bool[] data)
+        {
+            var buffer = new ComputeBuffer(data.Length, sizeof(int));
+            buffer.SetData(data.Select(x => x ? 1 : 0).ToArray());
+            computeShader.SetBuffer(markAreaKernelId, "MarkAreaBuffer", buffer);
+            computeShader.Dispatch(markAreaKernelId, textureSize.x / 32, textureSize.y / 32, 1);
+
+            buffer.Dispose();
         }
 
         public void Dispose()

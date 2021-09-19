@@ -1,9 +1,11 @@
 ﻿#pragma kernel CSPen
 #pragma kernel CSEraser
+#pragma kernel CSMarkArea
 
 Texture2D<float4> Tex;
 RWStructuredBuffer<int> Result;
 RWTexture2D<float4> PreviewTex;
+RWStructuredBuffer<int> MarkAreaBuffer;
 
 int Width;
 int Height;
@@ -44,4 +46,13 @@ void CSEraser (uint2 id : SV_DispatchThreadID)
 	Result[index] = false;
 }
 
-        
+[numthreads(32, 32, 1)]
+void CSMarkArea(uint2 id : SV_DispatchThreadID)
+{
+	int index = id.y * Width + id.x;
+
+	if (MarkAreaBuffer[index] == 0) return;
+
+	PreviewTex[id.xy] = PenColor;
+	Result[index] = true;
+}
