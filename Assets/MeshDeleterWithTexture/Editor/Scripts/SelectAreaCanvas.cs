@@ -1,6 +1,7 @@
 ﻿using Gatosyocora.MeshDeleterWithTexture.Models;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
@@ -76,6 +77,16 @@ namespace Gatosyocora.MeshDeleterWithTexture
         {
             InitalizeProperties();
             cs.Dispatch(clearKernelId, selectAreaRT.width, selectAreaRT.height, 1);
+        }
+
+        public bool[] GetFillArea()
+        {
+            var data = new int[selectAreaRT.width * selectAreaRT.height];
+            buffer.GetData(data);
+
+            ClearSelectArea();
+
+            return data.Select(x => x == 1).ToArray();
         }
 
         private void InitalizeProperties()
