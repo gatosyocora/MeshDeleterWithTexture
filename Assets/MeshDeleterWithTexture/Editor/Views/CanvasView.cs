@@ -99,8 +99,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             editMat.SetVector("_StartPos", new Vector4(0, 0, 0, 0));
             editMat.SetVector("_EndPos", new Vector4(0, 0, 0, 0));
 
-            editMat.SetTexture("_SelectTex", null);
-
             InitializeDrawArea(materialInfo, renderer);
 
             PenSize = 20;
