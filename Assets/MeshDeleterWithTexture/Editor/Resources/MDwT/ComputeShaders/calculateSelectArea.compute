@@ -71,8 +71,8 @@ void CSFill(int2 id : SV_DispatchThreadID)
 
         float2 a = Points[i].xy;
         float2 b = Points[j].xy;
-        float2 c = float2(Width + 1, id.y);
-        float2 d = id;
+        float2 c = id;
+        float2 d = float2(Width + 1, id.y);
 
         if (!isParallel(a, b, c, d) &&
             isCrossLine(a, b, c, d)) {
