@@ -26,6 +26,14 @@ bool isOnLine(float2 p1, float2 p2, float2 p, float lineSize)
         p.y >= min(p1.y, p2.y) && p.y <= max(p1.y, p2.y);
 }
 
+bool isUpwardVector(float2 a, float2 b) {
+    return b.y - a.y > 0;
+}
+
+bool isDownwardVector(float2 a, float2 b) {
+    return b.y - a.y < 0;
+}
+
 bool isParallel(float2 a, float2 b, float2 c, float2 d) {
     float ab = (b.y - a.y) / (b.x - a.x);
     float cd = (d.y - c.y) / (d.x - c.x);
@@ -75,7 +83,9 @@ void CSFill(int2 id : SV_DispatchThreadID)
         float2 d = float2(Width + 1, id.y);
 
         if (!isParallel(a, b, c, d) &&
-            isCrossLine(a, b, c, d)) {
+            isCrossLine(a, b, c, d) &&
+            !(isUpwardVector(a, b) && isOnLine(c, d, b, 0)) &&
+            !(isDownwardVector(a, b) && isOnLine(c, d, a, 0))) {
             count++;
         }
     }
