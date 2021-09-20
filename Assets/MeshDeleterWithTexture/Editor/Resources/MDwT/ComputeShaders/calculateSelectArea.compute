@@ -26,6 +26,12 @@ bool isOnLine(float2 p1, float2 p2, float2 p, float lineSize)
         p.y >= min(p1.y, p2.y) && p.y <= max(p1.y, p2.y);
 }
 
+bool isParallel(float2 a, float2 b, float2 c, float2 d) {
+    float ab = (b.y - a.y) / (b.x - a.x);
+    float cd = (d.y - c.y) / (d.x - c.x);
+    return ab == cd;
+}
+
 float mycross(float2 vec1, float2 vec2) {
     return vec1.x * vec2.y - vec1.y * vec2.x;
 }
@@ -63,7 +69,13 @@ void CSFill(int2 id : SV_DispatchThreadID)
             j = 0;
         }
 
-        if (isCrossLine(Points[i].xy, Points[j].xy, float2(0, 0), id)) {
+        float2 a = Points[i].xy;
+        float2 b = Points[j].xy;
+        float2 c = float2(0, 0);
+        float2 d = id;
+
+        if (!isParallel(a, b, c, d) &&
+            isCrossLine(a, b, c, d)) {
             count++;
         }
     }
