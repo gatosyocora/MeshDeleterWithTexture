@@ -45,8 +45,8 @@ float mycross(float2 vec1, float2 vec2) {
 }
 
 bool isCrossLine(float2 a, float2 b, float2 c, float2 d) {
-    return mycross(b - a, c - a) * mycross(b - a, d - a) < 0 &&
-        mycross(d - c, a - c) * mycross(d - c, b - c) < 0;
+    return mycross(b - a, c - a) * mycross(b - a, d - a) <= 0 &&
+        mycross(d - c, a - c) * mycross(d - c, b - c) <= 0;
 }
 ENDCG
 
