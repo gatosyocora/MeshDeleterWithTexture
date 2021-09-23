@@ -174,6 +174,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
                         if (DrawType == DrawType.SELECT)
                         {
+                            selectArea.AddLineEnd2Start();
                             selectArea.FillSelectArea();
                         }
                     }

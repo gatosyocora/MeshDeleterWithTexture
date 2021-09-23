@@ -19,6 +19,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
         
         private ComputeShader cs;
         private int addPointKernelId;
+        private int addLineKernelId;
         private int fillKernelId;
         private int clearKernelId;
 
@@ -69,6 +70,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
             cs.Dispatch(addPointKernelId, selectAreaRT.width, selectAreaRT.height, 1);
         }
 
+        public void AddLineEnd2Start()
+        {
+            DrawLine(points.LastOrDefault(), points.FirstOrDefault());
+        }
+
         public void FillSelectArea()
         {
             var buffer = new ComputeBuffer(points.Count, Marshal.SizeOf(typeof(Vector4)));
@@ -108,19 +114,32 @@ namespace Gatosyocora.MeshDeleterWithTexture
         {
             cs = Object.Instantiate(AssetRepository.LoadCalculateSelectAreaComputeShader());
             addPointKernelId = cs.FindKernel("CSAddPoint");
+            addLineKernelId = cs.FindKernel("CSAddLine");
             fillKernelId = cs.FindKernel("CSFill");
             clearKernelId = cs.FindKernel("CSClear");
 
             cs.SetTexture(addPointKernelId, "SelectAreaTex", renderTexture);
+            cs.SetTexture(addLineKernelId, "SelectAreaTex", renderTexture);
             cs.SetTexture(fillKernelId, "SelectAreaTex", renderTexture);
             cs.SetTexture(clearKernelId, "SelectAreaTex", renderTexture);
 
             buffer = new ComputeBuffer(renderTexture.width * renderTexture.height, sizeof(int));
             cs.SetBuffer(addPointKernelId, "Result", buffer);
+            cs.SetBuffer(addLineKernelId, "Result", buffer);
             cs.SetBuffer(fillKernelId, "Result", buffer);
             cs.SetBuffer(clearKernelId, "Result", buffer);
 
             cs.SetInt("Width", renderTexture.width);
+        }
+
+        private void DrawLine(Vector4 a, Vector4 b)
+        {
+            if (a == null || b == null) return;
+
+            cs.SetVector("Point1", a);
+            cs.SetVector("Point2", b);
+
+            cs.Dispatch(addLineKernelId, selectAreaRT.width, selectAreaRT.height, 1);
         }
     }
 }
