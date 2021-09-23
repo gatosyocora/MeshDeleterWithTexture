@@ -81,7 +81,20 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
                     EditorGUILayout.Space();
 
-                    PenEraserGUI(model, localizedText, canvasView);
+                    using (new EditorGUI.DisabledGroupScope(!model.HasTexture()))
+                    {
+                        PenColorChangeGUI(localizedText, canvasView);
+                    }
+
+                    EditorGUILayout.Space();
+
+                    GatoGUILayout.IntSlider(
+                        localizedText.Data.penEraserSizeLabelText,
+                        canvasView.PenSize,
+                        1,
+                        !model.HasTexture() ? 100 : model.Texture.width / 20,
+                        penSize => canvasView.PenSize = penSize
+                    );
 
                     EditorGUILayout.Space();
 
@@ -194,9 +207,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         public void Dispose() { }
 
-        private void PenEraserGUI(MeshDeleterWithTextureModel model, LocalizedText localizedText, CanvasView canvasView)
+        private void PenColorChangeGUI(LocalizedText localizedText, CanvasView canvasView)
         {
-            using (new EditorGUI.DisabledGroupScope(!model.HasTexture()))
             using (new EditorGUILayout.HorizontalScope())
             {
                 EditorGUILayout.LabelField(localizedText.Data.penColorLabelText);
@@ -223,16 +235,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                     penColor => { canvasView.PenColor = penColor; }
                 );
             }
-
-            EditorGUILayout.Space();
-
-            GatoGUILayout.IntSlider(
-                localizedText.Data.penEraserSizeLabelText,
-                canvasView.PenSize,
-                1,
-                !model.HasTexture() ? 100 : model.Texture.width / 20,
-                penSize => canvasView.PenSize = penSize
-            );
         }
 
         private void OutputMeshGUI(MeshDeleterWithTextureModel model, LocalizedText localizedText)
