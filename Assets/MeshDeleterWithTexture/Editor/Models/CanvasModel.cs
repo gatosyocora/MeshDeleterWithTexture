@@ -56,7 +56,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             computeShader.SetTexture(markAreaKernelId, CS_VARIABLE_PREVIEW_TEX, previewTexture);
 
             textureSize = new Vector2Int(texture.width, texture.height);
-            latestPos = new Vector2Int(-1, -1);
+            ResetLatestPos();
         }
 
         /// <summary>
@@ -92,6 +92,12 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             posArray[1 * sizeof(int)] = pos.y;
             computeShader.SetInts(CS_VARIABLE_POS, posArray);
 
+            var previousPosArray = new int[2 * sizeof(int)];
+            previousPosArray[0 * sizeof(int)] = latestPos.x;
+            previousPosArray[1 * sizeof(int)] = latestPos.y;
+            computeShader.SetInts(CS_VARIABLE_PREVIOUS_POS, previousPosArray);
+            latestPos = pos;
+
             computeShader.Dispatch(eraserKernelId, textureSize.x / 32, textureSize.y / 32, 1);
         }
 
@@ -114,6 +120,11 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             computeShader.Dispatch(markAreaKernelId, textureSize.x / 32, textureSize.y / 32, 1);
 
             buffer.Dispose();
+        }
+
+        public void ResetLatestPos()
+        {
+            latestPos = new Vector2Int(-1, -1);
         }
 
         public void Dispose()

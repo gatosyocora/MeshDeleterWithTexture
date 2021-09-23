@@ -364,6 +364,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         private void OnDrawTypeChanged(DrawType drawType)
         {
+            canvasModel.ResetLatestPos();
+
             if (drawType == DrawType.SELECT)
             {
                 selectArea.ApplyPenSize(PenSize);
