@@ -83,7 +83,7 @@ bool isOnLine(float2 a, float2 b, float2 p, float lineSize, float width)
 }
 ENDCG
 
-[numthreads(1, 1, 1)]
+[numthreads(32, 32, 1)]
 void CSAddPoint(uint2 id : SV_DispatchThreadID)
 {
     // 半径PenSize範囲内だったら塗る
@@ -102,7 +102,7 @@ void CSAddPoint(uint2 id : SV_DispatchThreadID)
     }
 }
 
-[numthreads(1, 1, 1)]
+[numthreads(32, 32, 1)]
 void CSAddLine(uint2 id : SV_DispatchThreadID)
 {
     if (Point1.x == -1 || Point2.x == -1) return;
@@ -113,7 +113,7 @@ void CSAddLine(uint2 id : SV_DispatchThreadID)
     }
 }
 
-[numthreads(1, 1, 1)]
+[numthreads(32, 32, 1)]
 void CSFill(int2 id : SV_DispatchThreadID)
 {
     int count = 0;
@@ -142,7 +142,7 @@ void CSFill(int2 id : SV_DispatchThreadID)
     }
 }
 
-[numthreads(1, 1, 1)]
+[numthreads(32, 32, 1)]
 void CSClear(int2 id : SV_DispatchThreadID)
 {
     SelectAreaTex[id] = float4(0, 0, 0, 1);

@@ -72,7 +72,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             cs.SetVector("PreviousPoint", latestPoint);
             latestPoint = point;
             cs.SetVector("NewPoint", point);
-            cs.Dispatch(addPointKernelId, selectAreaRT.width, selectAreaRT.height, 1);
+            cs.Dispatch(addPointKernelId, selectAreaRT.width / 32, selectAreaRT.height / 32, 1);
         }
 
         public void AddLineEnd2Start()
@@ -86,7 +86,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             buffer.SetData(points);
             cs.SetBuffer(fillKernelId, "Points", buffer);
             cs.SetInt("PointCount", points.Count);
-            cs.Dispatch(fillKernelId, selectAreaRT.width, selectAreaRT.height, 1);
+            cs.Dispatch(fillKernelId, selectAreaRT.width / 32, selectAreaRT.height / 32, 1);
 
             buffer.Dispose();
         }
@@ -96,7 +96,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             if (cs == null) return;
 
             InitalizeProperties();
-            cs.Dispatch(clearKernelId, selectAreaRT.width, selectAreaRT.height, 1);
+            cs.Dispatch(clearKernelId, selectAreaRT.width / 32, selectAreaRT.height / 32, 1);
         }
 
         public bool[] GetFillArea()
@@ -144,7 +144,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             cs.SetVector("Point1", a);
             cs.SetVector("Point2", b);
 
-            cs.Dispatch(addLineKernelId, selectAreaRT.width, selectAreaRT.height, 1);
+            cs.Dispatch(addLineKernelId, selectAreaRT.width / 32, selectAreaRT.height / 32, 1);
         }
     }
 }
