@@ -154,15 +154,11 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                     var uvPos = ConvertTexturePosToUVPos(textureSize, pos);
                     editMat.SetVector("_CurrentPos", new Vector4(uvPos.x, uvPos.y, 0, 0));
 
-                    if (Event.current.type == EventType.MouseDown &&
-                        Event.current.button == LEFT_BUTTON &&
-                        !isDrawing)
+                    if (InputMouseLeftDown() && !isDrawing)
                     {
                         OnStartDrawing();
                     }
-                    else if (Event.current.type == EventType.MouseUp &&
-                        Event.current.button == LEFT_BUTTON &&
-                        isDrawing)
+                    else if (InputMouseLeftUp() && isDrawing)
                     {
                         OnFinishDrawing();
                     }
@@ -445,5 +441,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 string.Empty
             );
         }
+
+        private bool InputMouseLeftDown() => Event.current.type == EventType.MouseDown && Event.current.button == LEFT_BUTTON;
+        private bool InputMouseLeftUp() => Event.current.type == EventType.MouseUp && Event.current.button == LEFT_BUTTON;
     }
 }
