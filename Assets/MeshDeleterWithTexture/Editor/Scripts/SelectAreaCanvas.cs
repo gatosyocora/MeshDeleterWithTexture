@@ -9,6 +9,17 @@ namespace Gatosyocora.MeshDeleterWithTexture
 {
     public class SelectAreaCanvas : MonoBehaviour
     {
+        private const string CS_VARIABLE_PEN_SIZE = "PenSize";
+        private const string CS_VARIABLE_PREVIOUS_POINT = "PreviousPoint";
+        private const string CS_VARIABLE_NEW_POINT = "NewPoint";
+        private const string CS_VARIABLE_POINTS = "Points";
+        private const string CS_VARIABLE_POINT_COUNT = "PointCount";
+        private const string CS_VARIABLE_SELECT_AREA_TEX = "SelectAreaTex";
+        private const string CS_VARIABLE_SELECT_RESULT = "Result";
+        private const string CS_VARIABLE_WIDTH = "Width";
+        private const string CS_VARIABLE_POINT_1 = "Point1";
+        private const string CS_VARIABLE_POINT_2 = "Point2";
+
         private Material editMat;
 
         private RenderTexture selectAreaRT;
@@ -58,7 +69,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
         {
             if (cs == null) return;
 
-            cs.SetInt("PenSize", penSize);
+            cs.SetInt(CS_VARIABLE_PEN_SIZE, penSize);
             this.penSize = penSize;
         }
 
@@ -69,9 +80,9 @@ namespace Gatosyocora.MeshDeleterWithTexture
             if (Vector4.Distance(latestPoint, point) < penSize) return;
 
             points.Add(point);
-            cs.SetVector("PreviousPoint", latestPoint);
+            cs.SetVector(CS_VARIABLE_PREVIOUS_POINT, latestPoint);
             latestPoint = point;
-            cs.SetVector("NewPoint", point);
+            cs.SetVector(CS_VARIABLE_NEW_POINT, point);
             cs.Dispatch(addPointKernelId, selectAreaRT.width / 32, selectAreaRT.height / 32, 1);
         }
 
@@ -84,8 +95,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
         {
             var buffer = new ComputeBuffer(points.Count, Marshal.SizeOf(typeof(Vector4)));
             buffer.SetData(points);
-            cs.SetBuffer(fillKernelId, "Points", buffer);
-            cs.SetInt("PointCount", points.Count);
+            cs.SetBuffer(fillKernelId, CS_VARIABLE_POINTS, buffer);
+            cs.SetInt(CS_VARIABLE_POINT_COUNT, points.Count);
             cs.Dispatch(fillKernelId, selectAreaRT.width / 32, selectAreaRT.height / 32, 1);
 
             buffer.Dispose();
@@ -123,26 +134,26 @@ namespace Gatosyocora.MeshDeleterWithTexture
             fillKernelId = cs.FindKernel("CSFill");
             clearKernelId = cs.FindKernel("CSClear");
 
-            cs.SetTexture(addPointKernelId, "SelectAreaTex", renderTexture);
-            cs.SetTexture(addLineKernelId, "SelectAreaTex", renderTexture);
-            cs.SetTexture(fillKernelId, "SelectAreaTex", renderTexture);
-            cs.SetTexture(clearKernelId, "SelectAreaTex", renderTexture);
+            cs.SetTexture(addPointKernelId, CS_VARIABLE_SELECT_AREA_TEX, renderTexture);
+            cs.SetTexture(addLineKernelId, CS_VARIABLE_SELECT_AREA_TEX, renderTexture);
+            cs.SetTexture(fillKernelId, CS_VARIABLE_SELECT_AREA_TEX, renderTexture);
+            cs.SetTexture(clearKernelId, CS_VARIABLE_SELECT_AREA_TEX, renderTexture);
 
             buffer = new ComputeBuffer(renderTexture.width * renderTexture.height, sizeof(int));
-            cs.SetBuffer(addPointKernelId, "Result", buffer);
-            cs.SetBuffer(addLineKernelId, "Result", buffer);
-            cs.SetBuffer(fillKernelId, "Result", buffer);
-            cs.SetBuffer(clearKernelId, "Result", buffer);
+            cs.SetBuffer(addPointKernelId, CS_VARIABLE_SELECT_RESULT, buffer);
+            cs.SetBuffer(addLineKernelId, CS_VARIABLE_SELECT_RESULT, buffer);
+            cs.SetBuffer(fillKernelId, CS_VARIABLE_SELECT_RESULT, buffer);
+            cs.SetBuffer(clearKernelId, CS_VARIABLE_SELECT_RESULT, buffer);
 
-            cs.SetInt("Width", renderTexture.width);
+            cs.SetInt(CS_VARIABLE_WIDTH, renderTexture.width);
         }
 
         private void DrawLine(Vector4 a, Vector4 b)
         {
             if (a == null || b == null) return;
 
-            cs.SetVector("Point1", a);
-            cs.SetVector("Point2", b);
+            cs.SetVector(CS_VARIABLE_POINT_1, a);
+            cs.SetVector(CS_VARIABLE_POINT_2, b);
 
             cs.Dispatch(addLineKernelId, selectAreaRT.width / 32, selectAreaRT.height / 32, 1);
         }
