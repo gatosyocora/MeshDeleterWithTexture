@@ -20,6 +20,9 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         private MaterialInfo materialInfo;
 
+        private Vector2Int startPos;
+        private bool isDrawingStraight = false;
+
         private const float MAX_ZOOM_SCALE = 1;
         private const float MIN_ZOOM_SCALE = 0.1f;
         private const float ZOOM_STEP = 0.1f;
@@ -151,6 +154,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
                 if (DrawType == DrawType.PEN || DrawType == DrawType.ERASER || DrawType == DrawType.SELECT)
                 {
+                    pos = ApplyStraightModeIfNeeded(pos);
+
                     var uvPos = ConvertTexturePosToUVPos(textureSize, pos);
                     editMat.SetVector("_CurrentPos", new Vector4(uvPos.x, uvPos.y, 0, 0));
 
@@ -358,6 +363,36 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         private Vector2 ConvertTexturePosToUVPos(Vector2Int textureSize, Vector2 texturePos) => texturePos / textureSize;
 
+        private Vector2Int ApplyStraightModeIfNeeded(Vector2Int pos)
+        {
+            if (InputKeyDownShift() && !isDrawingStraight && isDrawing)
+            {
+                startPos = pos;
+                isDrawingStraight = true;
+            }
+            else if (InputKeyUpShift() && isDrawingStraight)
+            {
+                startPos = Vector2Int.one * -1;
+                isDrawingStraight = false;
+            }
+            else if (isDrawing && isDrawingStraight)
+            {
+                var diffX = Mathf.Abs(pos.x - startPos.x);
+                var diffY = Mathf.Abs(pos.y - startPos.y);
+
+                if (diffX > diffY)
+                {
+                    pos.y = startPos.y;
+                }
+                else if (diffX < diffY)
+                {
+                    pos.x = startPos.x;
+                }
+            }
+
+            return pos;
+        }
+
         private static (Vector2, float) UpdateByZoomScale(Vector2 scrollOffset, float zoomScale, Vector2 delta)
         {
             zoomScale = Mathf.Clamp(
@@ -416,5 +451,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         private bool InputMouseLeftDown() => Event.current.type == EventType.MouseDown && Event.current.button == LEFT_BUTTON;
         private bool InputMouseLeftUp() => Event.current.type == EventType.MouseUp && Event.current.button == LEFT_BUTTON;
+
+        private bool InputKeyDownShift() => Event.current.type == EventType.KeyDown && (Event.current.keyCode == KeyCode.LeftShift || Event.current.keyCode == KeyCode.RightShift);
+        private bool InputKeyUpShift() => Event.current.type == EventType.KeyUp && (Event.current.keyCode == KeyCode.LeftShift || Event.current.keyCode == KeyCode.RightShift);
     }
 }
