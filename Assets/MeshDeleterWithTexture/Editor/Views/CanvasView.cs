@@ -27,7 +27,16 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         private const int LEFT_BUTTON = 0;
         private const int RIGHT_BUTTON = 1;
 
-        public DrawType DrawType { get; set; }
+        private DrawType _drawType;
+        public DrawType DrawType
+        {
+            get => _drawType;
+            set
+            {
+                _drawType = value;
+                OnDrawTypeChanged(value);
+            }
+        }
 
         private Color _penColor;
         public Color PenColor
@@ -49,6 +58,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 _penSize = value;
                 editMat.SetFloat("_PenSize", value / (float)textureSize.x);
                 canvasModel.SetPen(value, _penColor);
+                selectArea.ApplyPenSize(value);
             }
         }
 
@@ -349,6 +359,14 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         public void Dispose()
         {
             canvasModel.Dispose();
+        }
+
+        private void OnDrawTypeChanged(DrawType drawType)
+        {
+            if (drawType == DrawType.SELECT)
+            {
+                selectArea.ApplyPenSize(PenSize);
+            }
         }
 
         private static (Vector2, float) UpdateByZoomScale(Vector2 scrollOffset, float zoomScale, Vector2 delta)

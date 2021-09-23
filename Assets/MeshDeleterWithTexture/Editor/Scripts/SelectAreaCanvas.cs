@@ -51,6 +51,13 @@ namespace Gatosyocora.MeshDeleterWithTexture
             return true;
         }
 
+        public void ApplyPenSize(int penSize)
+        {
+            if (cs == null) return;
+
+            cs.SetInt("PenSize", penSize);
+        }
+
         public void AddSelectAreaPoint(Vector2 pos)
         {
             cs.SetVector("PreviousPoint", latestPoint);
@@ -112,7 +119,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
             cs.SetBuffer(clearKernelId, "Result", buffer);
 
             cs.SetInt("Width", renderTexture.width);
-            cs.SetInt("PenSize", 5);
         }
     }
 }
