@@ -27,12 +27,14 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         public string drawTypeLabelText = "DrawType";
         public string penToolNameText = "PEN";
         public string eraserToolNameText = "ERASER";
+        public string selectToolNameText = "SELECT";
         public string penColorLabelText = "PenColor";
         public string colorBlackButtonText = "Black";
         public string colorRedButtonText = "R";
         public string colorGreenButtonText = "G";
         public string colorBlueButtonText = "B";
         public string penEraserSizeLabelText = "Pen/Eraser size";
+        public string applySelectAreaButtonText = "Apply SelectArea";
         public string inverseFillAreaButtonText = "Inverse FillArea";
         public string clearAllDrawingButtonText = "Clear All Drawing";
         public string undoDrawingButtonText = "Undo Drawing";

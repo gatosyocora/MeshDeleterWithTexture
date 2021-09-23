@@ -90,7 +90,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                     using (new GatoGUILayout.RightAlignedScope())
                     {
                         GatoGUILayout.DisabledButton(
-                            "Apply SelectArea",
+                            localizedText.Data.applySelectAreaButtonText,
                             () => canvasView.ApplySelectArea(),
                             canvasView.DrawType != DrawType.SELECT
                         );
@@ -190,7 +190,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             drawTypeTexts = new string[] {
                 localizedText.Data.penToolNameText,
                 localizedText.Data.eraserToolNameText,
-                "SELECT"
+                localizedText.Data.selectToolNameText
             };
         }
 
