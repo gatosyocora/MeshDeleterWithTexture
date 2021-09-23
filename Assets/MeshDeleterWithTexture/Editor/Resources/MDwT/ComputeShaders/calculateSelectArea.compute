@@ -17,16 +17,6 @@ int PenSize;
 int Width;
 
 CGPROGRAM
-// 太さlineSizeのp1とp2の線分上にpが載っているかどうか
-bool isOnLine(float2 p1, float2 p2, float2 p, float lineSize)
-{
-    float a = (p2.y - p1.y) / (p2.x - p1.x);
-    float b = p1.y - a * p1.x;
-    return  abs(p.y - (a * p.x + b)) <= lineSize &&
-        p.x >= min(p1.x, p2.x) && p.x <= max(p1.x, p2.x) &&
-        p.y >= min(p1.y, p2.y) && p.y <= max(p1.y, p2.y);
-}
-
 // ABが上向きのベクトルかどうか
 bool isUpwardVector(float2 a, float2 b) {
     return b.y - a.y > 0;
@@ -54,6 +44,39 @@ bool isCrossLine(float2 a, float2 b, float2 c, float2 d) {
     return mycross(b - a, c - a) * mycross(b - a, d - a) <= 0 &&
         mycross(d - c, a - c) * mycross(d - c, b - c) <= 0;
 }
+
+bool isCountUp(float2 a, float2 b, float2 c, float2 d) {
+    return !isParallel(a, b, c, d) && // 平行ならカウントしない
+        isCrossLine(a, b, c, d) && // 交差するならカウントする
+        ((isUpwardVector(a, b) && c.y != a.y) || // 上向きベクトルの始点と重なるならカウントしない
+        (isDownwardVector(a, b) && c.y != b.y)); // 下向きベクトルの終点と重なるならカウントしない
+}
+
+// 太さlineSizeのABの線分上にpが載っているかどうか
+bool isOnLine(float2 a, float2 b, float2 p, float lineSize, float width)
+{
+    // a,bを垂直方向に移動させた4点の長方形の中にあるかで判定する
+    float2 q = float2(p.x + width, p.y);
+
+    // ABに直交するベクトルを正規化
+    float2 ab = a - b;
+    float2 invAB = ab.yx;
+    float2 normalizedInvAB = normalize(invAB);
+
+    // a,bを垂直方向に移動させた4点
+    float2 p1 = a + normalizedInvAB * float2(1, -1) * lineSize;
+    float2 p2 = a + normalizedInvAB * float2(-1, 1) * lineSize;
+    float2 p3 = b + normalizedInvAB * float2(-1, 1) * lineSize;
+    float2 p4 = b + normalizedInvAB * float2(1, -1) * lineSize;
+
+    int count = 0;
+    if (isCountUp(p1, p2, p, q)) count++;
+    if (isCountUp(p2, p3, p, q)) count++;
+    if (isCountUp(p3, p4, p, q)) count++;
+    if (isCountUp(p4, p1, p, q)) count++;
+
+    return  fmod(count, 2) == 1;
+}
 ENDCG
 
 [numthreads(1, 1, 1)]
@@ -69,7 +92,7 @@ void CSAddPoint(uint2 id : SV_DispatchThreadID)
     if (PreviousPoint.x == -1) return;
 
     // 前回と今回の点を繋いだ線分上だったら塗る
-    if (isOnLine(PreviousPoint.xy, NewPoint.xy, id, PenSize)) {
+    if (isOnLine(PreviousPoint.xy, NewPoint.xy, id, PenSize, Width)) {
         SelectAreaTex[id] = float4(1, 1, 1, 1);
         Result[id.y * Width + id.x] = true;
     }
@@ -92,11 +115,7 @@ void CSFill(int2 id : SV_DispatchThreadID)
         float2 c = id;
         float2 d = float2(Width + 1, id.y);
 
-        if (!isParallel(a, b, c, d) && // 平行ならカウントしない
-            isCrossLine(a, b, c, d) && // 交差するならカウントする
-            ((isUpwardVector(a, b) && c.y != a.y) || // 上向きベクトルの始点と重なるならカウントしない
-            (isDownwardVector(a, b) && c.y != b.y)) // 下向きベクトルの終点と重なるならカウントしない
-        ) {
+        if (isCountUp(a, b, c, d)) {
             count++;
         }
     }
