@@ -17,6 +17,7 @@ int PenSize;
 int Width;
 
 CGPROGRAM
+// 太さlineSizeのp1とp2の線分上にpが載っているかどうか
 bool isOnLine(float2 p1, float2 p2, float2 p, float lineSize)
 {
     float a = (p2.y - p1.y) / (p2.x - p1.x);
@@ -26,24 +27,29 @@ bool isOnLine(float2 p1, float2 p2, float2 p, float lineSize)
         p.y >= min(p1.y, p2.y) && p.y <= max(p1.y, p2.y);
 }
 
+// ABが上向きのベクトルかどうか
 bool isUpwardVector(float2 a, float2 b) {
     return b.y - a.y > 0;
 }
 
+// ABが下向きのベクトルかどうか
 bool isDownwardVector(float2 a, float2 b) {
     return b.y - a.y < 0;
 }
 
+// ABとCDが平行なベクトル関係か
 bool isParallel(float2 a, float2 b, float2 c, float2 d) {
     float ab = (b.y - a.y) / (b.x - a.x);
     float cd = (d.y - c.y) / (d.x - c.x);
     return ab == cd;
 }
 
+// 外積
 float mycross(float2 vec1, float2 vec2) {
     return vec1.x * vec2.y - vec1.y * vec2.x;
 }
 
+// ABとCDが交わっているか
 bool isCrossLine(float2 a, float2 b, float2 c, float2 d) {
     return mycross(b - a, c - a) * mycross(b - a, d - a) <= 0 &&
         mycross(d - c, a - c) * mycross(d - c, b - c) <= 0;
@@ -53,6 +59,7 @@ ENDCG
 [numthreads(1, 1, 1)]
 void CSAddPoint(uint2 id : SV_DispatchThreadID)
 {
+    // 半径PenSize範囲内だったら塗る
     if (distance(id, NewPoint.xy) <= PenSize) {
         SelectAreaTex[id] = float4(1, 1, 1, 1);
         return;
@@ -60,6 +67,7 @@ void CSAddPoint(uint2 id : SV_DispatchThreadID)
 
     if (PreviousPoint.x == -1) return;
 
+    // 前回と今回の点を繋いだ線分上だったら塗る
     if (isOnLine(PreviousPoint.xy, NewPoint.xy, id, PenSize)) {
         SelectAreaTex[id] = float4(1, 1, 1, 1);
         Result[id.y * Width + id.x] = true;
@@ -71,6 +79,7 @@ void CSFill(int2 id : SV_DispatchThreadID)
 {
     int count = 0;
 
+    // すべての線分と何回交差するか調べる
     for (int i = 0; i < PointCount; i++) {
         int j = i + 1;
         if (j >= PointCount) {
@@ -82,15 +91,16 @@ void CSFill(int2 id : SV_DispatchThreadID)
         float2 c = id;
         float2 d = float2(Width + 1, id.y);
 
-        if (!isParallel(a, b, c, d) &&
-            isCrossLine(a, b, c, d) &&
-            ((isUpwardVector(a, b) && c.y != a.y) ||
-            (isDownwardVector(a, b) && c.y != b.y))
+        if (!isParallel(a, b, c, d) && // 平行ならカウントしない
+            isCrossLine(a, b, c, d) && // 交差するならカウントする
+            ((isUpwardVector(a, b) && c.y != a.y) || // 上向きベクトルの始点と重なるならカウントしない
+            (isDownwardVector(a, b) && c.y != b.y)) // 下向きベクトルの終点と重なるならカウントしない
         ) {
             count++;
         }
     }
 
+    // 線分との交差回数が奇数なら塗る
     if (fmod(count, 2) == 1) {
         SelectAreaTex[id] = float4(1, 1, 1, 1);
         Result[id.y * Width + id.x] = true;
