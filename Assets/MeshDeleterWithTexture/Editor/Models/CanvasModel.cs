@@ -12,6 +12,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         private const string CS_VARIABLE_HEIGHT = "Height";
         private const string CS_VARIABLE_PREVIEW_TEX = "PreviewTex";
         private const string CS_VARIABLE_POS = "Pos";
+        private const string CS_VARIABLE_PREVIOUS_POS = "PreviousPos";
         private const string CS_VARIABLE_PEN_SIZE = "PenSize";
         private const string CS_VARIABLE_PEN_COLOR = "PenColor";
         private const string CS_VARIABLE_MARK_AREA_BUFFER = "MarkAreaBuffer";
@@ -21,6 +22,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         private int penKernelId, eraserKernelId, markAreaKernelId;
 
         private Vector2Int textureSize;
+        private Vector2Int latestPos;
 
         public void OnEnable()
         {
@@ -54,6 +56,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             computeShader.SetTexture(markAreaKernelId, CS_VARIABLE_PREVIEW_TEX, previewTexture);
 
             textureSize = new Vector2Int(texture.width, texture.height);
+            latestPos = new Vector2Int(-1, -1);
         }
 
         /// <summary>
@@ -67,6 +70,12 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             posArray[0 * sizeof(int)] = pos.x;
             posArray[1 * sizeof(int)] = pos.y;
             computeShader.SetInts(CS_VARIABLE_POS, posArray);
+
+            var previousPosArray = new int[2 * sizeof(int)];
+            previousPosArray[0 * sizeof(int)] = latestPos.x;
+            previousPosArray[1 * sizeof(int)] = latestPos.y;
+            computeShader.SetInts(CS_VARIABLE_PREVIOUS_POS, previousPosArray);
+            latestPos = pos;
 
             computeShader.Dispatch(penKernelId, textureSize.x / 32, textureSize.y / 32, 1);
         }
