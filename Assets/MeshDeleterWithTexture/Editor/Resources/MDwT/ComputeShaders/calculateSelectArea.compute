@@ -62,6 +62,7 @@ void CSAddPoint(uint2 id : SV_DispatchThreadID)
     // 半径PenSize範囲内だったら塗る
     if (distance(id, NewPoint.xy) <= PenSize) {
         SelectAreaTex[id] = float4(1, 1, 1, 1);
+        Result[id.y * Width + id.x] = true;
         return;
     }
 
