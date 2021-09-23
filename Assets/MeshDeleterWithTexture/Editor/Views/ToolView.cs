@@ -59,14 +59,12 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
                 GUILayout.Space(10);
 
-                if (model.HasMaterials())
+                using (var check = new EditorGUI.ChangeCheckScope())
                 {
-                    model.materialInfoIndex = GatoGUILayout.Popup(
-                        localizedText.Data.textureLabelText,
-                        model.materialInfoIndex,
-                        model.textureNames,
-                        index => model.OnChangeMaterial(canvasView)
-                    );
+                    if (model.HasMaterials())
+                        model.materialInfoIndex = EditorGUILayout.Popup(localizedText.Data.textureLabelText, model.materialInfoIndex, model.textureNames);
+
+                    if (check.changed) model.OnChangeMaterial(canvasView);
                 }
 
                 EditorGUILayout.Space();
