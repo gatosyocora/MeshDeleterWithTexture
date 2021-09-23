@@ -257,6 +257,10 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 selectArea.AddLineEnd2Start();
                 selectArea.FillSelectArea();
             }
+            else
+            {
+                canvasModel.ResetLatestPos();
+            }
         }
 
         /// <summary>
