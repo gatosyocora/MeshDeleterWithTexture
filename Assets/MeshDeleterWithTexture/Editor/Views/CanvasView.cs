@@ -242,35 +242,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             ZoomScale = 1;
         }
 
-        /// <summary>
-        /// 塗られている範囲を反転させる
-        /// </summary>
-        public void InverseFillArea()
-        {
-            var height = textureSize.y;
-            var width = textureSize.x;
-            var maskTexture = new Texture2D(width, height);
-
-            var deletePos = new int[width * height];
-            canvasModel.buffer.GetData(deletePos);
-            deletePos = deletePos.Select(x => Mathf.Abs(x - 1)).ToArray();
-            canvasModel.buffer.SetData(deletePos);
-
-            for (int j = 0; j < height; j++)
-            {
-                for (int i = 0; i < width; i++)
-                {
-                    var c = (deletePos[j * width + i] == 1) ? UnityEngine.Color.black : UnityEngine.Color.white;
-                    maskTexture.SetPixel(i, j, c);
-                }
-            }
-            maskTexture.Apply();
-
-            Material negaposiMat = new Material(Shader.Find("Gato/NegaPosi"));
-            negaposiMat.SetTexture("_MaskTex", maskTexture);
-            negaposiMat.SetFloat("_Inverse", 0);
-            Graphics.Blit(materialInfo.Texture, previewTexture, negaposiMat);
-        }
+        public void InverseFillArea() => canvasModel.InverseCanvasMarks();
 
         /// <summary>
         /// 削除する場所のデータを取得

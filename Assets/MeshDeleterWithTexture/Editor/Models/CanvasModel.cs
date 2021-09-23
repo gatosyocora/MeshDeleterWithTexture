@@ -19,7 +19,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
 
         private ComputeShader computeShader;
         public ComputeBuffer buffer;
-        private int penKernelId, eraserKernelId, markAreaKernelId;
+        private int penKernelId, eraserKernelId, inverseFillKernelId, markAreaKernelId;
 
         private Vector2Int textureSize;
         private Vector2Int latestPos;
@@ -29,6 +29,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             computeShader = Instantiate(AssetRepository.LoadDrawComputeShader());
             penKernelId = computeShader.FindKernel("CSPen");
             eraserKernelId = computeShader.FindKernel("CSEraser");
+            inverseFillKernelId = computeShader.FindKernel("CSInverseFill");
             markAreaKernelId = computeShader.FindKernel("CSMarkArea");
         }
 
@@ -43,16 +44,19 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             buffer = new ComputeBuffer(texture.width * texture.height, sizeof(int));
             computeShader.SetBuffer(penKernelId, CS_VARIABLE_RESULT, buffer);
             computeShader.SetBuffer(eraserKernelId, CS_VARIABLE_RESULT, buffer);
+            computeShader.SetBuffer(inverseFillKernelId, CS_VARIABLE_RESULT, buffer);
             computeShader.SetBuffer(markAreaKernelId, CS_VARIABLE_RESULT, buffer);
 
             computeShader.SetTexture(penKernelId, CS_VARIABLE_TEX, texture);
             computeShader.SetTexture(eraserKernelId, CS_VARIABLE_TEX, texture);
+            computeShader.SetTexture(inverseFillKernelId, CS_VARIABLE_TEX, texture);
             computeShader.SetTexture(markAreaKernelId, CS_VARIABLE_TEX, texture);
             computeShader.SetInt(CS_VARIABLE_WIDTH, texture.width);
             computeShader.SetInt(CS_VARIABLE_HEIGHT, texture.height);
 
             computeShader.SetTexture(penKernelId, CS_VARIABLE_PREVIEW_TEX, previewTexture);
             computeShader.SetTexture(eraserKernelId, CS_VARIABLE_PREVIEW_TEX, previewTexture);
+            computeShader.SetTexture(inverseFillKernelId, CS_VARIABLE_PREVIEW_TEX, previewTexture);
             computeShader.SetTexture(markAreaKernelId, CS_VARIABLE_PREVIEW_TEX, previewTexture);
 
             textureSize = new Vector2Int(texture.width, texture.height);
@@ -110,6 +114,11 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         {
             computeShader.SetInt(CS_VARIABLE_PEN_SIZE, penSize);
             computeShader.SetVector(CS_VARIABLE_PEN_COLOR, penColor);
+        }
+
+        public void InverseCanvasMarks()
+        {
+            computeShader.Dispatch(inverseFillKernelId, textureSize.x / 32, textureSize.y / 32, 1);
         }
 
         public void MarkArea(bool[] data)
