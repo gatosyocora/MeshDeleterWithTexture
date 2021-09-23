@@ -23,6 +23,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
         private int fillKernelId;
         private int clearKernelId;
 
+        private int penSize = 1;
+
         public SelectAreaCanvas(ref Material editMat)
         {
             this.editMat = editMat;
@@ -57,14 +59,17 @@ namespace Gatosyocora.MeshDeleterWithTexture
             if (cs == null) return;
 
             cs.SetInt("PenSize", penSize);
+            this.penSize = penSize;
         }
 
         public void AddSelectAreaPoint(Vector2 pos)
         {
-            cs.SetVector("PreviousPoint", latestPoint);
-
             var point = new Vector4(pos.x, pos.y, 0, 0);
+
+            if (Vector4.Distance(latestPoint, point) < penSize) return;
+
             points.Add(point);
+            cs.SetVector("PreviousPoint", latestPoint);
             latestPoint = point;
             cs.SetVector("NewPoint", point);
             cs.Dispatch(addPointKernelId, selectAreaRT.width, selectAreaRT.height, 1);
