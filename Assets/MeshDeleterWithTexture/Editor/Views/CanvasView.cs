@@ -158,25 +158,13 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                         Event.current.button == LEFT_BUTTON &&
                         !isDrawing)
                     {
-                        RegisterUndoTexture();
-                        isDrawing = true;
-
-                        if (DrawType == DrawType.SELECT)
-                        {
-                            selectArea.ClearSelectArea();
-                        }
+                        OnStartDrawing();
                     }
                     else if (Event.current.type == EventType.MouseUp &&
                         Event.current.button == LEFT_BUTTON &&
                         isDrawing)
                     {
-                        isDrawing = false;
-
-                        if (DrawType == DrawType.SELECT)
-                        {
-                            selectArea.AddLineEnd2Start();
-                            selectArea.FillSelectArea();
-                        }
+                        OnFinishDrawing();
                     }
 
                     if (isDrawing)
@@ -247,6 +235,28 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         public void ClearAllDrawing()
         {
             ClearAllDrawing(materialInfo);
+        }
+
+        private void OnStartDrawing()
+        {
+            RegisterUndoTexture();
+            isDrawing = true;
+
+            if (DrawType == DrawType.SELECT)
+            {
+                selectArea.ClearSelectArea();
+            }
+        }
+
+        private void OnFinishDrawing()
+        {
+            isDrawing = false;
+
+            if (DrawType == DrawType.SELECT)
+            {
+                selectArea.AddLineEnd2Start();
+                selectArea.FillSelectArea();
+            }
         }
 
         /// <summary>
