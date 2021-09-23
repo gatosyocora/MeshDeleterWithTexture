@@ -84,8 +84,9 @@ void CSFill(int2 id : SV_DispatchThreadID)
 
         if (!isParallel(a, b, c, d) &&
             isCrossLine(a, b, c, d) &&
-            !(isUpwardVector(a, b) && isOnLine(c, d, b, 0)) &&
-            !(isDownwardVector(a, b) && isOnLine(c, d, a, 0))) {
+            ((isUpwardVector(a, b) && c.y != a.y) ||
+            (isDownwardVector(a, b) && c.y != b.y))
+        ) {
             count++;
         }
     }
