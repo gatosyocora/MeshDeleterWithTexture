@@ -82,6 +82,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
 
         public void ClearSelectArea()
         {
+            if (cs == null) return;
+
             InitalizeProperties();
             cs.Dispatch(clearKernelId, selectAreaRT.width, selectAreaRT.height, 1);
         }

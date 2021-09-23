@@ -367,6 +367,10 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             {
                 selectArea.ApplyPenSize(PenSize);
             }
+            else
+            {
+                selectArea.ClearSelectArea();
+            }
         }
 
         private static (Vector2, float) UpdateByZoomScale(Vector2 scrollOffset, float zoomScale, Vector2 delta)
