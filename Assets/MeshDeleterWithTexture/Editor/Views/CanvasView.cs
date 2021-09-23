@@ -237,44 +237,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             ClearAllDrawing(materialInfo);
         }
 
-        private void OnStartDrawing()
-        {
-            RegisterUndoTexture();
-            isDrawing = true;
-
-            if (DrawType == DrawType.SELECT)
-            {
-                selectArea.ClearSelectArea();
-            }
-        }
-
-        private void OnFinishDrawing()
-        {
-            isDrawing = false;
-
-            if (DrawType == DrawType.SELECT)
-            {
-                selectArea.AddLineEnd2Start();
-                selectArea.FillSelectArea();
-            }
-            else
-            {
-                canvasModel.ResetLatestPos();
-            }
-        }
-
-        /// <summary>
-        /// ペン
-        /// </summary>
-        /// <param name="pos"></param>
-        private void DrawOnTexture(Vector2Int pos) => canvasModel.Mark(pos);
-
-        /// <summary>
-        /// 消しゴム
-        /// </summary>
-        /// <param name="pos"></param>
-        private void ClearOnTexture(Vector2Int pos) => canvasModel.UnMark(pos);
-
         /// <summary>
         /// ScrollOffsetとZoomScaleをリセットする
         /// </summary>
@@ -283,42 +245,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             ScrollOffset = Vector2.zero;
             ZoomScale = 1;
         }
-
-        // Textureのuv座標的にどの範囲が表示されているかを元に補正している
-        private Vector2Int ConvertWindowPosToTexturePos(Vector2Int textureSize, Vector2 windowPos, Rect rect, float zoomScale, Vector2 scrollOffset)
-        {
-            var invZoomScale = 1 - zoomScale;
-
-            float raito = textureSize.x / rect.width;
-
-            // 正規化されたCanvasのポジションに変換
-            var normalizedCanvasPosX = ((windowPos.x - rect.position.x) * raito) / textureSize.x;
-            var normalizedCanvasPosY = (textureSize.y - (windowPos.y - rect.position.y) * raito) / textureSize.y;
-
-            // ScrollOffsetを[-1, 1]の範囲にしたもの(中心からどれぐらいずれているか)
-            var normalizedOffset = zoomScale < 1 ? new Vector2(
-                Mathf.InverseLerp(-(invZoomScale), invZoomScale, scrollOffset.x) * 2f - 1f,
-                Mathf.InverseLerp(-(invZoomScale), invZoomScale, scrollOffset.y) * 2f - 1f 
-            ) : Vector2.zero;
-
-            // テクスチャのuv座標的な最小値と最大値
-            // zoomScaleが0.5でoffsetが0,0ならuv座標的に[0.25, 0.75]の範囲が表示されている
-            // zoomScale = uv座標の表示範囲幅
-            // offsetXがマイナス（左の方を表示している）のとき、左の未表示範囲 < 右の未表示範囲
-            // offsetXがプラス（右の方を表示している）のとき、左の未表示範囲 > 右の未表示範囲
-            var minCanvasPosX = 0.5f - zoomScale / 2f + normalizedOffset.x * (invZoomScale / 2f);
-            var maxCanvasPosX = 0.5f + zoomScale / 2f + normalizedOffset.x * (invZoomScale / 2f);
-            var minCanvasPosY = 0.5f - zoomScale / 2f + normalizedOffset.y * (invZoomScale / 2f);
-            var maxCanvasPosY = 0.5f + zoomScale / 2f + normalizedOffset.y * (invZoomScale / 2f);
-
-            // ScaleとOffsetによって変化しているので戻す
-            var x = (int)(Mathf.Lerp(minCanvasPosX, maxCanvasPosX, normalizedCanvasPosX) * textureSize.x);
-            var y = (int)(Mathf.Lerp(minCanvasPosY, maxCanvasPosY, normalizedCanvasPosY) * textureSize.y);
-
-            return new Vector2Int(x, y);
-        }
-
-        private Vector2 ConvertTexturePosToUVPos(Vector2Int textureSize, Vector2 texturePos) => texturePos / textureSize;
 
         /// <summary>
         /// 塗られている範囲を反転させる
@@ -375,6 +301,80 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         {
             canvasModel.Dispose();
         }
+
+        private void OnStartDrawing()
+        {
+            RegisterUndoTexture();
+            isDrawing = true;
+
+            if (DrawType == DrawType.SELECT)
+            {
+                selectArea.ClearSelectArea();
+            }
+        }
+
+        private void OnFinishDrawing()
+        {
+            isDrawing = false;
+
+            if (DrawType == DrawType.SELECT)
+            {
+                selectArea.AddLineEnd2Start();
+                selectArea.FillSelectArea();
+            }
+            else
+            {
+                canvasModel.ResetLatestPos();
+            }
+        }
+
+        /// <summary>
+        /// ペン
+        /// </summary>
+        /// <param name="pos"></param>
+        private void DrawOnTexture(Vector2Int pos) => canvasModel.Mark(pos);
+
+        /// <summary>
+        /// 消しゴム
+        /// </summary>
+        /// <param name="pos"></param>
+        private void ClearOnTexture(Vector2Int pos) => canvasModel.UnMark(pos);
+
+        // Textureのuv座標的にどの範囲が表示されているかを元に補正している
+        private Vector2Int ConvertWindowPosToTexturePos(Vector2Int textureSize, Vector2 windowPos, Rect rect, float zoomScale, Vector2 scrollOffset)
+        {
+            var invZoomScale = 1 - zoomScale;
+
+            float raito = textureSize.x / rect.width;
+
+            // 正規化されたCanvasのポジションに変換
+            var normalizedCanvasPosX = ((windowPos.x - rect.position.x) * raito) / textureSize.x;
+            var normalizedCanvasPosY = (textureSize.y - (windowPos.y - rect.position.y) * raito) / textureSize.y;
+
+            // ScrollOffsetを[-1, 1]の範囲にしたもの(中心からどれぐらいずれているか)
+            var normalizedOffset = zoomScale < 1 ? new Vector2(
+                Mathf.InverseLerp(-(invZoomScale), invZoomScale, scrollOffset.x) * 2f - 1f,
+                Mathf.InverseLerp(-(invZoomScale), invZoomScale, scrollOffset.y) * 2f - 1f 
+            ) : Vector2.zero;
+
+            // テクスチャのuv座標的な最小値と最大値
+            // zoomScaleが0.5でoffsetが0,0ならuv座標的に[0.25, 0.75]の範囲が表示されている
+            // zoomScale = uv座標の表示範囲幅
+            // offsetXがマイナス（左の方を表示している）のとき、左の未表示範囲 < 右の未表示範囲
+            // offsetXがプラス（右の方を表示している）のとき、左の未表示範囲 > 右の未表示範囲
+            var minCanvasPosX = 0.5f - zoomScale / 2f + normalizedOffset.x * (invZoomScale / 2f);
+            var maxCanvasPosX = 0.5f + zoomScale / 2f + normalizedOffset.x * (invZoomScale / 2f);
+            var minCanvasPosY = 0.5f - zoomScale / 2f + normalizedOffset.y * (invZoomScale / 2f);
+            var maxCanvasPosY = 0.5f + zoomScale / 2f + normalizedOffset.y * (invZoomScale / 2f);
+
+            // ScaleとOffsetによって変化しているので戻す
+            var x = (int)(Mathf.Lerp(minCanvasPosX, maxCanvasPosX, normalizedCanvasPosX) * textureSize.x);
+            var y = (int)(Mathf.Lerp(minCanvasPosY, maxCanvasPosY, normalizedCanvasPosY) * textureSize.y);
+
+            return new Vector2Int(x, y);
+        }
+
+        private Vector2 ConvertTexturePosToUVPos(Vector2Int textureSize, Vector2 texturePos) => texturePos / textureSize;
 
         private void OnDrawTypeChanged(DrawType drawType)
         {
