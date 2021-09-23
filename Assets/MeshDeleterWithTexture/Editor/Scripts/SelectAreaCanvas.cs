@@ -33,6 +33,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
         private int addLineKernelId;
         private int fillKernelId;
         private int clearKernelId;
+        private int inverseFillKernelId;
 
         private int penSize = 1;
 
@@ -120,6 +121,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
             return data.Select(x => x == 1).ToArray();
         }
 
+        public void InverseSelectArea()
+        {
+            cs.Dispatch(inverseFillKernelId, selectAreaRT.width / 32, selectAreaRT.height / 32, 1);
+        }
+
         private void InitalizeProperties()
         {
             points = new List<Vector4>();
@@ -133,17 +139,20 @@ namespace Gatosyocora.MeshDeleterWithTexture
             addLineKernelId = cs.FindKernel("CSAddLine");
             fillKernelId = cs.FindKernel("CSFill");
             clearKernelId = cs.FindKernel("CSClear");
+            inverseFillKernelId = cs.FindKernel("CSInverseFill");
 
             cs.SetTexture(addPointKernelId, CS_VARIABLE_SELECT_AREA_TEX, renderTexture);
             cs.SetTexture(addLineKernelId, CS_VARIABLE_SELECT_AREA_TEX, renderTexture);
             cs.SetTexture(fillKernelId, CS_VARIABLE_SELECT_AREA_TEX, renderTexture);
             cs.SetTexture(clearKernelId, CS_VARIABLE_SELECT_AREA_TEX, renderTexture);
+            cs.SetTexture(inverseFillKernelId, CS_VARIABLE_SELECT_AREA_TEX, renderTexture);
 
             buffer = new ComputeBuffer(renderTexture.width * renderTexture.height, sizeof(int));
             cs.SetBuffer(addPointKernelId, CS_VARIABLE_SELECT_RESULT, buffer);
             cs.SetBuffer(addLineKernelId, CS_VARIABLE_SELECT_RESULT, buffer);
             cs.SetBuffer(fillKernelId, CS_VARIABLE_SELECT_RESULT, buffer);
             cs.SetBuffer(clearKernelId, CS_VARIABLE_SELECT_RESULT, buffer);
+            cs.SetBuffer(inverseFillKernelId, CS_VARIABLE_SELECT_RESULT, buffer);
 
             cs.SetInt(CS_VARIABLE_WIDTH, renderTexture.width);
         }

@@ -2,6 +2,7 @@
 #pragma kernel CSAddLine
 #pragma kernel CSFill
 #pragma kernel CSClear
+#pragma kernel CSInverseFill
 
 RWStructuredBuffer<int> Result;
 RWTexture2D<float4> SelectAreaTex;
@@ -88,4 +89,19 @@ void CSClear(int2 id : SV_DispatchThreadID)
 {
     SelectAreaTex[id] = float4(0, 0, 0, 1);
     Result[id.y * Width + id.x] = false;
+}
+
+[numthreads(32, 32, 1)]
+void CSInverseFill(uint2 id : SV_DispatchThreadID)
+{
+    int index = id.y * Width + id.x;
+
+    if (Result[index] == false) {
+        SelectAreaTex[id] = float4(1, 1, 1, 1);
+        Result[index] = true;
+    }
+    else {
+        SelectAreaTex[id] = float4(0, 0, 0, 1);
+        Result[index] = false;
+    }
 }

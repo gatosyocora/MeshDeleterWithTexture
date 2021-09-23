@@ -33,6 +33,7 @@ MonoBehaviour:
   colorGreenButtonText: "\u7DD1"
   colorBlueButtonText: "\u9752"
   penEraserSizeLabelText: "\u30DA\u30F3/\u6D88\u3057\u30B4\u30E0 \u5927\u304D\u3055"
+  inverseSelectAreaButtonText: "\u9078\u629E\u7BC4\u56F2\u3092\u53CD\u8EE2"
   applySelectAreaButtonText: "\u9078\u629E\u7BC4\u56F2\u3092\u5857\u308B"
   inverseFillAreaButtonText: "\u5857\u308A\u3092\u53CD\u8EE2"
   clearAllDrawingButtonText: "\u5857\u308A\u3092\u3059\u3079\u3066\u6D88\u3059"
