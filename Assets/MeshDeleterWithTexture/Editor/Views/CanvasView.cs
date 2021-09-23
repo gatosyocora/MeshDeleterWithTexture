@@ -328,6 +328,20 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             }
         }
 
+        private void OnDrawTypeChanged(DrawType drawType)
+        {
+            canvasModel.ResetLatestPos();
+
+            if (drawType == DrawType.SELECT)
+            {
+                selectArea.ApplyPenSize(PenSize);
+            }
+            else
+            {
+                selectArea.ClearSelectArea();
+            }
+        }
+
         /// <summary>
         /// ペン
         /// </summary>
@@ -375,20 +389,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         }
 
         private Vector2 ConvertTexturePosToUVPos(Vector2Int textureSize, Vector2 texturePos) => texturePos / textureSize;
-
-        private void OnDrawTypeChanged(DrawType drawType)
-        {
-            canvasModel.ResetLatestPos();
-
-            if (drawType == DrawType.SELECT)
-            {
-                selectArea.ApplyPenSize(PenSize);
-            }
-            else
-            {
-                selectArea.ClearSelectArea();
-            }
-        }
 
         private static (Vector2, float) UpdateByZoomScale(Vector2 scrollOffset, float zoomScale, Vector2 delta)
         {
