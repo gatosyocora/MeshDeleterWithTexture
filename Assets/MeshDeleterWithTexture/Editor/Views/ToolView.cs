@@ -81,12 +81,15 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
                     EditorGUILayout.Space();
 
-                    using (new EditorGUI.DisabledGroupScope(!model.HasTexture()))
+                    if (canvasView.DrawType == DrawType.PEN || canvasView.DrawType == DrawType.ERASER)
                     {
-                        PenColorChangeGUI(localizedText, canvasView);
-                    }
+                        using (new EditorGUI.DisabledGroupScope(!model.HasTexture()))
+                        {
+                            PenColorChangeGUI(localizedText, canvasView);
+                        }
 
-                    EditorGUILayout.Space();
+                        EditorGUILayout.Space();
+                    }
 
                     GatoGUILayout.IntSlider(
                         localizedText.Data.penEraserSizeLabelText,
@@ -98,16 +101,19 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
                     EditorGUILayout.Space();
 
-                    using (new GatoGUILayout.RightAlignedScope())
+                    if (canvasView.DrawType == DrawType.SELECT)
                     {
-                        GatoGUILayout.DisabledButton(
-                            localizedText.Data.applySelectAreaButtonText,
-                            () => canvasView.ApplySelectArea(),
-                            canvasView.DrawType != DrawType.SELECT
-                        );
-                    }
+                        using (new GatoGUILayout.RightAlignedScope())
+                        {
+                            GatoGUILayout.DisabledButton(
+                                localizedText.Data.applySelectAreaButtonText,
+                                () => canvasView.ApplySelectArea(),
+                                canvasView.DrawType != DrawType.SELECT
+                            );
+                        }
 
-                    EditorGUILayout.Space();
+                        EditorGUILayout.Space();
+                    }
 
                     using (new GatoGUILayout.RightAlignedScope())
                     {
