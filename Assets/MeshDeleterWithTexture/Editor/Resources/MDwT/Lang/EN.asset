@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab925fdc50baf47479726bcae87997f3, type: 3}
   m_Name: EN
   m_EditorClassIdentifier: 
-  language: EN
+  language: 0
   rendererLabelText: Renderer
   scaleLabelText: Scale
   resetButtonText: Reset
@@ -21,17 +21,22 @@ MonoBehaviour:
   dragAndDropDeleteMaskTextureAreaText: Drag & Drop DeleteMaskTexture
   uvMapLineColorLabelText: UVMap LineColor
   exportUvMapButtonText: Export UVMap
+  textureLabelText: Texture (Material)
   toolsTitleText: Tools
   drawTypeLabelText: DrawType
   penToolNameText: PEN
   eraserToolNameText: ERASER
   penColorLabelText: PenColor
+  selectToolNameText: SELECT
   colorBlackButtonText: Black
   colorRedButtonText: R
   colorGreenButtonText: G
-  colorBrueButtonText: B
+  colorBlueButtonText: B
   penEraserSizeLabelText: Pen/Eraser size
+  inverseSelectAreaButtonText: Inverse SelectArea
+  applySelectAreaButtonText: Apply SelectArea
   inverseFillAreaButtonText: Inverse FillArea
+  clearAllDrawingButtonText: Clear All Drawing
   undoDrawingButtonText: Undo Drawing
   modelInformationTitleText: Model Information
   triangleCountLabelText: Triangle Count
@@ -42,3 +47,10 @@ MonoBehaviour:
   revertMeshToPrefabButtonText: Revert Mesh to Prefab
   revertMeshToPreviouslyButtonText: Revert Mesh to previously
   deleteMeshButtonText: Delete Mesh
+  androidNotSupportMessageText: 'Can''t use with BuildTarget ''Android''.
+
+    Please
+    switch BuildTarget to PC'
+  errorDialogTitleText: Error has occurred
+  notFoundVerticesExceptionDialogMessageText: Not found vertices to delete.
+  errorDialogOkText: OK
