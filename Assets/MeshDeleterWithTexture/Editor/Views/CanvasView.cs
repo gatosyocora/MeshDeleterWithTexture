@@ -117,6 +117,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             editMat.SetFloat("_SelectTextPatternTex_Size", patternTexture.width);
 
             editMat.SetInt("_IsStraightMode", 0);
+            startPos = Vector2Int.one * -1;
 
             InitializeDrawArea(materialInfo, renderer);
 
@@ -373,9 +374,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         private Vector2Int ApplyStraightModeIfNeeded(Vector2Int pos)
         {
-            if (InputKeyDownShift() && !isDrawingStraight && isDrawing)
+            if (InputKeyDownShift() && !isDrawingStraight)
             {
-                startPos = pos;
                 isDrawingStraight = true;
                 editMat.SetInt("_IsStraightMode", 1);
             }
@@ -385,8 +385,11 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 isDrawingStraight = false;
                 editMat.SetInt("_IsStraightMode", 0);
             }
-            else if (isDrawing && isDrawingStraight)
+
+            if (isDrawing && isDrawingStraight)
             {
+                if (startPos.x == -1) startPos = pos;
+
                 var diffX = Mathf.Abs(pos.x - startPos.x);
                 var diffY = Mathf.Abs(pos.y - startPos.y);
 
