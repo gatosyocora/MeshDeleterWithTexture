@@ -53,7 +53,6 @@
 
 			sampler2D _MainTex;
 			float4 _MainTex_ST;
-			float4 _MainTex_TexelSize;
 			float4 _MainTex_Size;
 			fixed4 _Color;
 			float _Threshold;
@@ -104,7 +103,7 @@
 				col.rgb = lerp(col.rgb, _UVMapLineColor, tex2D(_UVMap, uv).r);
 
 				// ペンカーソルを表示
-				float raito = _MainTex_TexelSize.x / _MainTex_TexelSize.y;
+				float raito = _MainTex_Size.x / _MainTex_Size.y;
 				if (distance (uv * float2(1, raito), _CurrentPos.xy * float2(1, raito)) <= _PenSize)
 					col = fixed4(1, 1, 0, 1);
 
