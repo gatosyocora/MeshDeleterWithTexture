@@ -34,13 +34,12 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             return Vector2.zero;
         }
 
-        public static string DragAndDropableArea(string text, string[] permissonExtensions, Action<string> onChanged)
+        public static string DragAndDropableArea(string text, string[] permissonExtensions, Action<string> onChanged, params GUILayoutOption[] options)
         {
             EditorGUILayout.LabelField(
                 text,
                 GUI.skin.box,
-                GUILayout.ExpandWidth(true),
-                GUILayout.Height(EditorGUIUtility.singleLineHeight * 2)
+                options
             );
             var rect = GUILayoutUtility.GetLastRect();
 
@@ -114,11 +113,11 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             }
         }
 
-        public static int IntSlider(string label, int value, int min, int max, Action<int> onChanged)
+        public static int IntSlider(string label, int value, int min, int max, Action<int> onChanged, params GUILayoutOption[] options)
         {
             using (var check = new EditorGUI.ChangeCheckScope())
             {
-                var newValue = EditorGUILayout.IntSlider(label, value, min, max);
+                var newValue = EditorGUILayout.IntSlider(label, value, min, max, options);
                 if (check.changed)
                 {
                     onChanged(newValue);
@@ -163,14 +162,14 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             }
         }
 
-        public static T Toolbar<T>(T value, string[] texts, Action<T> onChanged) where T : Enum
+        public static T Toolbar<T>(T value, string[] texts, Action<T> onChanged, params GUILayoutOption[] options) where T : Enum
         {
             var enumValues = Enum.GetValues(typeof(T)) as T[];
             var intValue = Array.IndexOf(enumValues, value);
 
             using (var check = new EditorGUI.ChangeCheckScope())
             {
-                var newIntValue = GUILayout.Toolbar(intValue, texts);
+                var newIntValue = GUILayout.Toolbar(intValue, texts, options);
                 var newValue = enumValues[newIntValue];
                 if (check.changed)
                 {
@@ -185,9 +184,9 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         {
             EditorGUILayout.HorizontalScope horizontalScope;
 
-            public RightAlignedScope()
+            public RightAlignedScope(params GUILayoutOption[] options)
             {
-                horizontalScope = new EditorGUILayout.HorizontalScope();
+                horizontalScope = new EditorGUILayout.HorizontalScope(options);
 
                 GUILayout.FlexibleSpace();
             }
@@ -200,9 +199,9 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         public class TitleScope : GUI.Scope
         {
-            public TitleScope(string label)
+            public TitleScope(string label, params GUILayoutOption[] options)
             {
-                EditorGUILayout.LabelField(label, EditorStyles.boldLabel);
+                EditorGUILayout.LabelField(label, EditorStyles.boldLabel, options);
             }
 
             protected override void CloseScope() {}

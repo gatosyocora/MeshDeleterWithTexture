@@ -111,7 +111,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     }
                 }
 
-                toolView.Render(model, localizedText, canvasView);
+                toolView.Render(model, localizedText, canvasView, 1 - CANVAS_SIZE_RAITO);
             }
 
             if (InputKeyDown(KeyCode.Z))
