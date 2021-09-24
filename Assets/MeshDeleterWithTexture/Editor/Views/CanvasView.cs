@@ -112,6 +112,10 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             editMat.SetVector("_StartPos", new Vector4(0, 0, 0, 0));
             editMat.SetVector("_EndPos", new Vector4(0, 0, 0, 0));
 
+            var patternTexture = AssetRepository.LoadSelectTextureAreaPatternTexture();
+            editMat.SetTexture("_SelectTextPatternTex", patternTexture);
+            editMat.SetFloat("_SelectTextPatternTex_Size", patternTexture.width);
+
             InitializeDrawArea(materialInfo, renderer);
 
             PenSize = 20;
@@ -194,6 +198,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             {
                 editTexture = TextureUtility.GenerateTextureToEditting(materialInfo.Texture);
                 textureSize = new Vector2Int(materialInfo.Texture.width, materialInfo.Texture.height);
+
+                editMat.SetVector("_MainTex_Size", new Vector4(textureSize.x, textureSize.y, 0, 0));
 
                 ClearAllDrawing(materialInfo);
 
