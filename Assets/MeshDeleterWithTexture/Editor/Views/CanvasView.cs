@@ -59,7 +59,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             set
             {
                 _penSize = value;
-                editMat.SetFloat("_PenSize", value / (float)textureSize.x);
+                UpdateCursorSize(value, textureSize);
                 canvasModel.SetPen(value, _penColor);
                 selectArea.ApplyPenSize(value);
             }
@@ -209,6 +209,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 ClearAllDrawing(materialInfo);
 
                 uvMap.SetUVMapTexture(renderer, materialInfo);
+
+                UpdateCursorSize(PenSize, textureSize);
 
                 selectArea.SetSelectAreaTexture(renderer, materialInfo);
                 selectArea.ApplyPenSize(PenSize);
@@ -413,6 +415,11 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             }
 
             return pos;
+        }
+
+        private void UpdateCursorSize(int penSize, Vector2Int textureSize)
+        {
+            editMat.SetFloat("_PenSize", penSize / (float)textureSize.x);
         }
 
         private static (Vector2, float) UpdateByZoomScale(Vector2 scrollOffset, float zoomScale, Vector2 delta)
