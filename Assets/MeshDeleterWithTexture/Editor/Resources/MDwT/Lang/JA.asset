@@ -27,7 +27,7 @@ MonoBehaviour:
   penToolNameText: "\u30DA\u30F3"
   eraserToolNameText: "\u6D88\u3057\u30B4\u30E0"
   selectToolNameText: "\u9078\u629E"
-  penColorLabelText: "\u30DA\u30F3\u8272"
+  penColorLabelText: "\u5857\u308A\u8272"
   colorBlackButtonText: "\u9ED2"
   colorRedButtonText: "\u8D64"
   colorGreenButtonText: "\u7DD1"

@@ -26,8 +26,8 @@ MonoBehaviour:
   drawTypeLabelText: DrawType
   penToolNameText: PEN
   eraserToolNameText: ERASER
-  penColorLabelText: PenColor
   selectToolNameText: SELECT
+  penColorLabelText: Color
   colorBlackButtonText: Black
   colorRedButtonText: R
   colorGreenButtonText: G
