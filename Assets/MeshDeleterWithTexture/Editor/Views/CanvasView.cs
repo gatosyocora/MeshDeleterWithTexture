@@ -314,13 +314,17 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         {
             canvasModel.ResetLatestPos();
 
-            if (drawType == DrawType.SELECT)
+            switch(drawType)
             {
-                selectArea.ApplyPenSize(PenSize);
-            }
-            else
-            {
-                selectArea.ClearSelectArea();
+                case DrawType.PEN:
+                case DrawType.ERASER:
+                    selectArea.ClearSelectArea();
+                    break;
+                case DrawType.SELECT:
+                    selectArea.ApplyPenSize(PenSize);
+                    break;
+                default:
+                    break;
             }
         }
 
