@@ -211,6 +211,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 uvMap.SetUVMapTexture(renderer, materialInfo);
 
                 selectArea.SetSelectAreaTexture(renderer, materialInfo);
+                selectArea.ApplyPenSize(PenSize);
 
                 // TODO: _MainTexが存在しないマテリアルは違うやつに入れないといけない
                 var materials = renderer.sharedMaterials;
