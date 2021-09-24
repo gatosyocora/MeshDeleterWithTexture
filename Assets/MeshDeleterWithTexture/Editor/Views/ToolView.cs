@@ -81,15 +81,12 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
                     EditorGUILayout.Space();
 
-                    if (canvasView.DrawType == DrawType.PEN || canvasView.DrawType == DrawType.ERASER)
+                    using (new EditorGUI.DisabledGroupScope(!model.HasTexture()))
                     {
-                        using (new EditorGUI.DisabledGroupScope(!model.HasTexture()))
-                        {
-                            PenColorChangeGUI(localizedText, canvasView);
-                        }
-
-                        EditorGUILayout.Space();
+                        PenColorChangeGUI(localizedText, canvasView);
                     }
+
+                    EditorGUILayout.Space();
 
                     GatoGUILayout.IntSlider(
                         localizedText.Data.penEraserSizeLabelText,
