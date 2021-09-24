@@ -116,6 +116,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             editMat.SetTexture("_SelectTextPatternTex", patternTexture);
             editMat.SetFloat("_SelectTextPatternTex_Size", patternTexture.width);
 
+            editMat.SetInt("_IsStraightMode", 0);
+
             InitializeDrawArea(materialInfo, renderer);
 
             PenSize = 20;
@@ -375,11 +377,13 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             {
                 startPos = pos;
                 isDrawingStraight = true;
+                editMat.SetInt("_IsStraightMode", 1);
             }
             else if (InputKeyUpShift() && isDrawingStraight)
             {
                 startPos = Vector2Int.one * -1;
                 isDrawingStraight = false;
+                editMat.SetInt("_IsStraightMode", 0);
             }
             else if (isDrawing && isDrawingStraight)
             {

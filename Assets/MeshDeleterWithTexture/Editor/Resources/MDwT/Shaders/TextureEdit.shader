@@ -75,6 +75,8 @@
 			sampler2D _SelectTex;
 			sampler2D _SelectTextPatternTex;
 			float _SelectTextPatternTex_Size;
+
+			int _IsStraightMode;
 			
 			v2f vert (appdata v)
 			{
@@ -104,8 +106,9 @@
 
 				// ペンカーソルを表示
 				float raito = _MainTex_Size.x / _MainTex_Size.y;
+				fixed4 cursorColor = _IsStraightMode ? fixed4(1, 0, 1, 1) : fixed4(1, 1, 0, 1);
 				if (distance (uv * float2(1, raito), _CurrentPos.xy * float2(1, raito)) <= _PenSize)
-					col = fixed4(1, 1, 0, 1);
+					col = cursorColor;
 
 				return col;
 			}
