@@ -116,6 +116,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             editMat.SetTexture("_SelectTextPatternTex", patternTexture);
             editMat.SetFloat("_SelectTextPatternTex_Size", patternTexture.width);
 
+            editMat.SetInt("_IsEraser", DrawType == DrawType.ERASER ? 1 : 0);
+
             editMat.SetInt("_IsStraightMode", 0);
             startPos = Vector2Int.one * -1;
 
@@ -314,7 +316,9 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         {
             canvasModel.ResetLatestPos();
 
-            switch(drawType)
+            editMat.SetInt("_IsEraser", drawType == DrawType.ERASER ? 1 : 0);
+
+            switch (drawType)
             {
                 case DrawType.PEN:
                 case DrawType.ERASER:
