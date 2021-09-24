@@ -8,7 +8,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
     public class ToolView : Editor, IDisposable
     {
         private readonly string[] deleteMaskTextureExtensions = { ".png", ".jpg", ".jpeg" };
-        private const int PADDING_SIZE = 6;
+        private const int PADDING_SIZE = 12;
 
         private string[] drawTypeTexts;
 

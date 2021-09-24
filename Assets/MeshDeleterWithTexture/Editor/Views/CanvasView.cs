@@ -10,6 +10,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 {
     public class CanvasView : Editor, IDisposable
     {
+        private const int PADDING_SIZE = 6;
+
         private static Material editMat;
         public Texture2D editTexture;
         public RenderTexture previewTexture;
@@ -128,15 +130,16 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         public void Render(bool hasTexture, float canvasSizeRaito)
         {
+            var width = EditorGUIUtility.currentViewWidth * canvasSizeRaito - PADDING_SIZE;
+
             if (!hasTexture)
             {
-                DrawDummyCanvasView(canvasSizeRaito);
+                DrawDummyCanvasView(width);
                 return;
             }
 
             if (textureSize == null) return;
 
-            var width = EditorGUIUtility.currentViewWidth * canvasSizeRaito;
             var height = width * textureSize.y / textureSize.x;
             EventType mouseEventType = 0;
             Rect rect = new Rect(0, 0, 0, 0);
@@ -467,15 +470,9 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             return scrollOffset;
         }
 
-        private void DrawDummyCanvasView(float canvasSizeRaito)
+        private void DrawDummyCanvasView(float width)
         {
-            GUI.Box(
-                GUILayoutUtility.GetRect(
-                    EditorGUIUtility.currentViewWidth * canvasSizeRaito,
-                    EditorGUIUtility.currentViewWidth * canvasSizeRaito
-                ),
-                string.Empty
-            );
+            GUI.Box(GUILayoutUtility.GetRect(width, width, GUI.skin.box), string.Empty);
         }
 
         private bool InputMouseLeftDown() => Event.current.type == EventType.MouseDown && Event.current.button == LEFT_BUTTON;
