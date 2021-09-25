@@ -19,6 +19,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         private const int PADDING_SIZE = 6;
 
+        private const string PREVIEW_MATERIAL_NAME = "_preview";
+
         private const string MAT_VARIABLE_APPLY_GAMMA_CORRECTION = "_ApplyGammaCorrection";
         private const string MAT_VARIABLE_POINT_NUM = "_PointNum";
         private const string MAT_VARIABLE_START_POS = "_StartPos";
@@ -239,7 +241,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 var materials = renderer.sharedMaterials;
                 previewMaterial = new Material(materials[materialInfo.MaterialSlotIndices[0]])
                 {
-                    name = "_preview",
+                    name = PREVIEW_MATERIAL_NAME,
                     mainTexture = previewTexture,
                 };
                 materials[materialInfo.MaterialSlotIndices[0]] = previewMaterial;
