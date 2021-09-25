@@ -2,7 +2,6 @@
 using UnityEditor;
 using System.Linq;
 using System.IO;
-using Gatosyocora.MeshDeleterWithTexture.Models;
 using System;
 
 namespace Gatosyocora.MeshDeleterWithTexture.Views
