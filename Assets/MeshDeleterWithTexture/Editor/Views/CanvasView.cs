@@ -24,6 +24,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         private Vector2Int startPos;
         private bool isDrawingStraight = false;
+        private StraightType straightType = StraightType.NONE;
 
         private const float MAX_ZOOM_SCALE = 1;
         private const float MIN_ZOOM_SCALE = 0.1f;
@@ -406,18 +407,21 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 var diffX = Mathf.Abs(pos.x - startPos.x);
                 var diffY = Mathf.Abs(pos.y - startPos.y);
 
-                if (diffX > diffY)
+                if (straightType == StraightType.HORIZONTAL || diffX > diffY)
                 {
                     pos.y = startPos.y;
+                    straightType = StraightType.HORIZONTAL;
                 }
-                else if (diffX < diffY)
+                else if (straightType == StraightType.VERTICAL || diffX < diffY)
                 {
                     pos.x = startPos.x;
+                    straightType = StraightType.VERTICAL;
                 }
             } 
             else
             {
                 startPos = Vector2Int.one * -1;
+                straightType = StraightType.NONE;
             }
 
             return pos;
@@ -483,5 +487,10 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         private bool InputKeyDownShift() => Event.current.type == EventType.KeyDown && (Event.current.keyCode == KeyCode.LeftShift || Event.current.keyCode == KeyCode.RightShift);
         private bool InputKeyUpShift() => Event.current.type == EventType.KeyUp && (Event.current.keyCode == KeyCode.LeftShift || Event.current.keyCode == KeyCode.RightShift);
+    }
+
+    public enum StraightType
+    {
+        NONE, HORIZONTAL, VERTICAL
     }
 }
