@@ -47,7 +47,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
             if (renderer == null || materialInfo == null)
             {
                 editMat.SetTexture("_SelectTex", null);
-                return true;
+                return false;
             }
 
             var texture = materialInfo.Texture;
