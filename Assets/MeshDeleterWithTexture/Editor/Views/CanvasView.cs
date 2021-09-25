@@ -395,7 +395,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             }
             else if (InputKeyUpShift() && isDrawingStraight)
             {
-                startPos = Vector2Int.one * -1;
                 isDrawingStraight = false;
                 editMat.SetInt("_IsStraightMode", 0);
             }
@@ -415,6 +414,10 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 {
                     pos.x = startPos.x;
                 }
+            } 
+            else
+            {
+                startPos = Vector2Int.one * -1;
             }
 
             return pos;
