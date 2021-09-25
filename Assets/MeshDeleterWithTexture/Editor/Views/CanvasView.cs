@@ -19,6 +19,20 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         private const int PADDING_SIZE = 6;
 
+        private const string MAT_VARIABLE_APPLY_GAMMA_CORRECTION = "_ApplyGammaCorrection";
+        private const string MAT_VARIABLE_POINT_NUM = "_PointNum";
+        private const string MAT_VARIABLE_START_POS = "_StartPos";
+        private const string MAT_VARIABLE_END_POS = "_EndPos";
+        private const string MAT_VARIABLE_CURRENT_POS = "_CurrentPos";
+        private const string MAT_VARIABLE_MAIN_TEX_SIZE = "_MainTex_Size";
+        private const string MAT_VARIABLE_SELECT_TEXT_PATTERN_TEX = "_SelectTextPatternTex";
+        private const string MAT_VARIABLE_SELECT_TEXT_PATTERN_TEX_SIZE = "_SelectTextPatternTex_Size";
+        private const string MAT_VARIABLE_IS_ERASER = "_IsEraser";
+        private const string MAT_VARIABLE_IS_STRAIGHT_MODE = "_IsStraightMode";
+        private const string MAT_VARIABLE_PEN_SIZE = "_PenSize";
+        private const string MAT_VARIABLE_OFFSET = "_Offset";
+        private const string MAT_VARIABLE_TEXTURE_SCALE = "_TextureScale";
+
         private CanvasModel canvasModel;
 
         private static Material editMat;
@@ -77,7 +91,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             get => _scrollOffset;
             private set
             {
-                editMat.SetVector("_Offset", new Vector4(value.x, value.y, 0, 0));
+                editMat.SetVector(MAT_VARIABLE_OFFSET, new Vector4(value.x, value.y, 0, 0));
                 _scrollOffset = value;
             }
         }
@@ -87,7 +101,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         {
             get => _zoomScale;
             set {
-                editMat.SetFloat("_TextureScale", value);
+                editMat.SetFloat(MAT_VARIABLE_TEXTURE_SCALE, value);
                 _zoomScale = value;
             }
         }
@@ -111,19 +125,19 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         public void Initialize(MaterialInfo materialInfo, Renderer renderer)
         {
-            editMat.SetFloat("_ApplyGammaCorrection", Convert.ToInt32(PlayerSettings.colorSpace == ColorSpace.Linear));
-            editMat.SetInt("_PointNum", 0);
+            editMat.SetFloat(MAT_VARIABLE_APPLY_GAMMA_CORRECTION, Convert.ToInt32(PlayerSettings.colorSpace == ColorSpace.Linear));
+            editMat.SetInt(MAT_VARIABLE_POINT_NUM, 0);
 
-            editMat.SetVector("_StartPos", new Vector4(0, 0, 0, 0));
-            editMat.SetVector("_EndPos", new Vector4(0, 0, 0, 0));
+            editMat.SetVector(MAT_VARIABLE_START_POS, new Vector4(0, 0, 0, 0));
+            editMat.SetVector(MAT_VARIABLE_END_POS, new Vector4(0, 0, 0, 0));
 
             var patternTexture = AssetRepository.LoadSelectTextureAreaPatternTexture();
-            editMat.SetTexture("_SelectTextPatternTex", patternTexture);
-            editMat.SetFloat("_SelectTextPatternTex_Size", patternTexture.width);
+            editMat.SetTexture(MAT_VARIABLE_SELECT_TEXT_PATTERN_TEX, patternTexture);
+            editMat.SetFloat(MAT_VARIABLE_SELECT_TEXT_PATTERN_TEX_SIZE, patternTexture.width);
 
-            editMat.SetInt("_IsEraser", DrawType == DrawType.ERASER ? 1 : 0);
+            editMat.SetInt(MAT_VARIABLE_IS_ERASER, DrawType == DrawType.ERASER ? 1 : 0);
 
-            editMat.SetInt("_IsStraightMode", 0);
+            editMat.SetInt(MAT_VARIABLE_IS_STRAIGHT_MODE, 0);
             startPos = Vector2Int.one * -1;
 
             InitializeDrawArea(materialInfo, renderer);
@@ -172,7 +186,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                     pos = ApplyStraightModeIfNeeded(pos);
 
                     var uvPos = ConvertTexturePosToUVPos(textureSize, pos);
-                    editMat.SetVector("_CurrentPos", new Vector4(uvPos.x, uvPos.y, 0, 0));
+                    editMat.SetVector(MAT_VARIABLE_CURRENT_POS, new Vector4(uvPos.x, uvPos.y, 0, 0));
 
                     if (InputMouseLeftDown() && !isDrawing)
                     {
@@ -210,7 +224,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 editTexture = TextureUtility.GenerateTextureToEditting(materialInfo.Texture);
                 textureSize = new Vector2Int(materialInfo.Texture.width, materialInfo.Texture.height);
 
-                editMat.SetVector("_MainTex_Size", new Vector4(textureSize.x, textureSize.y, 0, 0));
+                editMat.SetVector(MAT_VARIABLE_MAIN_TEX_SIZE, new Vector4(textureSize.x, textureSize.y, 0, 0));
 
                 ClearAllDrawing(materialInfo);
 
@@ -325,7 +339,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         {
             canvasModel.ResetLatestPos();
 
-            editMat.SetInt("_IsEraser", drawType == DrawType.ERASER ? 1 : 0);
+            editMat.SetInt(MAT_VARIABLE_IS_ERASER, drawType == DrawType.ERASER ? 1 : 0);
 
             switch (drawType)
             {
@@ -394,12 +408,12 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             if (InputKeyDownShift() && !isDrawingStraight)
             {
                 isDrawingStraight = true;
-                editMat.SetInt("_IsStraightMode", 1);
+                editMat.SetInt(MAT_VARIABLE_IS_STRAIGHT_MODE, 1);
             }
             else if (InputKeyUpShift() && isDrawingStraight)
             {
                 isDrawingStraight = false;
-                editMat.SetInt("_IsStraightMode", 0);
+                editMat.SetInt(MAT_VARIABLE_IS_STRAIGHT_MODE, 0);
             }
 
             if (isDrawing && isDrawingStraight)
@@ -431,7 +445,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         private void UpdateCursorSize(int penSize, Vector2Int textureSize)
         {
-            editMat.SetFloat("_PenSize", penSize / (float)textureSize.x);
+            editMat.SetFloat(MAT_VARIABLE_PEN_SIZE, penSize / (float)textureSize.x);
         }
 
         private static (Vector2, float) UpdateByZoomScale(Vector2 scrollOffset, float zoomScale, Vector2 delta)
