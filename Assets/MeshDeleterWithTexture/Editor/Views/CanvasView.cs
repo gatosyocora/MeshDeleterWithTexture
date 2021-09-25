@@ -36,7 +36,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
         private CanvasModel canvasModel;
 
-        private static Material editMat;
+        private Material editMat;
         private Texture2D editTexture;
         private Material previewMaterial;
 
