@@ -53,7 +53,7 @@
 ### Undo
 
 - "Undo Drawing"でPenでの塗りつぶしやInverse FillArea, Clear All Drawingを実行前の状態に戻せる
-  - Zキーでもこの機能を使用
+  - Ctrl+Zキーでもこの機能を使用
   - 最大10回までさかのぼれる
 
 
