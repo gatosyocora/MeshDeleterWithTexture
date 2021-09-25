@@ -10,11 +10,19 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 {
     public class CanvasView : Editor, IDisposable
     {
+        private const float MAX_ZOOM_SCALE = 1;
+        private const float MIN_ZOOM_SCALE = 0.1f;
+        private const float ZOOM_STEP = 0.1f;
+
+        private const int LEFT_BUTTON = 0;
+        private const int RIGHT_BUTTON = 1;
+
         private const int PADDING_SIZE = 6;
+
+        private CanvasModel canvasModel;
 
         private static Material editMat;
         private Texture2D editTexture;
-        public RenderTexture previewTexture;
         private Material previewMaterial;
 
         private bool isDrawing = false;
@@ -26,12 +34,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         private bool isDrawingStraight = false;
         private StraightType straightType = StraightType.NONE;
 
-        private const float MAX_ZOOM_SCALE = 1;
-        private const float MIN_ZOOM_SCALE = 0.1f;
-        private const float ZOOM_STEP = 0.1f;
-
-        private const int LEFT_BUTTON = 0;
-        private const int RIGHT_BUTTON = 1;
+        public RenderTexture previewTexture;
 
         private DrawType _drawType;
         public DrawType DrawType
@@ -78,6 +81,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 _scrollOffset = value;
             }
         }
+
         private float _zoomScale;
         public float ZoomScale 
         {
@@ -87,8 +91,6 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
                 _zoomScale = value;
             }
         }
-
-        private CanvasModel canvasModel;
 
         public UndoCanvas undo;
         public UVMapCanvas uvMap;
