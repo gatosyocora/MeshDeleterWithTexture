@@ -50,6 +50,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 return false;
             }
 
+            if (selectAreaRT != null)
+            {
+                selectAreaRT.Release();
+            }
+
             var texture = materialInfo.Texture;
 
             selectAreaRT = new RenderTexture(texture.width, texture.height, 0)

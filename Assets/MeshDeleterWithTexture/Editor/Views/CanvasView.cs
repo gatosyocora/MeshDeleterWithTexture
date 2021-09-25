@@ -222,6 +222,10 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
             if (materialInfo.Texture != null)
             {
+                if (editTexture != null)
+                {
+                    DestroyImmediate(editTexture);
+                }
                 editTexture = TextureUtility.GenerateTextureToEditting(materialInfo.Texture);
                 textureSize = new Vector2Int(materialInfo.Texture.width, materialInfo.Texture.height);
 
@@ -238,6 +242,10 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
 
                 // TODO: _MainTexが存在しないマテリアルは違うやつに入れないといけない
                 var materials = renderer.sharedMaterials;
+                if (previewMaterial != null)
+                {
+                    DestroyImmediate(previewMaterial);
+                }
                 previewMaterial = new Material(materials[materialInfo.MaterialSlotIndices[0]])
                 {
                     name = PREVIEW_MATERIAL_NAME,
@@ -263,6 +271,11 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         /// </summary>
         public void ClearAllDrawing(MaterialInfo materialInfo)
         {
+            if (previewTexture != null)
+            {
+                previewTexture.Release();
+            }
+
             previewTexture = TextureUtility.CopyTexture2DToRenderTexture(materialInfo.Texture, textureSize, PlayerSettings.colorSpace == ColorSpace.Linear);
             canvasModel.Initialize(ref editTexture, ref previewTexture);
             deleteMask = new DeleteMaskCanvas(ref canvasModel.buffer, materialInfo.Texture, ref previewTexture);
