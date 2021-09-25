@@ -13,9 +13,9 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         private const int PADDING_SIZE = 6;
 
         private static Material editMat;
-        public Texture2D editTexture;
+        private Texture2D editTexture;
         public RenderTexture previewTexture;
-        public Material previewMaterial;
+        private Material previewMaterial;
 
         private bool isDrawing = false;
         private Vector2Int textureSize;
