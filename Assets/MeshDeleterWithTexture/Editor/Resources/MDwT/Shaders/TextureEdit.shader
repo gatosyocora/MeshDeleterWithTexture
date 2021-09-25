@@ -73,8 +73,8 @@
 			float _ApplyGammaCorrection;
 
 			sampler2D _SelectTex;
-			sampler2D _SelectTextPatternTex;
-			float _SelectTextPatternTex_Size;
+			sampler2D _SelectAreaPatternTex;
+			float _SelectAreaPatternTex_Size;
 
 			int _IsEraser;
 			int _IsStraightMode;
@@ -100,7 +100,7 @@
 				float2 startPos = (float2(0.5, 0.5) * (1-_TextureScale) + _Offset.xy * 0.5) + _StartPos.xy * _TextureScale;
 				float2 endPos = (float2(0.5, 0.5) * (1-_TextureScale) + _Offset.xy * 0.5) + _EndPos.xy * _TextureScale;
 
-				col.rgb = lerp(col.rgb, fixed3(1, 0.7, 0), tex2D(_SelectTex, uv).x == 1 && tex2Dlod(_SelectTextPatternTex, float4(uv * _MainTex_Size.x / _SelectTextPatternTex_Size, 0, 0)).x == 1);
+				col.rgb = lerp(col.rgb, fixed3(1, 0.7, 0), tex2D(_SelectTex, uv).x == 1 && tex2Dlod(_SelectAreaPatternTex, float4(uv * _MainTex_Size.x / _SelectAreaPatternTex_Size, 0, 0)).x == 1);
 
 				// UVMapを表示
 				col.rgb = lerp(col.rgb, _UVMapLineColor, tex2D(_UVMap, uv).r);

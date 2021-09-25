@@ -25,8 +25,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
         private const string MAT_VARIABLE_END_POS = "_EndPos";
         private const string MAT_VARIABLE_CURRENT_POS = "_CurrentPos";
         private const string MAT_VARIABLE_MAIN_TEX_SIZE = "_MainTex_Size";
-        private const string MAT_VARIABLE_SELECT_TEXT_PATTERN_TEX = "_SelectTextPatternTex";
-        private const string MAT_VARIABLE_SELECT_TEXT_PATTERN_TEX_SIZE = "_SelectTextPatternTex_Size";
+        private const string MAT_VARIABLE_SELECT_AREA_PATTERN_TEX = "_SelectAreaPatternTex";
+        private const string MAT_VARIABLE_SELECT_AREA_PATTERN_TEX_SIZE = "_SelectAreaPatternTex_Size";
         private const string MAT_VARIABLE_IS_ERASER = "_IsEraser";
         private const string MAT_VARIABLE_IS_STRAIGHT_MODE = "_IsStraightMode";
         private const string MAT_VARIABLE_PEN_SIZE = "_PenSize";
@@ -132,8 +132,8 @@ namespace Gatosyocora.MeshDeleterWithTexture.Views
             editMat.SetVector(MAT_VARIABLE_END_POS, new Vector4(0, 0, 0, 0));
 
             var patternTexture = AssetRepository.LoadSelectTextureAreaPatternTexture();
-            editMat.SetTexture(MAT_VARIABLE_SELECT_TEXT_PATTERN_TEX, patternTexture);
-            editMat.SetFloat(MAT_VARIABLE_SELECT_TEXT_PATTERN_TEX_SIZE, patternTexture.width);
+            editMat.SetTexture(MAT_VARIABLE_SELECT_AREA_PATTERN_TEX, patternTexture);
+            editMat.SetFloat(MAT_VARIABLE_SELECT_AREA_PATTERN_TEX_SIZE, patternTexture.width);
 
             editMat.SetInt(MAT_VARIABLE_IS_ERASER, DrawType == DrawType.ERASER ? 1 : 0);
 
