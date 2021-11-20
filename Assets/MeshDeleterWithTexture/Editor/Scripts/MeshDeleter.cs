@@ -114,8 +114,8 @@ namespace Gatosyocora.MeshDeleterWithTexture
         /// <param name="array">要素の配列</param>
         /// <param name="indicesOrdered">抽出されない要素のindexの配列</param>
         /// <returns>indicesOrderedに含まれないindexの要素の配列</returns>
-        private static T[] ExtractMeshInfosWithIndices<T>(T[] array, List<int> indicesOrdered)
-            => array.Where((v, index) => indicesOrdered.BinarySearch(index) < 0).ToArray();
+        private static IEnumerable<T> ExtractMeshInfosWithIndices<T>(T[] array, List<int> indicesOrdered)
+            => array.Where((v, index) => indicesOrdered.BinarySearch(index) < 0);
 
         private static Mesh RemoveVertices(Mesh mesh, List<int> deleteIndexsOrdered)
         {
