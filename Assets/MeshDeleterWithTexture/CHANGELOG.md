@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.1] - 2021-11-22
+### Fixed
+- Unity 2018系で発生するエラーを修正
+
 ## [0.8.0] - 2021-09-25
 ### Added
 - ペンで書いて範囲選択する機能を追加
@@ -122,7 +126,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - ツールを公開
 
-[Unreleased]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.8.1...HEAD
+[0.7.1]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.8.0...v0.8.1
 [0.7.1]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.7.1...v0.8.0
 [0.7.1]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.6.3...v0.7.0
