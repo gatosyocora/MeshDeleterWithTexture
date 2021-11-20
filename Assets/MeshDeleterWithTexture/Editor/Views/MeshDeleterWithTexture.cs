@@ -86,7 +86,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 );
             }
 
-            EditorGUILayout.Space(20);
+            GUILayout.Space(20);
 
             using (new EditorGUILayout.HorizontalScope())
             {
