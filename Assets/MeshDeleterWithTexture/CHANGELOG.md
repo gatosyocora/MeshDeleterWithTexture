@@ -6,6 +6,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.1] - 2021-11-22
+### Fixed
+- Unity 2018系で発生するエラーを修正
+
+## [0.8.0] - 2021-09-25
+### Added
+- ペンで書いて範囲選択する機能を追加
+- 範囲選択した部分を塗りつぶす機能を追加
+- 範囲選択した部分を反転する機能を追加
+- 直線モードを追加
+### Changed
+- ペンや消しゴムの線を滑らかになるように変更
+- 消しゴム選択時にカーソルが専用のデザインに変わるようにした
+- 塗りつぶしを反転する機能を高速化
+- 塗りつぶしを反転させたときに塗る色を指定できるように変更
+- ドラッグ&ドロップ部分のダークテーマ対応のために実装を変更（まだ直っていない）
+- コードの可読性向上のためのいくつかのリファクタリングを実施
+- 色選択部分のテキストの文字を変更
+### Fixed
+- テクスチャを変更したときにカーソルのサイズが変わっていなかった不具合を修正
+
 ## [0.7.1] - 2021-09-05
 ### Fixed
 - 拡大時にカーソルがずれる不具合を修正
@@ -105,7 +126,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - ツールを公開
 
-[Unreleased]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.7.1...HEAD
+[Unreleased]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.8.1...HEAD
+[0.7.1]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.8.0...v0.8.1
+[0.7.1]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.7.1...v0.8.0
 [0.7.1]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.6.3...v0.7.0
 [0.6.3]: https://github.com/gatosyocora/MeshDeleterWithTexture/compare/v0.6.2...v0.6.3

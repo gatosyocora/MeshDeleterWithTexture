@@ -1,0 +1,95 @@
+﻿#pragma kernel CSPen
+#pragma kernel CSEraser
+#pragma kernel CSInverseFill
+#pragma kernel CSMarkArea
+
+Texture2D<float4> Tex;
+RWStructuredBuffer<int> Result;
+RWTexture2D<float4> PreviewTex;
+RWStructuredBuffer<int> MarkAreaBuffer;
+
+int Width;
+int Height;
+int Pos[2];
+int PreviousPos[2];
+
+float4 PenColor;
+int PenSize;
+
+CGPROGRAM
+#include "draw.cginc"
+ENDCG
+
+[numthreads(32,32,1)]
+void CSPen (uint2 id : SV_DispatchThreadID)
+{
+	bool result;
+	
+	int index = id.y * Width + id.x;
+
+	int2 currentPos = int2(Pos[0], Pos[1]);
+	if (distance(currentPos, id) <= PenSize) {
+		PreviewTex[id.xy] = PenColor;
+		Result[index] = true;
+	}
+
+	if (PreviousPos[0] == -1) return;
+
+	int2 previousPos = int2(PreviousPos[0], PreviousPos[1]);
+
+	// 前回と今回の点を繋いだ線分上だったら塗る
+	if (isOnLine(previousPos.xy, currentPos, id, PenSize, Width)) {
+		PreviewTex[id] = PenColor;
+		Result[index] = true;
+	}
+}
+
+[numthreads(32,32,1)]
+void CSEraser (uint2 id : SV_DispatchThreadID)
+{
+	bool result;
+	
+	int index = id.y * Width + id.x;
+
+	int2 currentPos = int2(Pos[0], Pos[1]);
+	if (distance(currentPos, id) <= PenSize) {
+		PreviewTex[id.xy] = Tex[id.xy];
+		Result[index] = false;
+	}
+		
+	if (PreviousPos[0] == -1) return;
+
+	int2 previousPos = int2(PreviousPos[0], PreviousPos[1]);
+
+	// 前回と今回の点を繋いだ線分上だったら消す
+	if (isOnLine(previousPos.xy, currentPos, id, PenSize, Width)) {
+		PreviewTex[id] = Tex[id.xy];
+		Result[index] = false;
+	}
+}
+
+[numthreads(32, 32, 1)]
+void CSInverseFill(uint2 id : SV_DispatchThreadID)
+{
+	int index = id.y * Width + id.x;
+
+	if (Result[index] == false) {
+		PreviewTex[id.xy] = PenColor;
+		Result[index] = true;
+	}
+	else {
+		PreviewTex[id.xy] = Tex[id.xy];
+		Result[index] = false;
+	}
+}
+
+[numthreads(32, 32, 1)]
+void CSMarkArea(uint2 id : SV_DispatchThreadID)
+{
+	int index = id.y * Width + id.x;
+
+	if (MarkAreaBuffer[index] == 0) return;
+
+	PreviewTex[id.xy] = PenColor;
+	Result[index] = true;
+}

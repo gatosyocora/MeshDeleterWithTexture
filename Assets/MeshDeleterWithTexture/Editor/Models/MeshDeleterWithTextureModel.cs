@@ -12,6 +12,9 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
 {
     public class MeshDeleterWithTextureModel : IDisposable
     {
+        private const string MESH_SUFFIX = "_deleteMesh";
+
+
         private MaterialInfo[] matInfos;
         public int materialInfoIndex = 0;
 
@@ -75,7 +78,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             var textureSize = new Vector2Int(texture.width, texture.height);
             var (deletedMesh, hadDeletedSubMeshes) = MeshDeleter.RemoveTriangles(mesh, deletePos, textureSize, materialIndexList);
 
-            if (meshName == "") meshName = mesh.name + "_deleteMesh";
+            if (meshName == "") meshName = mesh.name + MESH_SUFFIX;
             AssetDatabase.CreateAsset(deletedMesh, AssetDatabase.GenerateUniqueAssetPath(Path.Combine(saveFolder, $"{meshName}.asset")));
             AssetDatabase.SaveAssets();
 
@@ -108,7 +111,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             defaultMaterials = RendererUtility.GetMaterials(renderer);
             matInfos = RendererUtility.GetMaterialInfos(renderer);
             textureNames = matInfos.Select(x => x.Name).ToArray();
-            meshName = StringUtility.AddKeywordToEnd(mesh.name, "_deleteMesh");
+            meshName = StringUtility.AddKeywordToEnd(mesh.name, MESH_SUFFIX);
         }
 
         private void ResetMaterialsToDefault(Renderer renderer) 
@@ -180,6 +183,32 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             previousMaterials = null;
 
             Initialize(canvasView, false);
+        }
+
+        // TODO: Sceneファイルを保存してから実行する必要がある
+        public void DeleteUnUsedMeshes()
+        {
+            // 本ツールで作成したMeshをSuffixを元に取得する
+            var createdMeshPaths = AssetDatabase.FindAssets($"t:Mesh {MESH_SUFFIX}")
+                .Select(guid => AssetDatabase.GUIDToAssetPath(guid));
+
+            // AssetsフォルダにあるAssetが使用しているAssetのパス一覧を取得する（Sceneファイルも含む）
+            // 依存関係があるファイルが1つの場合、それは自分自身なので場外
+            var dependenciesPaths = AssetDatabase.GetAllAssetPaths()
+                .Select(assetPath => AssetDatabase.GetDependencies(assetPath, true))
+                .Where(paths => paths.Length > 1)
+                .ToArray();
+
+            var foundMeshPaths = createdMeshPaths
+                .Where(path => !dependenciesPaths.Any(paths => paths.Contains(path)))
+                .ToArray();
+
+            foreach (var path in foundMeshPaths)
+            {
+                // TODO: このファイルに対して削除処理をおこなう
+                Debug.Log(path);
+                //UnityEngine.Object.DestroyImmediate(AssetDatabase.LoadAssetAtPath(path));
+            }
         }
 
         public void OnDeleteMeshButtonClicked(CanvasView canvasView)

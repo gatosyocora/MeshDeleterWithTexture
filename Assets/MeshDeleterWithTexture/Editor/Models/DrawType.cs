@@ -8,5 +8,6 @@ namespace Gatosyocora.MeshDeleterWithTexture
     {
         PEN,
         ERASER,
+        SELECT
     }
 }

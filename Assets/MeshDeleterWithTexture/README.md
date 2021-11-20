@@ -13,48 +13,55 @@
 3. "Renderer"に削除したい箇所を持つメッシュのオブジェクトを設定する（SkinnedMeshRendererコンポーネントがついたオブジェクト）
 4. "Texture(Material)"のテクスチャ名を選択して削除したい箇所を持つテクスチャを選択する
 5. 以下の操作をおこなって削除したい箇所を指定する
-   - "DrawType"を"Pen"にするように選択してテクスチャの削除したいところを塗りつぶす
-   - "Eraser"を選択することで一部の塗りつぶしを消したり, "Clear All Drawing"ですべての塗りつぶしを削除したりできる
-   - "Pen/Eraser size"を変更することでペンの大きさを変えられる
-   - 塗りつぶしの際にマウスのホイールを動かしたり, "Scale"を変更することでテクスチャ表示画面の拡大縮小ができる
+   - "DrawType:描画ツール"を"Pen:ペン"にするように選択してテクスチャの削除したいところを塗りつぶす
+   - "Eraser:消しゴム"を選択することで一部の塗りつぶしを消したり, "Clear All Drawing:塗りをすべて消す"ですべての塗りつぶしを削除したりできる
+   - "Select:選択"を選択することで線で囲った範囲を選択できる。"Apply SelectArea:選択範囲を塗る"で選択中の範囲を塗りつぶしできる
+   - "Pen/Eraser size:ペン/消しゴム 大きさ"を変更することでペンの大きさを変えられる
+   - 塗りつぶしの際にマウスのホイールを動かしたり, "Scale:拡大/縮小"を変更することでテクスチャ表示画面の拡大縮小ができる
    - 右クリックをしながらマウスを動かすことで表示箇所を移動できる
-6. 削除したい箇所の塗りつぶしが終わったら"Output Mesh"の"SaveFolder"と"Name"でメッシュ書き出しの設定をおこなう
-7. "Delete Mesh"を押すと塗りつぶしの場所に対応した箇所を削除したメッシュが書き出され, 自動的に設定される
+6. 削除したい箇所の塗りつぶしが終わったら"Output Mesh:書き出すメッシュ"の"SaveFolder:保存するフォルダ"と"Name:名前"でメッシュ書き出しの設定をおこなう
+7. "Delete Mesh:メッシュを削除"を押すと塗りつぶしの場所に対応した箇所を削除したメッシュが書き出され, 自動的に設定される
 
 ## その他機能
 
-### Revert
+### Revert:メッシュ変形の取り消し
 
 - メッシュ削除後, Ctrl+Zでメッシュ削除前に戻せる
 - SkinnedMeshRendererのMeshから別のメッシュに変更できる
-- "Revert Mesh to Prefab"でfbxまたはPrefabに設定されているデフォルトのメッシュに戻せる
-- "Revert Mesh to previously"で削除前のメッシュに戻せる
+- "Revert Mesh to Prefab:プレハブのメッシュに戻す"でfbxまたはPrefabに設定されているデフォルトのメッシュに戻せる
+- "Revert Mesh to previously:ひとつ前のメッシュに戻す"で削除前のメッシュに戻せる
 
-### DeleteMask
+### DeleteMask:削除マスク
 
-- "Import DeleteMask"は削除したい箇所をマスク画像で指定できる
+- "Import DeleteMask:削除用テクスチャを読み込む"は削除したい箇所をマスク画像で指定できる
   - マスク画像はテクスチャと同じ大きさで黒の部分が塗りつぶされる
   - 現在, png形式とjpg形式に対応
-- "Export DeleteMask"で塗りつぶした箇所を黒色, それ以外を白色としたマスク画像をpng形式で出力できる
-- "Drag & Drop DeleteMeskTexture"にマスク画像をドラッグアンドドロップしても読み込める
+- "Export DeleteMask:削除用テクスチャを書き出す"で塗りつぶした箇所を黒色, それ以外を白色としたマスク画像をpng形式で出力できる
+- "Drag & Drop DeleteMeskTexture:削除用テクスチャをドラッグ$ドロップ"にマスク画像をドラッグアンドドロップしても読み込める
   - 現在はpngとjpgに対応している
 
-### UVMap
+### UVMap:UVマップ
 
-- "Export UVMap"でUVマップテクスチャを出力できる
-- "UVMap LineColor"でUVマップの線の色を変更できる
+- "Export UVMap:UVマップを書き出す"でUVマップテクスチャを出力できる
+- "UVMap LineColor:UVマップ線色"でUVマップの線の色を変更できる
 
-### Inverse
+### Inverse:反転
 
-- "Inverse FillArea"で塗りつぶされた箇所が反転する
+- "Inverse FillArea:塗りを反転"で塗りつぶされた箇所が反転する
   - 塗られている箇所->塗られていない
   - 塗られていない箇所->塗られている
 
-### Undo
+### Undo:塗り操作の取り消し
 
-- "Undo Drawing"でPenでの塗りつぶしやInverse FillArea, Clear All Drawingを実行前の状態に戻せる
-  - Zキーでもこの機能を使用
+- "Undo Drawing:塗りをひとつ戻す"でPenでの塗りつぶしやInverse FillArea, Clear All Drawingを実行前の状態に戻せる
+  - Ctrl+Zキーでもこの機能を使用
   - 最大10回までさかのぼれる
+
+### Straight Line:直線
+
+- 直線の線を引くことができる
+  - 左右いずれかのShift押しながら線を引くことでできる
+  - ペンだけでなく消しゴム、範囲選択モードでも使用可能
 
 
 
@@ -98,7 +105,7 @@ https://github.com/gatosyocora/MeshDeleterWithTexture.git?path=/Assets/MeshDelet
 
 ## 動作保証環境
 
-Unity 2019.4.29f1
+Unity 2019.4.31f1
 
 ## 更新履歴
 

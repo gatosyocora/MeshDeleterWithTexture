@@ -1,0 +1,107 @@
+﻿#pragma kernel CSAddPoint
+#pragma kernel CSAddLine
+#pragma kernel CSFill
+#pragma kernel CSClear
+#pragma kernel CSInverseFill
+
+RWStructuredBuffer<int> Result;
+RWTexture2D<float4> SelectAreaTex;
+
+float4 PreviousPoint;
+float4 NewPoint;
+
+float4 Point1;
+float4 Point2;
+
+StructuredBuffer<float4> Points;
+
+int PointCount;
+
+int PenSize;
+
+int Width;
+
+CGPROGRAM
+#include "draw.cginc"
+ENDCG
+
+[numthreads(32, 32, 1)]
+void CSAddPoint(uint2 id : SV_DispatchThreadID)
+{
+    // 半径PenSize範囲内だったら塗る
+    if (distance(id, NewPoint.xy) <= PenSize) {
+        SelectAreaTex[id] = float4(1, 1, 1, 1);
+        Result[id.y * Width + id.x] = true;
+        return;
+    }
+
+    if (PreviousPoint.x == -1) return;
+
+    // 前回と今回の点を繋いだ線分上だったら塗る
+    if (isOnLine(PreviousPoint.xy, NewPoint.xy, id, PenSize, Width)) {
+        SelectAreaTex[id] = float4(1, 1, 1, 1);
+        Result[id.y * Width + id.x] = true;
+    }
+}
+
+[numthreads(32, 32, 1)]
+void CSAddLine(uint2 id : SV_DispatchThreadID)
+{
+    if (Point1.x == -1 || Point2.x == -1) return;
+
+    if (isOnLine(Point1.xy, Point2.xy, id, PenSize, Width)) {
+        SelectAreaTex[id] = float4(1, 1, 1, 1);
+        Result[id.y * Width + id.x] = true;
+    }
+}
+
+[numthreads(32, 32, 1)]
+void CSFill(int2 id : SV_DispatchThreadID)
+{
+    int count = 0;
+
+    // すべての線分と何回交差するか調べる
+    for (int i = 0; i < PointCount; i++) {
+        int j = i + 1;
+        if (j >= PointCount) {
+            j = 0;
+        }
+
+        float2 a = Points[i].xy;
+        float2 b = Points[j].xy;
+        float2 c = id;
+        float2 d = float2(Width + 1, id.y);
+
+        if (isCountUp(a, b, c, d)) {
+            count++;
+        }
+    }
+
+    // 線分との交差回数が奇数なら塗る
+    if (fmod(count, 2) == 1) {
+        SelectAreaTex[id] = float4(1, 1, 1, 1);
+        Result[id.y * Width + id.x] = true;
+    }
+}
+
+[numthreads(32, 32, 1)]
+void CSClear(int2 id : SV_DispatchThreadID)
+{
+    SelectAreaTex[id] = float4(0, 0, 0, 1);
+    Result[id.y * Width + id.x] = false;
+}
+
+[numthreads(32, 32, 1)]
+void CSInverseFill(uint2 id : SV_DispatchThreadID)
+{
+    int index = id.y * Width + id.x;
+
+    if (Result[index] == false) {
+        SelectAreaTex[id] = float4(1, 1, 1, 1);
+        Result[index] = true;
+    }
+    else {
+        SelectAreaTex[id] = float4(0, 0, 0, 1);
+        Result[index] = false;
+    }
+}

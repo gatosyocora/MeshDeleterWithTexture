@@ -12,6 +12,12 @@ namespace Gatosyocora.MeshDeleterWithTexture
 {
     public class UVMapCanvas
     {
+        private const string CS_VARIABLE_UVMAP = "UVMap";
+        private const string CS_VARIABLE_WIDTH = "Width";
+        private const string CS_VARIABLE_HEIGHT = "Height";
+        private const string CS_VARIABLE_TRIANGLES = "Triangles";
+        private const string CS_VARIABLE_UVS = "UVs";
+
         private Material editMat;
 
         private Texture2D uvMapTexture;
@@ -88,11 +94,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
             triangleBuffer.SetData(triangles);
             uvBuffer.SetData(uvs);
 
-            cs.SetTexture(kernel, "UVMap", uvMapRT);
-            cs.SetInt("Width", texture.width);
-            cs.SetInt("Height", texture.height);
-            cs.SetBuffer(kernel, "Triangles", triangleBuffer);
-            cs.SetBuffer(kernel, "UVs", uvBuffer);
+            cs.SetTexture(kernel, CS_VARIABLE_UVMAP, uvMapRT);
+            cs.SetInt(CS_VARIABLE_WIDTH, texture.width);
+            cs.SetInt(CS_VARIABLE_HEIGHT, texture.height);
+            cs.SetBuffer(kernel, CS_VARIABLE_TRIANGLES, triangleBuffer);
+            cs.SetBuffer(kernel, CS_VARIABLE_UVS, uvBuffer);
 
             cs.Dispatch(kernel, triangles.Count() / 3, 1, 1);
 
