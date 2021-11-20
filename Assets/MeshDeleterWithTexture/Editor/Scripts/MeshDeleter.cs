@@ -134,16 +134,16 @@ namespace Gatosyocora.MeshDeleterWithTexture
             var nonDeleteUV3s = ExtractMeshInfosWithIndices(mesh.uv3, deleteIndexsOrdered);
             var nonDeleteUV4s = ExtractMeshInfosWithIndices(mesh.uv4, deleteIndexsOrdered);
 
-            deletedMesh.SetVertices(nonDeleteVertices);
-            deletedMesh.boneWeights = nonDeleteWeights;
-            deletedMesh.SetNormals(nonDeleteNormals);
-            deletedMesh.SetTangents(nonDeleteTangents);
-            deletedMesh.SetColors(nonDeleteColors);
-            deletedMesh.SetColors(nonDeleteColor32s);
-            deletedMesh.SetUVs(0, nonDeleteUVs);
-            deletedMesh.SetUVs(1, nonDeleteUV2s);
-            deletedMesh.SetUVs(2, nonDeleteUV3s);
-            deletedMesh.SetUVs(3, nonDeleteUV4s);
+            deletedMesh.SetVertices(nonDeleteVertices.ToList());
+            deletedMesh.boneWeights = nonDeleteWeights.ToArray();
+            deletedMesh.SetNormals(nonDeleteNormals.ToList());
+            deletedMesh.SetTangents(nonDeleteTangents.ToList());
+            deletedMesh.SetColors(nonDeleteColors.ToList());
+            deletedMesh.SetColors(nonDeleteColor32s.ToList());
+            deletedMesh.SetUVs(0, nonDeleteUVs.ToList());
+            deletedMesh.SetUVs(1, nonDeleteUV2s.ToList());
+            deletedMesh.SetUVs(2, nonDeleteUV3s.ToList());
+            deletedMesh.SetUVs(3, nonDeleteUV4s.ToList());
 
             return deletedMesh;
         }
@@ -243,9 +243,9 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 var deltaNonDeleteTangentsList = ExtractMeshInfosWithIndices(deltaTangents, deleteIndexsOrdered);
 
                 deletedMesh.AddBlendShapeFrame(blendShapeName, frameWeight,
-                    deltaNonDeleteVerteicesList,
-                    deltaNonDeleteNormalsList,
-                    deltaNonDeleteTangentsList);
+                    deltaNonDeleteVerteicesList.ToArray(),
+                    deltaNonDeleteNormalsList.ToArray(),
+                    deltaNonDeleteTangentsList.ToArray());
             }
 
             return deletedMesh;
