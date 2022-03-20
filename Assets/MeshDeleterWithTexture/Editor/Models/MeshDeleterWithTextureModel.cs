@@ -117,6 +117,20 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         private void ResetMaterialsToDefault(Renderer renderer) 
             => RendererUtility.SetMaterials(renderer, defaultMaterials);
 
+        private bool SetFbxReadWriteEnabledIfNeeded(Renderer renderer)
+        {
+            var mesh = RendererUtility.GetMesh(renderer);
+            var path = AssetDatabase.GetAssetPath(mesh);
+
+            if (!path.EndsWith(".fbx", true, null)) return false;
+
+            var importer = ModelImporter.GetAtPath(path) as ModelImporter;
+            importer.isReadable = true;
+            importer.SaveAndReimport();
+
+            return true;
+        }
+
         public void OnChangeRenderer(CanvasView canvasView, Renderer newRenderer)
         {
             if (defaultMaterials != null)
@@ -214,6 +228,9 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         public void OnDeleteMeshButtonClicked(CanvasView canvasView)
         {
             ResetMaterialsToDefault(renderer);
+
+            // fbxのRead Write/Enabledが有効でないとメッシュのverticesなどにアクセスできない
+            SetFbxReadWriteEnabledIfNeeded(renderer);
 
             var deletePos = canvasView.GetDeleteData();
             var hadDeletedSubMesh = DeleteMesh(renderer, deletePos, matInfos[materialInfoIndex]);
