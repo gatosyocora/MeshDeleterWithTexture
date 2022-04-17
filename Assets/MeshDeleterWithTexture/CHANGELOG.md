@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.2] - 2022-04-17
+### Fixed
+- Read Write Enabledがfalseになっている3Dモデルで削除時に塗りつぶしていない箇所も削除される不具合を修正
+
 ## [0.8.1] - 2021-11-22
 ### Fixed
 - Unity 2018系で発生するエラーを修正
