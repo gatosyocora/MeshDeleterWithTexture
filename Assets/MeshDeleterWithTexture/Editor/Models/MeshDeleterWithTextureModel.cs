@@ -125,6 +125,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
             if (!path.EndsWith(".fbx", true, null)) return false;
 
             var importer = ModelImporter.GetAtPath(path) as ModelImporter;
+            if (importer.isReadable) return false;
             importer.isReadable = true;
             importer.SaveAndReimport();
 
