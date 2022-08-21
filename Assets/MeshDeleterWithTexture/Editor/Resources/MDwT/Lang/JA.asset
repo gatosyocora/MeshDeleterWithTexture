@@ -51,3 +51,4 @@ MonoBehaviour:
   errorDialogTitleText: "\u30A8\u30E9\u30FC\u304C\u767A\u751F\u3057\u307E\u3057\u305F"
   notFoundVerticesExceptionDialogMessageText: "\u524A\u9664\u3059\u308B\u9802\u70B9\u304C\u898B\u3064\u304B\u308A\u307E\u305B\u3093\u3067\u3057\u305F\u3002"
   errorDialogOkText: "\u4E86\u89E3"
+  helpButtonText: "\u30D8\u30EB\u30D7"
