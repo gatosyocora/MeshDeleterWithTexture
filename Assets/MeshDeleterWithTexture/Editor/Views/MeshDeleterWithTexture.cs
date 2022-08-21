@@ -21,6 +21,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
     public class MeshDeleterWithTexture : EditorWindow
     {
         private const float CANVAS_SIZE_RAITO = 0.6f;
+        private const string HELP_PAGE_URL = "http://cream-period-a2e.notion.site/e14c9dda72d343b49c94f8f1b40fc351";
 
         private CanvasView canvasView;
         private ToolView toolView;
@@ -83,6 +84,12 @@ namespace Gatosyocora.MeshDeleterWithTexture
                     localizedText.SelectedLanguage,
                     language => OnLanguagePopupChanged(language),
                     GUILayout.Width(50)
+                );
+
+                GatoGUILayout.Button(
+                    "ヘルプ",
+                    () => OpenHelpPage(),
+                    GUILayout.Width(80f)
                 );
             }
 
@@ -147,6 +154,11 @@ namespace Gatosyocora.MeshDeleterWithTexture
         {
             localizedText.SetLanguage(language);
             toolView.OnChangeLanguage(localizedText);
+        }
+
+        private void OpenHelpPage()
+        {
+            Application.OpenURL(HELP_PAGE_URL);
         }
     }
 #endif
