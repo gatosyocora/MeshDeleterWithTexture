@@ -87,7 +87,7 @@ namespace Gatosyocora.MeshDeleterWithTexture
                 );
 
                 GatoGUILayout.Button(
-                    "ヘルプ",
+                    localizedText.Data.helpButtonText,
                     () => OpenHelpPage(),
                     GUILayout.Width(80f)
                 );

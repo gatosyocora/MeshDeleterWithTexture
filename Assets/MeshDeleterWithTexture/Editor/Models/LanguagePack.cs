@@ -58,5 +58,7 @@ namespace Gatosyocora.MeshDeleterWithTexture.Models
         public string errorDialogTitleText = "Error has occurred";
         public string notFoundVerticesExceptionDialogMessageText = "Not found vertices to delete.";
         public string errorDialogOkText = "OK";
+
+        public string helpButtonText = "Help";
     }
 }
