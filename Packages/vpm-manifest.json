@@ -5,6 +5,9 @@
     },
     "com.vrchat.core.vpm-resolver": {
       "version": "0.1.17"
+    },
+    "com.vrchat.core.bootstrap": {
+      "version": "0.1.15"
     }
   },
   "locked": {
@@ -13,6 +16,9 @@
     },
     "com.vrchat.core.vpm-resolver": {
       "version": "0.1.17"
+    },
+    "com.vrchat.core.bootstrap": {
+      "version": "0.1.15"
     }
   }
 }
