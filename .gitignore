@@ -59,4 +59,4 @@ sysinfo.txt
 crashlytics-build.properties
 
 Assets/*
-!Packages/net.gatosyocora.meshDeleterWithTexture
+!Assets/MeshDeleterWithTexture

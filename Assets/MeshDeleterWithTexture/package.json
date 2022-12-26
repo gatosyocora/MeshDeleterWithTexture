@@ -1,0 +1,18 @@
+{
+  "name": "com.gatosyocora.mesh-deleter-with-texture",
+  "version": "0.8.2",
+  "displayName": "Mesh Deleter with Texture",
+  "description": "Editor extension to remove polygons by filling texture",
+  "unity": "2019.4",
+ "keywords": [
+    "Editor Extension",
+    "Mesh",
+    "Skinned Mesh Renderer",
+    "Mesh Renderer"
+  ],
+  "author": {
+    "name": "gatosyocora",
+    "email": "gatosyocora36@gmail.com",
+    "url": "https://github.com/gatosyocora/MeshDeleterWithTexture"
+  }
+}
