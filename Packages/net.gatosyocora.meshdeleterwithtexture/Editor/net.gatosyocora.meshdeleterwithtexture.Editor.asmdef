@@ -1,14 +1,17 @@
 {
-  "name": "net.gatosyocora.meshdeleterwithtexture.Editor",
-  "references": [
-    "net.gatosyocora.meshdeleterwithtexture"
-  ],
-  "includePlatforms": [],
-  "excludePlatforms": [],
-  "allowUnsafeCode": false,
-  "autoReferenced": true,
-  "overrideReferences": false,
-  "precompiledReferences": [],
-  "defineConstraints": [],
-  "optionalUnityReferences": []
+    "name": "net.gatosyocora.meshdeleterwithtexture.Editor",
+    "references": [
+        "net.gatosyocora.meshdeleterwithtexture"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }
