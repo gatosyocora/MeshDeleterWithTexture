@@ -3,7 +3,7 @@ name: Build Release
 on: 
   workflow_dispatch:
   push:
-    tags: "v**"
+    tags: "v*"
 
 env:
   packageName: "net.gatosyocora.meshdeleterwithtexture"
@@ -15,18 +15,15 @@ jobs:
     
       - name: Checkout
         uses: actions/checkout@v3
-    
-      - name: get version
-        id: version
-        uses: notiz-dev/github-action-json-property@7c8cf5cc36eb85d8d287a8086a39dac59628eb31
-        with: 
-            path: "Packages/${{env.packageName}}/package.json"
-            prop_path: "version"
+
+      - name: get tag
+        id: tag
+        run: echo ${GITHUB_REF##*/}
     
       - name: Set Environment Variables
         run: |
-          echo "zipFile=${{ env.packageName }}_v${{ steps.version.outputs.prop }}".zip >> $GITHUB_ENV
-          echo "unityPackage=${{ env.packageName }}_v${{ steps.version.outputs.prop }}.unitypackage" >> $GITHUB_ENV
+          echo "zipFile=MeshDeleterWithTexture_${{ steps.tag.outputs.prop }}".zip >> $GITHUB_ENV
+          echo "unityPackage=MeshDeleterWithTexture_${{ steps.tag.outputs.prop }}.unitypackage" >> $GITHUB_ENV
         
       - name: Create Zip
         uses: thedoctor0/zip-release@09336613be18a8208dfa66bd57efafd9e2685657
@@ -42,12 +39,17 @@ jobs:
         with:
           package-path: ${{ env.unityPackage }}
           include-files: metaList
-        
+
+      - name: version
+        id: version
+        run: echo "${{ steps.tag.outputs.prop }}" | sed -e "s/v//g" >> $GITHUB_ENV
         
       - name: Make Release
         uses: softprops/action-gh-release@1e07f4398721186383de40550babbdf2b84acfc5
         with:
-          tag_name: "v${{ steps.version.outputs.prop }}"
+          name: ${{ steps.tag.version.prop }}
+          tag_name: ${{ steps.tag.outputs.prop }}
           files: |
             ${{ env.zipFile }}
             ${{ env.unityPackage }}
+            Packages/${{ env.packageName }}/package.json
