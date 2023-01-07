@@ -25,8 +25,8 @@ jobs:
     
       - name: Set Environment Variables
         run: |
-          echo "zipFile=${{ env.packageName }}_v${{ steps.version.outputs.prop }}".zip >> $GITHUB_ENV
-          echo "unityPackage=${{ env.packageName }}_v${{ steps.version.outputs.prop }}.unitypackage" >> $GITHUB_ENV
+          echo "zipFile=MeshDeleterWithTexture_v${{ steps.version.outputs.prop }}".zip >> $GITHUB_ENV
+          echo "unityPackage=MeshDeleterWithTexture_v${{ steps.version.outputs.prop }}.unitypackage" >> $GITHUB_ENV
         
       - name: Create Zip
         uses: thedoctor0/zip-release@09336613be18a8208dfa66bd57efafd9e2685657
