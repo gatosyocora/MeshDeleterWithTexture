@@ -41,12 +41,12 @@ jobs:
 
       - name: version
         id: version
-        run: echo "${{env.tag}}" | sed -e "s/v//g" >> $GITHUB_ENV
+        run: echo "version=${{env.tag}}" | sed -e "s/v//g" >> $GITHUB_ENV
         
       - name: Make Release
         uses: softprops/action-gh-release@1e07f4398721186383de40550babbdf2b84acfc5
         with:
-          name: ${{ steps.tag.version.prop }}
+          name: ${{env.version}}
           tag_name: ${{env.tag}}
           files: |
             ${{ env.zipFile }}
