@@ -3,7 +3,7 @@ name: Build Release
 on: 
   workflow_dispatch:
   push:
-    tags: "v**"
+    tags: "v*"
 
 env:
   packageName: "net.gatosyocora.meshdeleterwithtexture"
