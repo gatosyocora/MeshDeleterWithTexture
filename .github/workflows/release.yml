@@ -40,8 +40,9 @@ jobs:
           include-files: metaList
 
       - name: version
-        id: version
-        run: echo "version=${{env.tag/v/}}" >> $GITHUB_ENV
+        run: |
+          tag=${{env.tag}}
+          echo "version=${tag/v/}" >> $GITHUB_ENV
         
       - name: Make Release
         uses: softprops/action-gh-release@1e07f4398721186383de40550babbdf2b84acfc5
