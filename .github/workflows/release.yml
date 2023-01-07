@@ -48,6 +48,7 @@ jobs:
         with:
           name: ${{env.version}}
           tag_name: ${{env.tag}}
+          generate_release_notes: true
           files: |
             ${{ env.zipFile }}
             ${{ env.unityPackage }}
