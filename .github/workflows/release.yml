@@ -17,13 +17,12 @@ jobs:
         uses: actions/checkout@v3
 
       - name: get tag
-        id: tag
-        run: echo ${GITHUB_REF##*/}
+        run: echo "tag=${GITHUB_REF##*/}" >> $GITHUB_ENV
     
       - name: Set Environment Variables
         run: |
-          echo "zipFile=MeshDeleterWithTexture_${{ steps.tag.outputs.prop }}".zip >> $GITHUB_ENV
-          echo "unityPackage=MeshDeleterWithTexture_${{ steps.tag.outputs.prop }}.unitypackage" >> $GITHUB_ENV
+          echo "zipFile=MeshDeleterWithTexture_${{env.tag}}".zip >> $GITHUB_ENV
+          echo "unityPackage=MeshDeleterWithTexture_${{env.tag}}.unitypackage" >> $GITHUB_ENV
         
       - name: Create Zip
         uses: thedoctor0/zip-release@09336613be18a8208dfa66bd57efafd9e2685657
@@ -42,13 +41,13 @@ jobs:
 
       - name: version
         id: version
-        run: echo "${{ steps.tag.outputs.prop }}" | sed -e "s/v//g" >> $GITHUB_ENV
+        run: echo "${{env.tag}}" | sed -e "s/v//g" >> $GITHUB_ENV
         
       - name: Make Release
         uses: softprops/action-gh-release@1e07f4398721186383de40550babbdf2b84acfc5
         with:
           name: ${{ steps.tag.version.prop }}
-          tag_name: ${{ steps.tag.outputs.prop }}
+          tag_name: ${{env.tag}}
           files: |
             ${{ env.zipFile }}
             ${{ env.unityPackage }}
